@@ -1,3 +1,3 @@
 # about
 
-About me and stuff I've done.
+About me and stuff I've done
