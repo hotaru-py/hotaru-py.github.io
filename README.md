@@ -1,2 +1,3 @@
 # about
-About me and Portfolio stuff :3
+
+About me and stuff I've done.
