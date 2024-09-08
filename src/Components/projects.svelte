@@ -18,7 +18,7 @@
         <span
           class="text-2xl p-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
-          [ This website <span class="italic">(duh)</span> ]
+          [ This website <span class="italic">(duh)</span> ] - WIP
         </span>
       </a>
     </div>
@@ -32,7 +32,7 @@
         <span
           class="text-2xl p-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
-          [ Starboard (WIP) - Private ]
+          [ Starboard (Private) ] - WIP
         </span>
       </a>
     </div>
