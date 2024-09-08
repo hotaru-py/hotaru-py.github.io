@@ -14,6 +14,6 @@
   </p>
   <p class="text-2xl p-4">
     I’m currently an undergrad student at Shiv Nadar University Chennai,
-    pursuing my Bachelors in Artificial Intelligence and Data Science.
+    pursuing my Bachelors in Computer Science.
   </p>
 </main>
