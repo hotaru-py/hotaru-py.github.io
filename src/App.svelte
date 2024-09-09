@@ -105,11 +105,23 @@
           {/if}
         </h1>
         <div class="ml-8 flex flex-col">
-          {#if curPage != 1}
-            <button class="arrow up mt-3" on:click={upClick}></button>
+          {#if curPage == 1}
+            <button
+              class="arrow up mt-3 border-gray-400 cursor-default"
+              on:click={upClick}
+            ></button>
+          {:else}
+            <button class="arrow up mt-3 border-black" on:click={upClick}
+            ></button>
           {/if}
-          {#if curPage != 4}
-            <button class="arrow down mt-2" on:click={downClick}></button>
+          {#if curPage == 4}
+            <button
+              class="arrow down mt-2 border-gray-400 cursor-default"
+              on:click={downClick}
+            ></button>
+          {:else}
+            <button class="arrow down mt-2 border-black" on:click={downClick}
+            ></button>
           {/if}
         </div>
       </div>
