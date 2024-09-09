@@ -12,18 +12,30 @@ body {
   font-style: bold;
 }
 
-.arrow {
+.arrow-up,
+.arrow-down {
   border-width: 0 3px 3px 0;
   display: inline-block;
   padding: 6px;
+  transition: transform 0.2s ease;
 }
 
-.up {
+.arrow-up {
   transform: rotate(-135deg);
   -webkit-transform: rotate(-135deg);
 }
 
-.down {
+.arrow-down {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+.arrow-up:hover {
+  transform: scale(1.4) rotate(-135deg);
+  -webkit-transform: scale(1.4) rotate(-135deg);
+}
+
+.arrow-down:hover {
+  transform: scale(1.4) rotate(45deg);
+  -webkit-transform: scale(1.4) rotate(45deg);
 }

@@ -1,10 +1,12 @@
 <script>
+  import { onMount } from "svelte";
   import About from "./Components/about.svelte";
   import Skills from "./Components/skills.svelte";
   import Projects from "./Components/projects.svelte";
   import Reach from "./Components/reach.svelte";
-  // import Footer from "./Components/footer.svelte";
 
+  let welcomeSwipe = false;
+  let footerOn = false;
   let curPage = 1;
 
   function upClick() {
@@ -18,11 +20,18 @@
       curPage += 1;
     }
   }
+
+  onMount(() => {
+    setTimeout(() => {
+      footerOn = true;
+      welcomeSwipe = true;
+    }, 2500);
+  });
 </script>
 
 <div class="bg-[#F4F4F4] flex flex-col min-h-screen justify-between">
   {#if curPage == 1}
-    <About />
+    <About status={welcomeSwipe} />
   {:else if curPage == 2}
     <Skills />
   {:else if curPage == 3}
@@ -31,8 +40,10 @@
     <Reach />
   {/if}
 
-  <footer>
-    <div class="bg-[#000000] h-0.5 m-8"></div>
+  <footer
+    class={`transition-opacity transition-max-height duration-700 ease-in-out ${footerOn ? "opacity-100 max-h-[500px]" : "opacity-0 max-h-0 invisible"}`}
+  >
+    <div class="bg-black h-0.5 m-8"></div>
     <div class="flex m-8 mb-10 items-center justify-center">
       <div class="flex">
         <div>
@@ -107,20 +118,24 @@
         <div class="ml-8 flex flex-col">
           {#if curPage == 1}
             <button
-              class="arrow up mt-3 border-gray-400 cursor-default"
+              class="arrow-up mt-3 border-gray-400 cursor-default"
               on:click={upClick}
             ></button>
           {:else}
-            <button class="arrow up mt-3 border-black" on:click={upClick}
+            <button
+              class="arrow-up mt-3 transition border-black"
+              on:click={upClick}
             ></button>
           {/if}
           {#if curPage == 4}
             <button
-              class="arrow down mt-2 border-gray-400 cursor-default"
+              class="arrow-down mt-2 transition border-gray-400 cursor-default"
               on:click={downClick}
             ></button>
           {:else}
-            <button class="arrow down mt-2 border-black" on:click={downClick}
+            <button
+              class="arrow-down mt-2 transition border-black"
+              on:click={downClick}
             ></button>
           {/if}
         </div>

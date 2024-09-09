@@ -1,24 +1,32 @@
 <script>
   import { onMount } from "svelte";
 
+  export let status = false;
+
   let is1Replaced = false;
   let is2Replaced = false;
   let is3Replaced = false;
 
-  onMount(() => {
-    setTimeout(() => {
-      is1Replaced = true;
-    }, 800);
-    setTimeout(() => {
-      is2Replaced = true;
-    }, 1200);
-    setTimeout(() => {
-      is3Replaced = true;
-    }, 1600);
-  });
+  if (status == true) {
+    is1Replaced = true;
+    is2Replaced = true;
+    is3Replaced = true;
+  } else {
+    onMount(() => {
+      setTimeout(() => {
+        is1Replaced = true;
+      }, 1000);
+      setTimeout(() => {
+        is2Replaced = true;
+      }, 1400);
+      setTimeout(() => {
+        is3Replaced = true;
+      }, 1800);
+    });
+  }
 </script>
 
-<main class="w-1/2 mt-6 ml-8">
+<main class="w-1/2 mt-6 ml-8 transition-opacity duration-500 ease-in-out">
   <div class="p-4 group transition-all duration-800">
     <span
       class="text-2xl bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-no-repeat transition-all duration-1500 ease-out"
