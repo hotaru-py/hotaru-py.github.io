@@ -21,7 +21,7 @@
 <main class="w-1/2 mt-6 ml-8">
   <div class="p-4 group transition-all duration-800">
     <span
-      class="text-2xl bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:100%_40px] bg-no-repeat transition-all duration-1500 ease-out"
+      class="text-2xl bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-no-repeat transition-all duration-1500 ease-out"
       class:bg-[length:0%_30px]={is1Replaced}
       class:bg-[length:100%_30px]={!is1Replaced}
       class:text-black={is1Replaced}
@@ -51,7 +51,7 @@
   </div>
   <div class="p-4 group transition-all duration-800">
     <span
-      class="text-2xl bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:100%_40px] bg-no-repeat transition-all duration-1500 ease-out"
+      class="text-2xl bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-no-repeat transition-all duration-1500 ease-out"
       class:bg-[length:0%_30px]={is3Replaced}
       class:bg-[length:100%_30px]={!is3Replaced}
       class:text-black={is3Replaced}
