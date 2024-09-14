@@ -9,18 +9,19 @@
   </span><br /><br />
   <span class="text-2xl">
     I work primarily with Svelte and have used React and Next.js extensively in
-    my other projects. I make UI mockups and concepts on Figma.
+    my projects for the Frontend, which I conceptualize using Figma and
+    Inkscape.
   </span><br /><br />
   <span class="text-2xl">
-    I’ve worked with Python and FastAPI for backend, which I’m still exploring
-    as part of my migration from Frontend to Full Stack Development.
+    I’ve worked with Python and FastAPI for the backend, which I’m still
+    exploring as part of my migration from Frontend to Full Stack Development.
   </span><br /><br />
   <span class="text-2xl">
-    I’ve dabbled <span class="italic">(and still occasionally dabble)</span> in graphic
-    design, animation and digital art over the years.
+    I’ve dabbled <span class="italic">(and still dabble)</span> in graphic design,
+    animation and digital art over the years.
   </span><br /><br />
   <span class="text-2xl">
-    I’m also learning Game Development (Unreal Engine & Blender) for something
+    I’m also learning Game Development (Unreal Engine + Blender) for something
     I’ve planned in the long run, a magnum opus of sorts.
   </span>
 </main>
