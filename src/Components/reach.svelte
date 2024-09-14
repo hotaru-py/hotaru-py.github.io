@@ -1,9 +1,11 @@
-<main class="w-1/2 mt-6 ml-8">
-  <p class="text-2xl p-4">
-    I’m <span class="text-[#1B4965] font-bold"
-      >open to projects and internships</span
-    >, and to reach out to me:
-  </p>
+<main
+  class="sm:w-1/2 w-full md:mt-8 ml-8 transition-opacity duration-500 ease-in-out min-w-screen"
+>
+  <span class="text-2xl py-4">
+    I’m open to <span class="sm:hidden block"></span>
+    <span class="text-[#1B4965] font-bold">projects and internships</span>,<br
+    /> and to reach out to me:
+  </span>
   <div>
     <div class="mt-8">
       <a
@@ -13,7 +15,7 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl ml-4 p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ LinkedIn ]
         </span>
@@ -27,7 +29,7 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl ml-4 p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ E-mail ]
         </span>
@@ -41,7 +43,7 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl ml-4 p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ Resume ]
         </span>

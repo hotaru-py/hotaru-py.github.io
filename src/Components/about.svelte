@@ -26,8 +26,10 @@
   }
 </script>
 
-<main class="w-1/2 mt-6 ml-8 transition-opacity duration-500 ease-in-out">
-  <div class="p-4 group transition-all duration-800">
+<main
+  class="sm:w-1/2 w-full md:mt-8 ml-8 pr-8 transition-opacity duration-500 ease-in-out min-w-screen"
+>
+  <div class="py-4 group transition-all duration-800">
     <span
       class="text-2xl bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-no-repeat transition-all duration-1500 ease-out"
       class:bg-[length:0%_30px]={is1Replaced}
@@ -45,7 +47,7 @@
       Bachelors in Computer Science.
     </span>
   </div>
-  <div class="p-4 group transition-all duration-800">
+  <div class="py-4 group transition-all duration-800">
     <span
       class="text-2xl bg-right-bottom bg-gradient-to-l from-pink-500 to-pink-500 bg-no-repeat transition-all duration-1500 ease-out"
       class:bg-[length:0%_30px]={is2Replaced}
@@ -57,7 +59,7 @@
       up Game Development for something I’ve planned in the long run.
     </span>
   </div>
-  <div class="p-4 group transition-all duration-800">
+  <div class="py-4 group transition-all duration-800">
     <span
       class="text-2xl bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-no-repeat transition-all duration-1500 ease-out"
       class:bg-[length:0%_30px]={is3Replaced}

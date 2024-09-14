@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
 body {
   font-family: "Red Hat Display", sans-serif;
   font-optical-sizing: auto;
@@ -28,6 +36,24 @@ body {
 .arrow-down {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+.arrow-left,
+.arrow-right {
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 6px;
+  transition: transform 0.2s ease;
+}
+
+.arrow-left {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+
+.arrow-right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
 }
 
 .arrow-up:hover {

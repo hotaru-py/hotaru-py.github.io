@@ -29,7 +29,56 @@
   });
 </script>
 
-<div class="bg-[#F4F4F4] flex flex-col min-h-screen justify-between">
+<header
+  class={`bg-[#f4f4f4] md:hidden flex flex-col my-4 sticky top-0 z-50 transition-opacity duration-700 ease-in-out ${
+    footerOn ? "opacity-100" : "opacity-0 invisible"
+  }`}
+>
+  <div class="flex items-center justify-between w-full px-4">
+    <h1 class="text-2xl m-2">
+      {#if curPage == 1}
+        About me
+      {:else if curPage == 2}
+        Skills
+      {:else if curPage == 3}
+        Projects
+      {:else}
+        Reach out
+      {/if}
+    </h1>
+
+    <div class="flex">
+      {#if curPage == 1}
+        <button
+          class="arrow-left mt-1 border-gray-400 cursor-default"
+          on:click={upClick}
+        ></button>
+      {:else}
+        <button
+          class="arrow-left mt-1 transition border-black"
+          on:click={upClick}
+        ></button>
+      {/if}
+
+      {#if curPage == 4}
+        <button
+          class="arrow-right mt-1 transition border-gray-400 cursor-default ml-4"
+          on:click={downClick}
+        ></button>
+      {:else}
+        <button
+          class="arrow-right mt-1 transition border-black ml-4"
+          on:click={downClick}
+        ></button>
+      {/if}
+    </div>
+  </div>
+  <div class="w-full bg-black h-0.5 my-4 mx-2"></div>
+</header>
+
+<div
+  class="bg-[#F4F4F4] flex flex-col h-full w-full justify-between items-center md:items-start md:pl-0"
+>
   {#if curPage == 1}
     <About status={welcomeSwipe} />
   {:else if curPage == 2}
@@ -41,12 +90,18 @@
   {/if}
 
   <footer
-    class={`transition-opacity transition-max-height duration-700 ease-in-out ${footerOn ? "opacity-100 max-h-[500px]" : "opacity-0 max-h-0 invisible"}`}
+    class={`bg-[#F4F4F4] fixed bottom-0 left-0 w-full z-50 md:px-8 md:py-2 transition-opacity duration-700 ease-in-out ${
+      footerOn ? "opacity-100" : "opacity-0 invisible"
+    }`}
   >
-    <div class="bg-black h-0.5 m-8"></div>
-    <div class="flex m-8 mb-10 items-center justify-center">
-      <div class="flex">
-        <div>
+    <div class="bg-black h-0.5 m-2"></div>
+    <div
+      class="flex flex-wrap items-center justify-center sm:justify-between w-full sm:m-2 sm:mb-4 m-4 mb-4 md:mt-6 md:mx-8"
+    >
+      <div
+        class="flex flex-wrap items-center justify-center sm:justify-start w-full sm:w-auto"
+      >
+        <div class="pr-8 sm:pr-8">
           <a
             class="group transition-all duration-150"
             href="https://github.com/hotaru-hspr"
@@ -54,13 +109,13 @@
             rel="noopener noreferrer"
           >
             <span
-              class="ml-8 p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
+              class="p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
             >
               GitHub
             </span>
           </a>
         </div>
-        <div>
+        <div class="pr-8 sm:pr-8">
           <a
             class="group transition-all duration-200"
             href="https://linkedin.com/in/prajesh-raam"
@@ -68,13 +123,13 @@
             rel="noopener noreferrer"
           >
             <span
-              class="ml-8 p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
+              class="p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
             >
               LinkedIn
             </span>
           </a>
         </div>
-        <div>
+        <div class="pr-8 sm:pr-8">
           <a
             class="group transition-all duration-200"
             href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -82,13 +137,13 @@
             rel="noopener noreferrer"
           >
             <span
-              class="ml-8 p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
+              class="p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
             >
               Resume
             </span>
           </a>
         </div>
-        <div>
+        <div class="pr-8 sm:pr-8">
           <a
             class="group transition-all duration-200"
             href="mailto:stu.prajeshraam@gmail.com"
@@ -96,15 +151,15 @@
             rel="noopener noreferrer"
           >
             <span
-              class="ml-8 p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
+              class="p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
             >
               E-mail
             </span>
           </a>
         </div>
       </div>
-      <div class="ml-auto flex items-center justify-center mr-8">
-        <h1 class="text-6xl my-4">
+      <div class="hidden md:flex items-center ml-auto mr-16">
+        <h1 class="text-3xl my-4">
           {#if curPage == 1}
             About me
           {:else if curPage == 2}
@@ -115,7 +170,7 @@
             Reach out
           {/if}
         </h1>
-        <div class="ml-8 flex flex-col">
+        <div class="flex flex-col pl-8">
           {#if curPage == 1}
             <button
               class="arrow-up mt-3 border-gray-400 cursor-default"

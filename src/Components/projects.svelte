@@ -1,10 +1,8 @@
-<script>
-  import Details from "./details.svelte";
-</script>
-
-<main class="flex w-1/2 mt-6 ml-8">
+<main
+  class="sm:w-1/2 w-full md:mt-8 ml-8 transition-opacity duration-500 ease-in-out min-w-screen"
+>
   <div>
-    <div class="text-2xl p-4">
+    <div class="text-2xl py-4">
       Here are some of my
       <span class="text-[#1B4965] font-bold"> Projects: </span>
     </div>
@@ -16,7 +14,7 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl p-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl py-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ This website <span class="italic">(duh)</span> ] - WIP
         </span>
@@ -30,7 +28,7 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl p-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl py-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ Starboard (Private) ] - WIP
         </span>
@@ -44,7 +42,7 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl p-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl py-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ PhiTector ]
         </span>
@@ -58,7 +56,7 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl p-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl py-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ SkibidiGPT ]
         </span>
@@ -72,14 +70,11 @@
         rel="noopener noreferrer"
       >
         <span
-          class="text-2xl p-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
+          class="text-2xl py-4 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-400 ease-out"
         >
           [ EcoQuests ]
         </span>
       </a>
     </div>
   </div>
-  <!-- <div class="ml-auto">
-    <Details />
-  </div> -->
 </main>
