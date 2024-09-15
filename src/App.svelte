@@ -132,21 +132,7 @@
         <div class="pr-8 sm:pr-8">
           <a
             class="group transition-all duration-200"
-            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span
-              class="p-1 hover:text-[#1B4965] hover:font-bold bg-left-bottom bg-gradient-to-r from-pink-500 to-pink-500 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-200 ease-out"
-            >
-              Resume
-            </span>
-          </a>
-        </div>
-        <div class="pr-8 sm:pr-8">
-          <a
-            class="group transition-all duration-200"
-            href="mailto:stu.prajeshraam@gmail.com"
+            href="mailto:prajeshraam@gmail.com"
             target="_blank"
             rel="noopener noreferrer"
           >
