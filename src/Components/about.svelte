@@ -27,7 +27,7 @@
 </script>
 
 <main
-  class="sm:w-1/2 w-full md:mt-8 ml-8 pr-8 transition-opacity duration-500 ease-in-out min-w-screen"
+  class="sm:w-1/2 w-full md:mt-8 ml-8 pr-8 mb-32 transition-opacity duration-500 ease-in-out min-w-screen"
 >
   <div class="py-4 group transition-all duration-800">
     <span
@@ -37,8 +37,10 @@
       class:text-black={is1Replaced}
       class:text-pink-500={!is1Replaced}
     >
-      Hello, I’m <span
-        class=" font-bold"
+      <span class:visible={is1Replaced} class:invisible={!is1Replaced}>👋</span
+      >Hello, I’m
+      <span
+        class="font-bold"
         class:text-[#1B4965]={is1Replaced}
         class:text-pink-500={!is1Replaced}
       >
