@@ -104,7 +104,7 @@
         <div class="pr-8 sm:pr-8">
           <a
             class="group transition-all duration-150"
-            href="https://github.com/hotaru-hspr"
+            href="https://github.com/hotaru-py"
             target="_blank"
             rel="noopener noreferrer"
           >
