@@ -1,7 +1,7 @@
 {
-  "name": "about",
+  "name": "hotaru_portfolio",
   "private": true,
-  "version": "1.0.0",
+  "version": "25.5.1",
   "homepage": "https://hotaru-hspr.github.io",
   "type": "module",
   "scripts": {

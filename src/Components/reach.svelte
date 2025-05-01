@@ -139,13 +139,6 @@
     flex-grow: 1;
   }
 
-  .browser-description {
-    font-size: 14px;
-    color: #4a4a4a;
-    margin-bottom: 16px;
-    flex-grow: 1;
-  }
-
   .browser-link {
     font-size: 20px;
     color: #1b4965;

@@ -176,26 +176,6 @@
     flex-wrap: wrap;
   }
 
-  .project-status {
-    font-size: 12px;
-    font-weight: normal;
-    background-color: rgba(194, 239, 211, 0.5);
-    color: #2c3e50;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 8px;
-  }
-
-  .project-private {
-    font-size: 12px;
-    font-weight: normal;
-    background-color: rgba(243, 188, 188, 0.5);
-    color: #2c3e50;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 8px;
-  }
-
   .project-description {
     font-size: 14px;
     color: #4a4a4a;

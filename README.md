@@ -1,12 +1,7 @@
-# About
+# Personal Website!
 
-About me and stuff I've done & can do.
+Desktop-like (on desktop) and mobile-like (on mobile) environment for my portfolio website! (still WIP).
 
-Built with Svelte+Vite, styled with Tailwind.CSS
+## Note to self:
 
-## To-do
-
-- [x] Basic information and layout
-- [ ] Text animation
-- [ ] Project details pane on hover
-- [x] Mobile responsiveness & optimizations
+Run `npm run build; npx gh-pages -d dist` to deploy it to GitHub Pages.
