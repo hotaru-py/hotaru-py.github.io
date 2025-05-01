@@ -177,6 +177,7 @@
     border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     position: relative;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
   }
 
   .title-bar {

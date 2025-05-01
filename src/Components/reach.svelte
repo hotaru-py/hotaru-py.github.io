@@ -66,7 +66,12 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: 100%;
+    width: calc(100% + 16px); /* Compensate for the parent padding */
+    margin-left: -8px;
+    margin-right: -8px;
+    box-sizing: border-box;
+    padding: 0 16px 0 16px;
+    overflow-y: auto;
   }
 
   .contact-title {
@@ -98,14 +103,15 @@
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
     margin-bottom: 24px;
-    overflow-y: auto;
+    overflow-y: visible;
+    padding-right: 8px; /* Add extra padding for scrollbar */
   }
 
   .contact-card {
     background-color: white;
     border-radius: 12px;
     padding: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
     transition:
       transform 0.2s ease,
       box-shadow 0.2s ease;
@@ -116,7 +122,7 @@
 
   .contact-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
   }
 
   .contact-header {

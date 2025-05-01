@@ -13,6 +13,8 @@
   let windows = [];
   let activeWindowId = null;
   let closingWindowId = null;
+  let desktopWidth = 0;
+  let desktopHeight = 0;
 
   const desktopIcons = [
     { id: "about", title: "About Me", icon: "📄", component: About },
@@ -33,10 +35,19 @@
       startupComplete = true;
     }, 1000);
 
+    updateDesktopDimensions();
+    window.addEventListener("resize", updateDesktopDimensions);
+
     return () => {
       clearInterval(timer);
+      window.removeEventListener("resize", updateDesktopDimensions);
     };
   });
+
+  function updateDesktopDimensions() {
+    desktopWidth = window.innerWidth;
+    desktopHeight = window.innerHeight;
+  }
 
   function handleIconClick(iconData) {
     openWindow(iconData);
@@ -52,8 +63,8 @@
         id: iconData.id,
         title: iconData.title,
         component: iconData.component,
-        position: { x: 50 + windows.length * 30, y: 50 + windows.length * 30 },
-        size: { width: 700, height: 500 }, // Larger windows by default
+        position: { x: 150 + windows.length * 30, y: 50 + windows.length * 20 },
+        size: { width: 700, height: 500 },
       };
       windows = [...windows, newWindow];
       activeWindowId = newWindow.id;
@@ -103,7 +114,11 @@
     </div>
   {/if}
 
-  <div class="desktop-background">
+  <div
+    class="desktop-background"
+    bind:clientWidth={desktopWidth}
+    bind:clientHeight={desktopHeight}
+  >
     <div class="desktop-icons">
       {#each desktopIcons as icon, i (icon.id)}
         <div in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}>
@@ -166,9 +181,46 @@
   .desktop-icons {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 16px;
     padding: 24px;
+    height: calc(100% - 30px);
+    overflow: auto;
+  }
+
+  .desktop-icons > div {
     width: 120px;
+  }
+
+  @media (max-height: 600px) {
+    .desktop-icons {
+      flex-direction: row;
+      height: auto;
+      width: calc(100% - 48px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .desktop-icons {
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .desktop-icons > div {
+      width: 100px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .desktop-icons {
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .desktop-icons > div {
+      width: 80px;
+    }
   }
 
   .window-wrapper {

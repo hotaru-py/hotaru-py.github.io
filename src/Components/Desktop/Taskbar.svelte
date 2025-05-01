@@ -152,7 +152,7 @@
     -webkit-backdrop-filter: blur(15px);
     display: flex;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
     width: 100%;
     z-index: 1000;
     border: 1px solid rgba(255, 255, 255, 0.6);
@@ -176,16 +176,17 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
   .start-button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   }
 
   .start-button.active {
     background: linear-gradient(to right, #8bc6f4, #7ab6e4);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
     transform: translateY(1px);
   }
 
@@ -205,7 +206,7 @@
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     z-index: 1001;
@@ -284,6 +285,7 @@
     white-space: nowrap;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
   }
 
   .taskbar-window-button:hover:not(.active) {
@@ -293,6 +295,7 @@
   .taskbar-window-button.active {
     background: rgba(163, 216, 233, 0.3);
     border-color: rgba(139, 198, 244, 0.5);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   }
 
   .window-icon {

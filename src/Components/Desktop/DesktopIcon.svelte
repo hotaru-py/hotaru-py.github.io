@@ -32,7 +32,6 @@
     width: 100px;
     cursor: pointer;
     color: #2c3e50;
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
     padding: 8px;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -46,7 +45,6 @@
   .desktop-icon:focus {
     outline: none;
     background-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 0 2px rgba(139, 198, 244, 0.5);
   }
 
   .icon-container {
@@ -59,12 +57,15 @@
     background-color: rgba(255, 255, 255, 0.7);
     border-radius: 12px;
     backdrop-filter: blur(4px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease;
   }
 
   .desktop-icon:hover .icon-container {
     transform: scale(1.05);
+  }
+
+  .icon-container.active .icon {
+    box-shadow: 0 0 0 2px rgba(139, 198, 244, 0.5);
   }
 
   .icon {
@@ -81,5 +82,6 @@
     padding: 3px 6px;
     border-radius: 4px;
     backdrop-filter: blur(2px);
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
   }
 </style>

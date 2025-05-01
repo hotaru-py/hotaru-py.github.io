@@ -11,6 +11,8 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+    font-family: "Quicksand", sans-serif;
+    font-weight: 300;
   }
 
   main {
