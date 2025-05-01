@@ -11,13 +11,12 @@ body {
 }
 
 body {
-  font-family: "Red Hat Display", sans-serif;
-  font-optical-sizing: auto;
-  font-style: light;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 300;
 }
 
 .bold {
-  font-style: bold;
+  font-weight: 500;
 }
 
 .arrow-up,
