@@ -5,6 +5,7 @@
 
   export let window;
   export let isActive = false;
+  export let isMobileView = false;
 
   const dispatch = createEventDispatcher();
 
@@ -39,6 +40,8 @@
   });
 
   function handleMouseDown(e) {
+    if (isMobileView) return;
+
     activate();
 
     if (e.target.closest(".title-bar")) {
@@ -55,6 +58,8 @@
   }
 
   function handleResizeMouseDown(e) {
+    if (isMobileView) return;
+
     activate();
     isResizing = true;
     startX = e.clientX;
@@ -125,34 +130,66 @@
 <div
   class="window-container"
   class:active={isActive}
-  style="left: {currentX}px; top: {currentY}px;"
+  class:mobile-window-container={isMobileView}
+  style={isMobileView ? "" : `left: ${currentX}px; top: ${currentY}px;`}
   on:mousedown={handleMouseDown}
   bind:this={windowElement}
 >
   <div
     class="window"
-    style="width: {currentWidth}px; height: {currentHeight}px;"
+    class:mobile-window-inner={isMobileView}
+    style={isMobileView
+      ? ""
+      : `width: ${currentWidth}px; height: ${currentHeight}px;`}
   >
-    <div class="title-bar" class:active={isActive}>
-      <div class="title-text">{window.title}</div>
-      <div class="window-controls">
-        <button
-          class="window-control close"
-          on:click={close}
-          aria-label="Close"
-        >
-          <span>×</span>
-        </button>
+    {#if !isMobileView}
+      <div class="title-bar" class:active={isActive}>
+        <div class="title-text">{window.title}</div>
+        <div class="window-controls">
+          <button
+            class="window-control close"
+            on:click={close}
+            aria-label="Close"
+          >
+            <span>×</span>
+          </button>
+        </div>
       </div>
+    {/if}
+
+    <div class="window-content" class:mobile-window-content={isMobileView}>
+      {#if isMobileView}
+        <div class="mobile-header">
+          <div class="mobile-header-content">
+            <button class="mobile-back-button" on:click={close}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M19 12H5"></path>
+                <path d="M12 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <div class="mobile-title">{window.title}</div>
+          </div>
+        </div>
+      {/if}
+      <svelte:component this={window.component} isMobile={isMobileView} />
     </div>
-    <div class="window-content">
-      <svelte:component this={window.component} />
-    </div>
-    <div
-      class="resize-handle"
-      on:mousedown={handleResizeMouseDown}
-      aria-label="Resize window"
-    ></div>
+
+    {#if !isMobileView}
+      <div
+        class="resize-handle"
+        on:mousedown={handleResizeMouseDown}
+        aria-label="Resize window"
+      ></div>
+    {/if}
   </div>
 </div>
 
@@ -163,6 +200,16 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
     overflow: hidden;
+  }
+
+  .mobile-window-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .window-container.active {
@@ -178,6 +225,14 @@
     border: 1px solid rgba(0, 0, 0, 0.1);
     position: relative;
     box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  .mobile-window-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
   }
 
   .title-bar {
@@ -245,6 +300,61 @@
     padding: 16px;
   }
 
+  .mobile-window-content {
+    -webkit-overflow-scrolling: touch;
+    padding: 0;
+  }
+
+  .mobile-window-content :global(> *:not(.mobile-header)) {
+    padding: 16px;
+    width: auto;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+  }
+
+  .mobile-header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .mobile-back-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #2c3e50;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 12px;
+  }
+
+  .mobile-back-button:active {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
   .resize-handle {
     position: absolute;
     bottom: 0;
@@ -265,13 +375,5 @@
     border-right: 2px solid rgba(0, 0, 0, 0.3);
     border-bottom: 2px solid rgba(0, 0, 0, 0.3);
     border-bottom-right-radius: 2px;
-  }
-
-  :global(.minimizing) {
-    display: none;
-  }
-
-  @keyframes minimize {
-    display: none;
   }
 </style>

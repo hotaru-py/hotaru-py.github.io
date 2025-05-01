@@ -72,7 +72,7 @@
         on:click={toggleStartMenu}
       >
         <img src="/firefly.webp" alt="hotaru logo" class="start-icon" />
-        <span class="start-text">hotaru</span>
+        <span class="start-text">Start</span>
       </button>
 
       {#if isStartMenuOpen}
@@ -85,9 +85,11 @@
             class="start-menu-header"
             in:fade={{ delay: 100, duration: 150 }}
           >
-            <div class="user-info">
-              <div class="user-avatar">👤</div>
-              <div class="user-name">Prajesh</div>
+            <div class="menu-header-logo">
+              <div class="menu-logo-container">
+                <img src="/firefly.webp" alt="hotaru logo" class="menu-logo" />
+              </div>
+              <div class="menu-title">hotaru</div>
             </div>
           </div>
 
@@ -102,7 +104,9 @@
                   easing: cubicOut,
                 }}
               >
-                <div class="start-menu-item-icon">{icon.icon}</div>
+                <div class="start-menu-item-icon">
+                  {@html icon.icon}
+                </div>
                 <div class="start-menu-item-text">{icon.title}</div>
               </div>
             {/each}
@@ -120,9 +124,9 @@
           in:slide={{ duration: 200, easing: cubicOut }}
           out:slide={{ duration: 200, easing: cubicOut }}
         >
-          <span class="window-icon"
-            >{desktopIcons.find((i) => i.id === window.id)?.icon || "📄"}</span
-          >
+          <span class="window-icon">
+            {@html desktopIcons.find((i) => i.id === window.id)?.icon || "📄"}
+          </span>
           <span class="window-title">{window.title}</span>
         </button>
       {/each}
@@ -202,62 +206,104 @@
     bottom: 55px;
     left: 0;
     width: 280px;
-    background-color: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background-color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 12px;
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.7);
     display: flex;
     flex-direction: column;
     z-index: 1001;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.7);
   }
 
   .start-menu-header {
-    background: linear-gradient(to right, #a3d8e9, #8bc6f4);
+    background: rgba(255, 255, 255, 0.9);
     color: #2c3e50;
     padding: 16px;
     height: 70px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
   }
 
-  .user-info {
+  .menu-header-logo {
     display: flex;
     align-items: center;
   }
 
-  .user-avatar {
-    font-size: 30px;
+  .menu-logo-container {
+    width: 38px;
+    height: 38px;
+    background-color: #a8e6cf;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  .user-name {
+  .menu-logo {
+    width: 26px;
+    height: 26px;
+  }
+
+  .menu-title {
     font-weight: 500;
     font-size: 18px;
+    letter-spacing: 0.5px;
+    color: #2c3e50;
   }
 
   .start-menu-items {
-    padding: 8px;
+    padding: 12px;
+    background-color: rgba(255, 255, 255, 0.5);
   }
 
   .start-menu-item {
     display: flex;
-    padding: 10px;
+    padding: 12px;
     align-items: center;
     cursor: pointer;
     border-radius: 8px;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
   .start-menu-item:hover {
-    background-color: #e8f4fa;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.05),
+      0 2px 4px -1px rgba(0, 0, 0, 0.03),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+    transform: translateY(-1px);
   }
 
   .start-menu-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 20px;
     margin-right: 12px;
     width: 24px;
+    height: 24px;
     text-align: center;
+  }
+
+  .start-menu-item-icon :global(svg) {
+    width: 24px;
+    height: 24px;
+  }
+
+  .start-menu-item-text {
+    font-size: 14px;
+    color: #2c3e50;
+    font-weight: 500;
   }
 
   .window-buttons {
@@ -299,7 +345,17 @@
   }
 
   .window-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 8px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .window-icon :global(svg) {
+    width: 20px;
+    height: 20px;
   }
 
   .window-title {

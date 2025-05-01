@@ -15,16 +15,63 @@
   let closingWindowId = null;
   let desktopWidth = 0;
   let desktopHeight = 0;
-
-  const desktopIcons = [
-    { id: "about", title: "About Me", icon: "📄", component: About },
-    { id: "skills", title: "Skills", icon: "🛠️", component: Skills },
-    { id: "projects", title: "Projects", icon: "📁", component: Projects },
-    { id: "contact", title: "Contact", icon: "📞", component: Reach },
-  ];
-
+  let isMobileView = false;
   let currentTime = new Date();
   let startupComplete = false;
+
+  const desktopIcons = [
+    {
+      id: "about",
+      title: "About Me",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="#f1f8e9" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 13H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      component: About,
+    },
+    {
+      id: "skills",
+      title: "Work",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="#e1f5fe" stroke="#039be5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      component: Skills,
+    },
+    {
+      id: "projects",
+      title: "Projects",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="#fff8e1" stroke="#ffb300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      component: Projects,
+    },
+    {
+      id: "browser",
+      title: "Browser",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1976d2" stroke-width="1"/><line x1="2" y1="12" x2="22" y2="12" stroke="#1976d2" stroke-width="1"/><line x1="12" y1="2" x2="12" y2="22" stroke="#1976d2" stroke-width="1"/></svg>`,
+      component: Reach,
+    },
+  ];
+
+  const additionalIcons = [
+    {
+      id: "browser",
+      title: "Browser",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1976d2" stroke-width="1"/><line x1="2" y1="12" x2="22" y2="12" stroke="#1976d2" stroke-width="1"/><line x1="12" y1="2" x2="12" y2="22" stroke="#1976d2" stroke-width="1"/></svg>`,
+      component: Reach,
+    },
+    {
+      id: "about",
+      title: "About Me",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="#f1f8e9" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 13H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      component: About,
+    },
+    {
+      id: "skills",
+      title: "Work",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="#e1f5fe" stroke="#039be5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      component: Skills,
+    },
+    {
+      id: "projects",
+      title: "Projects",
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="#fff8e1" stroke="#ffb300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      component: Projects,
+    },
+  ];
 
   onMount(() => {
     const timer = setInterval(() => {
@@ -47,6 +94,7 @@
   function updateDesktopDimensions() {
     desktopWidth = window.innerWidth;
     desktopHeight = window.innerHeight;
+    isMobileView = window.innerWidth <= 768;
   }
 
   function handleIconClick(iconData) {
@@ -63,8 +111,12 @@
         id: iconData.id,
         title: iconData.title,
         component: iconData.component,
-        position: { x: 150 + windows.length * 30, y: 50 + windows.length * 20 },
-        size: { width: 700, height: 500 },
+        position: isMobileView
+          ? { x: 0, y: 0 }
+          : { x: 150 + windows.length * 30, y: 50 + windows.length * 20 },
+        size: isMobileView
+          ? { width: desktopWidth, height: desktopHeight - 60 }
+          : { width: 700, height: 500 },
       };
       windows = [...windows, newWindow];
       activeWindowId = newWindow.id;
@@ -102,12 +154,24 @@
       w.id === id ? { ...w, size: { width, height } } : w,
     );
   }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function formatDate(date) {
+    return date.toLocaleDateString([], {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
+  }
 </script>
 
 <div class="desktop-container">
   {#if !startupComplete}
     <div class="startup-screen" out:fade={{ duration: 300 }}>
-      <div class="startup-logo">hotaru</div>
+      <div class="startup-logo">hotaru's PC</div>
       <div class="startup-loading">
         <div class="loading-bar"></div>
       </div>
@@ -116,25 +180,20 @@
 
   <div
     class="desktop-background"
+    class:mobile-view={isMobileView}
     bind:clientWidth={desktopWidth}
     bind:clientHeight={desktopHeight}
   >
-    <div class="desktop-icons">
-      {#each desktopIcons as icon, i (icon.id)}
-        <div in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}>
-          <DesktopIcon {icon} on:click={() => handleIconClick(icon)} />
-        </div>
-      {/each}
-    </div>
-
     {#each windows as window, i (window.id)}
       <div
         class="window-wrapper"
+        class:mobile-window={isMobileView}
         class:active={activeWindowId === window.id}
         class:closing={closingWindowId === window.id}
       >
         <Window
           {window}
+          {isMobileView}
           isActive={activeWindowId === window.id}
           on:close={() => closeWindow(window.id)}
           on:activate={() => activateWindow(window.id)}
@@ -143,16 +202,53 @@
         />
       </div>
     {/each}
+
+    {#if !isMobileView}
+      <div class="desktop-icons" in:fade={{ duration: 300, delay: 100 }}>
+        {#each desktopIcons as icon, i (icon.id)}
+          <div in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}>
+            <DesktopIcon
+              {icon}
+              on:click={() => handleIconClick(icon)}
+              isMobile={false}
+            />
+          </div>
+        {/each}
+      </div>
+    {/if}
+
+    {#if isMobileView}
+      <div
+        class="mobile-icons-additional"
+        class:mobile-icons-hidden={activeWindowId}
+        in:fade={{ duration: 300, delay: 100 }}
+      >
+        {#each additionalIcons as icon, i (icon.id)}
+          <div
+            in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}
+            class="mobile-icon-wrapper"
+          >
+            <DesktopIcon
+              {icon}
+              on:click={() => handleIconClick(icon)}
+              isMobile={true}
+            />
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 
-  <Taskbar
-    {windows}
-    {activeWindowId}
-    {desktopIcons}
-    {currentTime}
-    on:activateWindow={(e) => activateWindow(e.detail)}
-    on:openWindow={(e) => openWindow(e.detail)}
-  />
+  {#if !isMobileView}
+    <Taskbar
+      {windows}
+      {activeWindowId}
+      {desktopIcons}
+      {currentTime}
+      on:activateWindow={(e) => activateWindow(e.detail)}
+      on:openWindow={(e) => openWindow(e.detail)}
+    />
+  {/if}
 </div>
 
 <style>
@@ -178,6 +274,10 @@
     overflow: hidden;
   }
 
+  .desktop-background.mobile-view {
+    padding-top: 0;
+  }
+
   .desktop-icons {
     display: flex;
     flex-direction: column;
@@ -193,8 +293,59 @@
     width: 120px;
   }
 
+  .mobile-icons-additional {
+    position: fixed;
+    bottom: 20px;
+    max-width: 90%;
+    width: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 12px 20px;
+    border-radius: 24px;
+    z-index: 1000;
+    overflow-x: auto;
+    gap: 16px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-icons-hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(50px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .mobile-icons-additional:not(.mobile-icons-hidden) {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .mobile-icon-wrapper {
+    width: auto !important;
+    flex: 0 0 auto;
+  }
+
+  .mobile-window {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1000 !important;
+  }
+
   @media (max-height: 600px) {
-    .desktop-icons {
+    .desktop-icons:not(.mobile-icons) {
       flex-direction: row;
       height: auto;
       width: calc(100% - 48px);
@@ -202,23 +353,23 @@
   }
 
   @media (max-width: 768px) {
-    .desktop-icons {
+    .desktop-icons:not(.mobile-icons) {
       gap: 12px;
       padding: 16px;
     }
 
-    .desktop-icons > div {
+    .desktop-icons:not(.mobile-icons) > div {
       width: 100px;
     }
   }
 
   @media (max-width: 480px) {
-    .desktop-icons {
+    .desktop-icons:not(.mobile-icons) {
       gap: 8px;
       padding: 12px;
     }
 
-    .desktop-icons > div {
+    .desktop-icons:not(.mobile-icons) > div {
       width: 80px;
     }
   }

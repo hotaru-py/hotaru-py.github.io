@@ -47,7 +47,7 @@
       items: skills.design,
     },
     {
-      name: "Art & Editing (still learning)",
+      name: "Art & Video Editing (amateur)",
       items: skills.art,
     },
     {
@@ -58,7 +58,7 @@
 </script>
 
 <div class="skills-container">
-  <h2 class="skills-title">Professional Skills</h2>
+  <h2 class="skills-title">Skills</h2>
 
   <div class="skills-grid">
     {#each skillCategories as category}
@@ -78,22 +78,18 @@
   </div>
 
   <div class="skills-description">
-    <p>
-      I'm a <span class="highlight">Full Stack Developer</span> and a proficient
-      <span class="highlight">UI/UX designer</span>, focusing on balancing
-      functionality, design, usability and aesthetics from the user's
-      perspective.
-    </p>
-
-    <p>
-      I work primarily with Svelte and have used React and Next.js extensively
-      in my projects for the Frontend, which I conceptualize using Figma and
-      Inkscape.
-    </p>
-
-    <p>
-      I've worked with Python and FastAPI for the backend, which I'm still
-      exploring as part of my migration from Frontend to Full Stack Development.
+    <h2 class="skills-title">Work Experience</h2>
+    <p class="about-paragraph">
+      Software Development Engineering Intern
+      <span class="about-subtitle">
+        <a
+          href="https://miniture.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="company-link">Miniture</a
+        >
+        (March 2025 - Now)
+      </span>
     </p>
   </div>
 </div>
@@ -103,12 +99,21 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: calc(100% + 16px); /* Compensate for the parent padding */
+    width: calc(100% + 16px);
     margin-left: -8px;
     margin-right: -8px;
+    margin-top: 0;
     box-sizing: border-box;
-    padding: 0 16px 0 16px;
+    padding: 16px;
     overflow-y: auto;
+  }
+
+  @media (max-width: 768px) {
+    .skills-container {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 
   .skills-title {
@@ -125,7 +130,7 @@
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
     margin-bottom: 24px;
-    padding-right: 8px; /* Add extra padding for scrollbar */
+    padding-right: 8px;
   }
 
   .skill-card {
@@ -158,16 +163,6 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-  }
-
-  .skill-learning-tag {
-    font-size: 12px;
-    font-weight: normal;
-    background-color: rgba(194, 239, 211, 0.5);
-    color: #2c3e50;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 8px;
   }
 
   .skill-pills {
@@ -206,14 +201,43 @@
     margin-bottom: 0;
   }
 
-  .highlight {
-    color: #1b4965;
-    font-weight: 600;
+  .about-paragraph {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    color: #4a4a4a;
   }
 
-  .content-header,
-  .avatar,
-  .title {
-    display: none;
+  .about-subtitle {
+    display: block;
+    font-size: 14px;
+    color: #777;
+    margin-top: 4px;
+  }
+
+  .company-link {
+    color: #1b4965;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    position: relative;
+  }
+
+  .company-link:hover {
+    color: #3d89c9;
+  }
+
+  .company-link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #3d89c9;
+    transition: width 0.3s ease;
+  }
+
+  .company-link:hover::after {
+    width: 100%;
   }
 </style>
