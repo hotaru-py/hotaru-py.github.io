@@ -23,7 +23,8 @@
         design <span class="highlight">visually-appealing and usable</span> experiences
       </li>
       <li>design <span class="highlight">good-looking</span> graphics</li>
-      <li><span class="highlight">doodle</span> (and soon, animate stuff!)</li>
+      <!-- <li><span class="highlight">doodle</span> (and soon, animate stuff!)</li> -->
+      <li><span class="highlight">doodle</span> randomly</li>
     </ul>
 
     <h3 class="about-heading">Education</h3>
