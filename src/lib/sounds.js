@@ -3,8 +3,8 @@
 // first play, which made the first hover of each xylophone note lag.
 
 const FILES = {
-  open: "/click1.mp3",
-  close: "/click2.mp3",
+  open: "/click2.mp3",
+  close: "/click1.mp3",
   "xylo:A4": "/xylo/xylo_A4.mp3",
   "xylo:A#4": "/xylo/xylo_Asharp4.mp3",
   "xylo:C5": "/xylo/xylo_C5.mp3",

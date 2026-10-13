@@ -8,6 +8,7 @@
   import Loader from "../Loader.svelte";
   import MobileClock from "./MobileClock.svelte";
   import MobileSettings from "./MobileSettings.svelte";
+  import WelcomeNotice from "./WelcomeNotice.svelte";
   import { sparkleDots } from "../../lib/halftone.js";
   import { playSound } from "../../lib/sounds.js";
   import About from "../about.svelte";
@@ -222,6 +223,10 @@
   </svg>
 
   <Loader onExit={() => (booted = true)} />
+
+  {#if booted}
+    <WelcomeNotice isMobile={isMobileView} />
+  {/if}
 
   <div
     class="desktop-background"

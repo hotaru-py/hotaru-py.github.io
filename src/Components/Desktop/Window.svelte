@@ -465,11 +465,16 @@
     padding: 0;
   }
 
+  /* On phones the content area is the window's only scroller. A section that scrolls on
+     its own inside it would stop a swipe dead at its end, before the page has. clip
+     (unlike hidden) trims sideways overflow without making another scroller. */
   .mobile-window-content :global(> *:not(.mobile-header)) {
     padding: 16px;
     width: auto;
+    height: auto;
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow: visible;
+    overflow-x: clip;
   }
 
   .mobile-header {

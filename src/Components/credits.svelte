@@ -22,7 +22,7 @@
 </script>
 
 <div class="credits-container">
-  <h2 class="credits-title">Credits</h2>
+  <h2 class="credits-title">What made this website?</h2>
 
   <div class="credits-grid">
     <section class="credit-card">
@@ -45,6 +45,16 @@
           </a>
         {/each}
       </div>
+    </section>
+
+    <section class="credit-card">
+      <h3 class="credit-heading">Profile Picture &amp; Favicon</h3>
+      <p class="credit-text">
+        <strong>Firefly</strong> from <em>Honkai: Star Rail</em>
+      </p>
+      <p class="credit-text credit-note">
+        Character and artwork © HoYoverse. Non-commercial usage.
+      </p>
     </section>
 
     <section class="credit-card">
@@ -188,6 +198,12 @@
   .credit-text strong {
     color: var(--color-ink);
     font-weight: 700;
+  }
+
+  .credit-note {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--color-ink-muted);
   }
 
   .credit-aside {

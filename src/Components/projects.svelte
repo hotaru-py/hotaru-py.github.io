@@ -2,8 +2,10 @@
   import { preloadImages } from "../lib/preload.js";
   import minitureShot from "../assets/work-miniture.webp";
   import tccShot from "../assets/work-tcc.webp";
+  import inventeShot from "../assets/work-invente.webp";
+  import instinctsShot from "../assets/work-instincts.webp";
 
-  preloadImages([minitureShot, tccShot]);
+  preloadImages([minitureShot, tccShot, inventeShot, instinctsShot]);
 </script>
 
 <script>
@@ -17,6 +19,18 @@
       url: "https://www.miniture.in",
       domain: "miniture.in",
       image: minitureShot,
+    },
+    {
+      name: "SSN-SNUC INVENTE '26",
+      url: "https://invente-2026.vercel.app/",
+      domain: "invente-2026.vercel.app",
+      image: inventeShot,
+    },
+    {
+      name: "SSN-SNUC INSTINCTS '26",
+      url: "https://www.ssnsnucinstincts.com/",
+      domain: "ssnsnucinstincts.com",
+      image: instinctsShot,
     },
     {
       name: "The Curation Company",
@@ -106,7 +120,7 @@
   </div>
 
   <h2 class="projects-title">
-    Personal Projects
+    Featured Personal Projects
     <a
       href="https://github.com/hotaru-py"
       target="_blank"

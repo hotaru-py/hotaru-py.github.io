@@ -17,32 +17,38 @@
   <div class="about-content">
     <p class="about-paragraph">
       I'm an engineer by day, designer by night, artist throughout. Currently an
-      undergrad Computer Science student and Fullstack Developer.
+      undergrad engineering student and a full-stack developer.
     </p>
     <p class="about-paragraph">
-      I work on a few different things, including but not limited to:
+      Working on a few different things, including but not limited to:
     </p>
 
     <ul class="about-list">
       <li>
-        <span class="highlight">software development</span> across platforms and
-        stacks
+        <span class="highlight">software development</span> across platforms and stacks
       </li>
       <li>
         designing <span class="highlight"
-          >visually-appealing, usable and accessible</span
+          >visually appealing, usable, and accessible</span
         > experiences
       </li>
       <li>
-        <span class="highlight">graphic & UI/UX design</span>, and the
-        occasional
-        <span class="highlight">doodling</span> (also a wannabe multimedia artist)
+        <span class="highlight">graphic & UI/UX design</span>
       </li>
       <li>
         <span class="highlight">product and interaction design</span> in the long
         run
       </li>
     </ul>
+
+    <p class="about-paragraph">
+      If I’m not doing the above, I’m probably at the piano, doodling at my
+      desk, on the tennis court, watching the evolution of the Intel Inside
+      jingle for the gazillionth time, bingeing anime or TV, watching rich
+      people race expensive cars in circles, listening to my curated Mr.
+      Worldwide playlist with Hatsune Miku sitting between Olivia Rodrigo and
+      Kanye West, or just kicking back and taking a nap.
+    </p>
 
     <h3 class="about-heading">Education</h3>
     <p class="about-paragraph">
