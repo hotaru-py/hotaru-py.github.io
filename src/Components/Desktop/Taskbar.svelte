@@ -1,6 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import Logo from "../Logo.svelte";
+  import avatar from "../../assets/firefly-avatar.webp";
+  import { isMuted, setMuted, playSound } from "../../lib/sounds.js";
   import { fade, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
@@ -11,7 +13,10 @@
    * @property {any} [desktopIcons]
    * @property {any} [currentTime]
    * @property {(windowId: any) => void} [onActivateWindow]
+   * @property {(windowId: any) => void} [onMinimizeWindow]
    * @property {(icon: any) => void} [onOpenWindow]
+   * @property {boolean} [showReset] Only offered once the icons have been moved
+   * @property {() => void} [onResetLayout]
    */
 
   /** @type {Props} */
@@ -21,7 +26,10 @@
     desktopIcons = [],
     currentTime = new Date(),
     onActivateWindow,
+    onMinimizeWindow,
     onOpenWindow,
+    showReset = false,
+    onResetLayout,
   } = $props();
 
   let isStartMenuOpen = $state(false);
@@ -36,6 +44,7 @@
       ) {
         if (!event.target.closest(".start-button")) {
           isStartMenuOpen = false;
+          playSound("close");
         }
       }
     }
@@ -47,16 +56,38 @@
     };
   });
 
+  let muted = $state(isMuted());
+
+  // Muting clicks just before going quiet; unmuting clicks just after
+  function toggleMute() {
+    muted = !muted;
+    if (muted) playSound("close");
+    setMuted(muted);
+    if (!muted) playSound("open");
+  }
+
   function toggleStartMenu() {
     isStartMenuOpen = !isStartMenuOpen;
+    playSound(isStartMenuOpen ? "open" : "close");
+  }
+
+  function resetLayout() {
+    playSound("open");
+    onResetLayout?.();
   }
 
   function activateWindow(windowId) {
     onActivateWindow?.(windowId);
   }
 
+  // Like Windows: clicking the focused window's button minimizes it, anything else brings it up
   function handleTaskbarButtonClick(windowId) {
-    activateWindow(windowId);
+    const win = windows.find((w) => w.id === windowId);
+    if (win && !win.minimized && activeWindowId === windowId) {
+      onMinimizeWindow?.(windowId);
+    } else {
+      activateWindow(windowId);
+    }
   }
 
   function openWindow(iconData) {
@@ -101,7 +132,7 @@
           >
             <div class="menu-header-logo">
               <div class="menu-logo-container">
-                <img src="/firefly.webp" alt="hotaru logo" class="menu-logo" />
+                <img src={avatar} alt="hotaru logo" class="menu-logo" />
               </div>
               <div class="menu-title">hotaru</div>
             </div>
@@ -135,6 +166,7 @@
         <button
           class="taskbar-window-button"
           class:active={activeWindowId === window.id}
+          class:minimized={window.minimized}
           onclick={() => handleTaskbarButtonClick(window.id)}
           in:slide={{ duration: 200, easing: cubicOut }}
           out:slide={{ duration: 200, easing: cubicOut }}
@@ -148,6 +180,48 @@
     </div>
 
     <div class="system-tray">
+      <div class="tray-actions">
+        <button
+          type="button"
+          class="tray-button reset-button"
+          class:hidden={!showReset}
+          onclick={resetLayout}
+          aria-label="Reset desktop icons"
+          title="Reset desktop icons"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect
+              x="3"
+              y="3"
+              width="7"
+              height="7"
+              rx="1.5"
+              fill="url(#halftone)"
+            />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="tray-button"
+          onclick={toggleMute}
+          aria-pressed={muted}
+          aria-label="Mute sounds"
+          title={muted ? "Unmute sounds" : "Mute sounds"}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z" fill="url(#halftone)" />
+            {#if muted}
+              <path d="M16 9l5 6M21 9l-5 6" />
+            {:else}
+              <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
+            {/if}
+          </svg>
+        </button>
+      </div>
+
       <div class="system-time">
         <div class="time">{formatTime(currentTime)}</div>
         <div class="date">{formatDate(currentTime)}</div>
@@ -267,8 +341,8 @@
   }
 
   .menu-logo {
-    width: 26px;
-    height: 26px;
+    width: 32px;
+    height: 32px;
   }
 
   .menu-title {
@@ -368,6 +442,11 @@
     box-shadow: 2px 2px 0 var(--color-ink);
   }
 
+  .taskbar-window-button.minimized {
+    border-style: dashed;
+    color: var(--color-ink-muted);
+  }
+
   .taskbar-window-button.active {
     color: var(--color-ink);
     font-weight: 700;
@@ -401,6 +480,88 @@
     margin-left: auto;
     padding: 0 12px;
     border-left: var(--ink-border);
+  }
+
+  /* Reset-icons and mute buttons, left of the clock */
+  .tray-actions {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+  }
+
+  .tray-button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: none;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  /* Collapses while hidden so the tray's separator slides over to hug the mute button.
+     The tray is pinned to the right edge, so mute and the clock stay put; visibility
+     also takes the button out of the tab order. */
+  .reset-button {
+    margin-right: 4px;
+    overflow: hidden;
+    transition:
+      opacity 0.2s ease,
+      width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      margin-right 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      border-width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s,
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .reset-button.hidden {
+    width: 0;
+    margin-right: 0;
+    border-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s ease,
+      width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      margin-right 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      border-width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 0.25s;
+  }
+
+  .tray-button svg {
+    flex-shrink: 0;
+  }
+
+  .tray-button:hover {
+    transform: translate(-1px, -1px);
+    border-color: var(--color-ink);
+    background: var(--color-paper);
+    box-shadow: 2px 2px 0 var(--color-ink);
+  }
+
+  .tray-button:active {
+    transform: translate(1px, 1px);
+    box-shadow: none;
+  }
+
+  .tray-button svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .system-time {

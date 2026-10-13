@@ -225,7 +225,7 @@
       }
     }
 
-    // The home screen clock sits mid-screen; tell it what the wallpaper looks like there
+    // Tell the mobile home screen clock what the wallpaper looks like behind it
     // so its ink can adapt (deeper green over the blob, paper if it ever gets dark)
     const inkRgb = cssRgb("--color-ink");
     const deepRgb = cssRgb("--color-moss-900");
@@ -233,12 +233,17 @@
     let lastClockInk = "";
 
     function sampleClockBackdrop() {
+      // Sample wherever the clock actually is (it marks itself with data-wallpaper-sample)
+      const target = document.querySelector("[data-wallpaper-sample]");
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
       const w = canvas.width;
       const h = canvas.height;
-      const x0 = Math.floor(w * 0.2);
-      const x1 = Math.ceil(w * 0.8);
-      const y0 = Math.floor(h * 0.44);
-      const y1 = Math.ceil(h * 0.56);
+      const x0 = Math.max(0, Math.floor(rect.left / SCALE));
+      const x1 = Math.min(w, Math.ceil(rect.right / SCALE));
+      const y0 = Math.max(0, Math.floor(rect.top / SCALE));
+      const y1 = Math.min(h, Math.ceil(rect.bottom / SCALE));
+      if (x1 <= x0 || y1 <= y0) return;
       let sum = 0;
       let n = 0;
       for (let y = y0; y < y1; y += 2) {

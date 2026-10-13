@@ -35,7 +35,11 @@
   });
 </script>
 
-<time class="mobile-clock" datetime={currentTime.toISOString()}>
+<time
+  class="mobile-clock"
+  datetime={currentTime.toISOString()}
+  data-wallpaper-sample
+>
   <span class="clock-date">{date}</span>
   <span class="clock-time">
     {time.text}{#if time.period}<span class="clock-period">{time.period}</span
@@ -44,10 +48,13 @@
 </time>
 
 <style>
-  /* Centered on the screen; --clock-ink is set by the wallpaper to suit what is behind */
+  /* Top centre of the home screen; --clock-ink is set by the wallpaper to suit what is
+     behind it (data-wallpaper-sample tells the wallpaper where to look) */
   .mobile-clock {
     position: absolute;
-    inset: 0;
+    top: calc(clamp(72px, 13vh, 140px) + env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;

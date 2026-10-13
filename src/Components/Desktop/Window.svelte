@@ -2,13 +2,16 @@
   import { onMount, untrack } from "svelte";
   import { scale, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
+  import { playSound } from "../../lib/sounds.js";
 
   /**
    * @typedef {Object} Props
    * @property {any} window
    * @property {boolean} [isActive]
    * @property {boolean} [isMobileView]
+   * @property {boolean} [minimized]
    * @property {() => void} [onClose]
+   * @property {() => void} [onMinimize]
    * @property {() => void} [onActivate]
    * @property {(pos: { id: any, x: number, y: number }) => void} [onMove]
    * @property {(size: { id: any, width: number, height: number }) => void} [onResize]
@@ -19,7 +22,9 @@
     window,
     isActive = false,
     isMobileView = false,
+    minimized = false,
     onClose,
+    onMinimize,
     onActivate,
     onMove,
     onResize,
@@ -43,12 +48,40 @@
   let currentHeight = $state(size.height);
   let windowElement = $state();
 
+  // Maximized windows fill the desktop; `animatingFrame` eases the jump between sizes
+  let maximized = $state(false);
+  let animatingFrame = $state(false);
+  let frameTimer;
+
+  const frameStyle = $derived(
+    isMobileView || maximized
+      ? ""
+      : `left: ${currentX}px; top: ${currentY}px; width: ${currentWidth}px; height: ${currentHeight}px;`,
+  );
+
   function close() {
     onClose?.();
   }
 
   function activate() {
     onActivate?.();
+  }
+
+  function minimize() {
+    onMinimize?.();
+  }
+
+  function toggleMaximize() {
+    clearTimeout(frameTimer);
+    animatingFrame = true;
+    maximized = !maximized;
+    playSound(maximized ? "open" : "close");
+    frameTimer = setTimeout(() => (animatingFrame = false), 300);
+  }
+
+  function handleTitleDoubleClick(e) {
+    if (e.target.closest(".window-controls")) return;
+    toggleMaximize();
   }
 
   onMount(() => {
@@ -63,7 +96,12 @@
 
     activate();
 
-    if (e.target.closest(".title-bar")) {
+    // Drag from the title bar, but not from its buttons or while maximized
+    if (
+      e.target.closest(".title-bar") &&
+      !e.target.closest(".window-controls") &&
+      !maximized
+    ) {
       isDragging = true;
       startX = e.clientX;
       startY = e.clientY;
@@ -99,13 +137,6 @@
 
       currentWidth = newWidth;
       currentHeight = newHeight;
-
-      if (windowElement) {
-        windowElement.querySelector(".window").style.width =
-          `${currentWidth}px`;
-        windowElement.querySelector(".window").style.height =
-          `${currentHeight}px`;
-      }
     }
   }
 
@@ -127,11 +158,6 @@
     if (isDragging) {
       currentX = offsetX + (e.clientX - startX);
       currentY = offsetY + (e.clientY - startY);
-
-      if (windowElement) {
-        windowElement.style.left = `${currentX}px`;
-        windowElement.style.top = `${currentY}px`;
-      }
     }
   }
 
@@ -149,30 +175,52 @@
 <div
   class="window-container"
   class:active={isActive}
+  class:maximized
+  class:minimized
+  class:animating-frame={animatingFrame}
   class:mobile-window-container={isMobileView}
-  style={isMobileView ? "" : `left: ${currentX}px; top: ${currentY}px;`}
+  style={frameStyle}
   onmousedown={handleMouseDown}
   bind:this={windowElement}
 >
-  <div
-    class="window"
-    class:mobile-window-inner={isMobileView}
-    style={isMobileView
-      ? ""
-      : `width: ${currentWidth}px; height: ${currentHeight}px;`}
-  >
+  <div class="window" class:mobile-window-inner={isMobileView}>
     {#if !isMobileView}
-      <div class="title-bar" class:active={isActive}>
-        <div class="title-text">{window.title}</div>
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="title-bar"
+        class:active={isActive}
+        ondblclick={handleTitleDoubleClick}
+      >
+        <!-- Mac-style traffic lights; glyphs appear while the group is hovered -->
         <div class="window-controls">
+          <button class="light close" onclick={close} aria-label="Close">
+            <svg viewBox="0 0 8 8" aria-hidden="true">
+              <path d="M2 2l4 4M6 2L2 6" />
+            </svg>
+          </button>
           <button
-            class="window-control close"
-            onclick={close}
-            aria-label="Close"
+            class="light minimize"
+            onclick={minimize}
+            aria-label="Minimize"
           >
-            <span>×</span>
+            <svg viewBox="0 0 8 8" aria-hidden="true">
+              <path d="M1.75 4h4.5" />
+            </svg>
+          </button>
+          <button
+            class="light maximize"
+            onclick={toggleMaximize}
+            aria-label={maximized ? "Restore" : "Maximize"}
+          >
+            <svg viewBox="0 0 8 8" aria-hidden="true">
+              <path
+                class="glyph-fill"
+                d="M1.5 1.5h3.5L1.5 5zM6.5 6.5H3L6.5 3z"
+              />
+            </svg>
           </button>
         </div>
+        <div class="title-text">{window.title}</div>
       </div>
     {/if}
 
@@ -206,7 +254,7 @@
       <window.component isMobile={isMobileView} />
     </div>
 
-    {#if !isMobileView}
+    {#if !isMobileView && !maximized}
       <div
         class="resize-handle"
         onmousedown={handleResizeMouseDown}
@@ -219,11 +267,46 @@
 <style>
   /* Stacking between windows is set on the wrapper in Desktop.svelte */
   .window-container {
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
     position: absolute;
     box-shadow: 4px 4px 0 var(--color-ink);
     border-radius: 12px;
     overflow: hidden;
-    transition: box-shadow 0.15s ease;
+    transform-origin: bottom center;
+    transition:
+      box-shadow 0.15s ease,
+      transform 0.25s var(--ease),
+      opacity 0.2s ease,
+      visibility 0s;
+  }
+
+  /* Fills the desktop, leaving room for the ink border and shadow */
+  .window-container.maximized {
+    left: 8px;
+    top: 8px;
+    width: calc(100% - 22px);
+    height: calc(100% - 22px);
+  }
+
+  .window-container.animating-frame {
+    transition:
+      box-shadow 0.15s ease,
+      left 0.3s var(--ease),
+      top 0.3s var(--ease),
+      width 0.3s var(--ease),
+      height 0.3s var(--ease);
+  }
+
+  /* Drops toward the taskbar, then hides so it can't be clicked or focused */
+  .window-container.minimized {
+    transform: translateY(60px) scale(0.9);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      box-shadow 0.15s ease,
+      transform 0.25s var(--ease),
+      opacity 0.2s ease,
+      visibility 0s linear 0.25s;
   }
 
   .mobile-window-container {
@@ -241,6 +324,8 @@
   }
 
   .window {
+    width: 100%;
+    height: 100%;
     background-color: var(--color-paper);
     display: flex;
     flex-direction: column;
@@ -267,21 +352,21 @@
     color: var(--color-ink-muted);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 10px 0 16px;
+    padding: 0 16px 0 12px;
     font-weight: 600;
     user-select: none;
     border-bottom: var(--ink-border);
     cursor: move;
   }
 
-  /* Halftone band that fades in toward the controls on the focused window */
+  /* Halftone band that fades in toward the right on the focused window; the dots
+     swell and vanish in a wave travelling left to right (static if not installed) */
   .title-bar::before {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: var(--halftone);
-    background-size: var(--halftone-size);
+    background-image: var(--halftone-wave, var(--halftone));
+    background-size: var(--halftone-wave-size, var(--halftone-size));
     mask-image: var(--halftone-fade);
     opacity: 0;
     transition: opacity 0.15s ease;
@@ -309,32 +394,63 @@
   .window-controls {
     position: relative;
     display: flex;
-    height: 100%;
     align-items: center;
+    gap: 8px;
+    margin-right: 14px;
   }
 
-  .window-control {
-    width: 24px;
-    height: 24px;
-    margin-left: 8px;
-    border: var(--ink-border);
-    color: var(--color-ink);
+  .light {
+    --light-color: var(--color-paper);
+    width: 14px;
+    height: 14px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 50%;
     background: var(--color-paper);
-    transition:
-      background-color 0.15s ease,
-      color 0.15s ease;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
   }
 
-  .window-control:hover {
-    background-color: var(--color-ink);
-    color: var(--color-paper);
+  .light.close {
+    --light-color: #ee6a5a;
+  }
+
+  .light.minimize {
+    --light-color: #f4c04f;
+  }
+
+  .light.maximize {
+    --light-color: var(--color-accent);
+  }
+
+  /* Coloured on the focused window or while pointed at; outlined otherwise */
+  .title-bar.active .light,
+  .window-controls:hover .light {
+    background-color: var(--light-color);
+  }
+
+  .light svg {
+    width: 8px;
+    height: 8px;
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+
+  .light .glyph-fill {
+    fill: var(--color-ink);
+    stroke: none;
+  }
+
+  .window-controls:hover .light svg,
+  .light:focus-visible svg {
+    opacity: 1;
   }
 
   .window-content {

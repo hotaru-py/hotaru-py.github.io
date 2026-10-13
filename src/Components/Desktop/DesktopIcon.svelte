@@ -1,13 +1,23 @@
 <script>
+  import { slide } from "svelte/transition";
+
   /**
    * @typedef {Object} Props
    * @property {any} icon
    * @property {boolean} [isMobile]
+   * @property {boolean} [lifted] Picked up and being dragged
+   * @property {boolean} [showLabel] Dock icons only: show the title under the icon
    * @property {() => void} [onclick]
    */
 
   /** @type {Props} */
-  let { icon, isMobile = false, onclick } = $props();
+  let {
+    icon,
+    isMobile = false,
+    lifted = false,
+    showLabel = false,
+    onclick,
+  } = $props();
 
   function handleClick() {
     onclick?.();
@@ -17,6 +27,7 @@
 <div
   class="desktop-icon"
   class:mobile-icon={isMobile}
+  class:lifted
   onclick={handleClick}
   role="button"
   tabindex="0"
@@ -30,6 +41,10 @@
   </div>
   {#if !isMobile}
     <div class="icon-title">{icon.title}</div>
+  {:else if showLabel}
+    <div class="mobile-icon-title" transition:slide={{ duration: 160 }}>
+      {icon.title}
+    </div>
   {/if}
 </div>
 
@@ -38,10 +53,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100px;
+    width: 88px;
     cursor: pointer;
     color: var(--color-ink);
-    padding: 8px;
+    padding: 6px 4px;
     border-radius: 8px;
   }
 
@@ -73,7 +88,7 @@
     justify-content: center;
     width: 60px;
     height: 60px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     background-color: var(--color-paper);
     border: var(--ink-border);
     border-radius: 12px;
@@ -81,6 +96,14 @@
     transition:
       transform 0.15s ease,
       box-shadow 0.15s ease;
+  }
+
+  .mobile-icon-title {
+    padding-top: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--color-ink);
   }
 
   .mobile-icon-container {
@@ -98,6 +121,12 @@
   .desktop-icon:active .icon-container {
     transform: translate(2px, 2px);
     box-shadow: 1px 1px 0 var(--color-ink);
+  }
+
+  /* Picked up: tilted and raised higher off the desktop */
+  .desktop-icon.lifted .icon-container {
+    transform: translate(-3px, -3px) rotate(-4deg);
+    box-shadow: 7px 7px 0 var(--color-ink);
   }
 
   .icon {
@@ -128,7 +157,7 @@
     font-size: 13px;
     font-weight: 600;
     word-break: break-word;
-    max-width: 100px;
+    max-width: 88px;
     background-color: var(--color-paper);
     padding: 2px 6px;
     border-radius: 4px;

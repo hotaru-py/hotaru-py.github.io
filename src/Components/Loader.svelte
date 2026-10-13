@@ -5,22 +5,53 @@
   import { LOGO_PATH, LOGO_VIEWBOX, LOGO_ASPECT } from "../lib/logo.js";
   import fillImage from "../assets/logo-fill.webp";
 
+  /**
+   * @typedef {Object} Props
+   * @property {() => void} [onExit] Called as the loader starts fading out, so the page can animate in underneath
+   */
+
+  /** @type {Props} */
+  let { onExit } = $props();
+
   // Timings in seconds; they mirror the keyframes in the style block
   const FILL_DELAY = 0.5;
   const FILL_DURATION = 1.05;
   const HOLD = 0.3;
+  // Never hold the page back longer than this waiting for the fill image
+  const IMAGE_WAIT_MS = 1500;
+
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   let visible = $state(true);
+  // The mark only renders (and so only starts animating) once the fill image is decoded
+  let ready = $state(false);
 
   onMount(() => {
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const timer = setTimeout(
-      () => (visible = false),
-      reduceMotion ? 150 : (FILL_DELAY + FILL_DURATION + HOLD) * 1000,
-    );
-    return () => clearTimeout(timer);
+    let dismissTimer;
+
+    function start() {
+      if (ready) return;
+      ready = true;
+      dismissTimer = setTimeout(
+        () => {
+          visible = false;
+          onExit?.();
+        },
+        reduceMotion ? 150 : (FILL_DELAY + FILL_DURATION + HOLD) * 1000,
+      );
+    }
+
+    const image = new Image();
+    image.src = fillImage;
+    image.decode().then(start, start);
+    const fallbackTimer = setTimeout(start, IMAGE_WAIT_MS);
+
+    return () => {
+      clearTimeout(dismissTimer);
+      clearTimeout(fallbackTimer);
+    };
   });
 </script>
 
@@ -29,36 +60,43 @@
     class="loader"
     role="status"
     aria-live="polite"
-    out:scale={{ start: 1.05, opacity: 0, duration: 550, easing: expoOut }}
+    out:scale={{
+      start: reduceMotion ? 1 : 1.05,
+      opacity: 0,
+      duration: 550,
+      easing: expoOut,
+    }}
   >
-    <div class="mark" style:aspect-ratio={LOGO_ASPECT}>
-      <!-- Outline fades in, then wipes away from the bottom as the fill rises -->
-      <svg class="layer outline" viewBox={LOGO_VIEWBOX} fill="none">
-        <path
-          d={LOGO_PATH}
-          stroke="var(--color-moss-600)"
-          stroke-width="1"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+    {#if ready}
+      <div class="mark" style:aspect-ratio={LOGO_ASPECT}>
+        <!-- Outline fades in, then wipes away from the bottom as the fill rises -->
+        <svg class="layer outline" viewBox={LOGO_VIEWBOX} fill="none">
+          <path
+            d={LOGO_PATH}
+            stroke="var(--color-moss-600)"
+            stroke-width="1"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
 
-      <!-- Noisy gradient, clipped to the logo shape -->
-      <svg class="layer fill" viewBox={LOGO_VIEWBOX}>
-        <defs>
-          <clipPath id="loader-logo-clip">
-            <path d={LOGO_PATH} />
-          </clipPath>
-        </defs>
-        <image
-          href={fillImage}
-          width="100%"
-          height="100%"
-          preserveAspectRatio="none"
-          clip-path="url(#loader-logo-clip)"
-        />
-      </svg>
-    </div>
+        <!-- Noisy gradient, clipped to the logo shape -->
+        <svg class="layer fill" viewBox={LOGO_VIEWBOX}>
+          <defs>
+            <clipPath id="loader-logo-clip">
+              <path d={LOGO_PATH} />
+            </clipPath>
+          </defs>
+          <image
+            href={fillImage}
+            width="100%"
+            height="100%"
+            preserveAspectRatio="none"
+            clip-path="url(#loader-logo-clip)"
+          />
+        </svg>
+      </div>
+    {/if}
 
     <span class="sr-only">Loading</span>
   </div>

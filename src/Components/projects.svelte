@@ -1,4 +1,31 @@
+<script module>
+  import { preloadImages } from "../lib/preload.js";
+  import minitureShot from "../assets/work-miniture.webp";
+  import tccShot from "../assets/work-tcc.webp";
+
+  preloadImages([minitureShot, tccShot]);
+</script>
+
 <script>
+  import { onMount } from "svelte";
+  import { tapToOpen } from "../lib/tapToOpen.js";
+  import { fetchStars } from "../lib/githubStars.js";
+
+  const liveWork = [
+    {
+      name: "Miniture",
+      url: "https://www.miniture.in",
+      domain: "miniture.in",
+      image: minitureShot,
+    },
+    {
+      name: "The Curation Company",
+      url: "https://www.thecurationcompany.in/",
+      domain: "thecurationcompany.in",
+      image: tccShot,
+    },
+  ];
+
   const projects = [
     {
       name: "My Personal Website (this one!)",
@@ -15,6 +42,8 @@
       name: "Minimalist ROG Grub Theme",
       description: "Minimalist theme for the Grub Bootloader",
       link: "https://github.com/hotaru-py/rog-grub",
+      // Shown until (or if) the live count can't be fetched
+      stars: { repo: "hotaru-py/rog-grub", fallback: 27 },
     },
     {
       name: "Starboard",
@@ -33,11 +62,51 @@
       link: "https://github.com/hotaru-py/CacheSim",
     },
   ];
+
+  /** @type {Record<string, number>} */
+  let liveStars = $state({});
+
+  onMount(() => {
+    for (const { stars } of projects) {
+      if (!stars) continue;
+      fetchStars(stars.repo).then((count) => {
+        if (count !== null) liveStars[stars.repo] = count;
+      });
+    }
+  });
+
+  function starLabel({ repo, fallback }) {
+    const count = liveStars[repo] ?? fallback;
+    return `${count} ${count === 1 ? "star" : "stars"} on GitHub`;
+  }
 </script>
 
 <div class="projects-container">
+  <h2 class="projects-title">Live Work</h2>
+
+  <div class="projects-grid">
+    {#each liveWork as site}
+      <div class="project-card live-card" use:tapToOpen={site.url}>
+        <div class="live-shot">
+          <img src={site.image} alt="Screenshot of the {site.name} website" />
+        </div>
+        <div class="live-body">
+          <h3 class="project-name">{site.name}</h3>
+          <a
+            href={site.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="project-link"
+          >
+            {site.domain} →
+          </a>
+        </div>
+      </div>
+    {/each}
+  </div>
+
   <h2 class="projects-title">
-    My Personal Projects
+    Personal Projects
     <a
       href="https://github.com/hotaru-py"
       target="_blank"
@@ -62,13 +131,23 @@
 
   <div class="projects-grid">
     {#each projects as project}
-      <div class="project-card">
+      <div class="project-card" use:tapToOpen={project.link}>
         <div class="project-header">
           <h3 class="project-name">
             {project.name}
           </h3>
         </div>
         <p class="project-description">{project.description}</p>
+        {#if project.stars}
+          <span class="star-pill">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95z"
+              />
+            </svg>
+            {starLabel(project.stars)}
+          </span>
+        {/if}
         <a
           href={project.link}
           target="_blank"
@@ -209,5 +288,62 @@
     text-decoration: none;
     padding: 4px 0;
     align-self: flex-start;
+  }
+
+  /* Live work: the screenshot fills the top, name and link sit underneath */
+  .live-card {
+    padding: 0;
+  }
+
+  .live-shot {
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border-bottom: var(--ink-border);
+    border-radius: 10px 10px 0 0;
+    background-color: var(--color-moss-100);
+  }
+
+  .live-shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .live-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px 12px;
+  }
+
+  /* Outlined like the skill pills, with a halftone-shaded star */
+  .star-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    margin: -4px 0 14px;
+    padding: 3px 10px 3px 8px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .star-pill svg {
+    width: 15px;
+    height: 15px;
+    fill: url(#halftone);
+    stroke: var(--color-ink);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  /* First tap on a touch screen (see tapToOpen) */
+  .project-card:global(.tap-armed) {
+    background-color: var(--color-moss-100);
   }
 </style>

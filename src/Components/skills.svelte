@@ -1,86 +1,5 @@
 <script>
-  const noteSequence = [
-    "A4",
-    "E5",
-    "A4",
-    "G#4",
-    "A4",
-    "E4",
-    "A4",
-    "A4",
-    "E5",
-    "A4",
-    "G#4",
-    "A4",
-    "E4",
-    "A4",
-    "E5",
-    "A4",
-    "G#4",
-    "A4",
-    "E4",
-    "D4",
-    "C#4",
-    "D4",
-    "E4",
-    "B4",
-    "A4",
-  ];
-
-  const noteFileMap = {
-    A4: "xylo_A4.mp3",
-    E5: "xylo_E5.mp3",
-    "G#4": "xylo_Gsharp4.mp3",
-    E4: "xylo_E4.mp3",
-    D4: "xylo_D4.mp3",
-    "C#4": "xylo_Csharp4.mp3",
-    B4: "xylo_B4.mp3",
-  };
-
-  const audioByNote = Object.fromEntries(
-    Object.entries(noteFileMap).map(([note, filename]) => {
-      const audio = new Audio(`/xylo/${filename}`);
-      audio.preload = "auto";
-      audio.load();
-      return [note, audio];
-    }),
-  );
-
-  let noteIndex = 0;
-  let activeTouchAudio;
-  let lastTouchAt = 0;
-
-  function playSound(allowOverlap = true) {
-    const note = noteSequence[noteIndex % noteSequence.length];
-    noteIndex = (noteIndex + 1) % noteSequence.length;
-
-    if (!allowOverlap && activeTouchAudio) {
-      activeTouchAudio.pause();
-      activeTouchAudio.currentTime = 0;
-    }
-
-    const audio = audioByNote[note].cloneNode();
-    audio.volume = 0.8;
-    if (!allowOverlap) {
-      activeTouchAudio = audio;
-    }
-    audio.play().catch((error) => {
-      console.warn(`Unable to play xylo note ${note}:`, error);
-    });
-  }
-
-  function playHoverSound() {
-    if (Date.now() - lastTouchAt < 500) {
-      return;
-    }
-    playSound();
-  }
-
-  function playTouchSound(event) {
-    event.preventDefault();
-    lastTouchAt = Date.now();
-    playSound(false);
-  }
+  import { xylophone } from "../lib/xylophone.js";
 
   const skillCategories = [
     {
@@ -148,15 +67,7 @@
             <span
               class="skill-pill"
               tabindex="0"
-              on:mouseenter={playHoverSound}
-              on:touchstart={playTouchSound}
-              on:focus={playHoverSound}
-              on:keydown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  playHoverSound();
-                }
-              }}
+              use:xylophone={{ keys: true }}
             >
               {skill}
             </span>

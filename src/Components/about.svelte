@@ -1,28 +1,42 @@
-<script>
+<script module>
+  import { preloadImages } from "../lib/preload.js";
+  // Padded so the whole drawing fits inside a circle (the start menu uses it too)
+  import avatar from "../assets/firefly-avatar.webp";
+
+  preloadImages([avatar]);
 </script>
 
 <div class="about-container">
   <div class="about-header">
-    <img src="/firefly.webp" alt="Hotaru" class="about-avatar" />
-    <h1 class="about-title">👋 Hello, I'm Prajesh</h1>
+    <img src={avatar} alt="Hotaru" class="about-avatar" />
+    <h1 class="about-title">
+      Hello, I'm Prajesh (^_^)/ <span class="pronouns">(he/him)</span>
+    </h1>
   </div>
 
   <div class="about-content">
     <p class="about-paragraph">
-      I'm a developer-designer, and an undergrad Computer Science student. I
-      work on a few different things, including but not limited to:
+      I'm an engineer by day, designer by night, artist throughout. Currently an
+      undergrad Computer Science student and Fullstack Developer.
+    </p>
+    <p class="about-paragraph">
+      I work on a few different things, including but not limited to:
     </p>
 
     <ul class="about-list">
-      <li><span class="highlight">software development</span> across stacks</li>
+      <li>
+        <span class="highlight">software development</span> across platforms and
+        stacks
+      </li>
       <li>
         designing <span class="highlight"
           >visually-appealing, usable and accessible</span
         > experiences
       </li>
       <li>
-        <span class="highlight">graphic design</span> and the occasional
-        <span class="highlight">doodling</span> (wannabe multimedia design)
+        <span class="highlight">graphic & UI/UX design</span>, and the
+        occasional
+        <span class="highlight">doodling</span> (also a wannabe multimedia artist)
       </li>
       <li>
         <span class="highlight">product and interaction design</span> in the long
@@ -65,7 +79,7 @@
     background-color: var(--color-accent);
     border: var(--ink-border);
     box-shadow: 3px 3px 0 var(--color-ink);
-    padding: 4px;
+    padding: 2px;
   }
 
   .about-title {
@@ -73,6 +87,13 @@
     font-weight: 700;
     color: var(--color-ink);
     margin: 0;
+  }
+
+  .pronouns {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+    white-space: nowrap;
   }
 
   .about-content {

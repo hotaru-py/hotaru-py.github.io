@@ -2,19 +2,28 @@
   import { onMount } from "svelte";
   import Taskbar from "./Taskbar.svelte";
   import DesktopIcon from "./DesktopIcon.svelte";
+  import IconGrid from "./IconGrid.svelte";
   import Window from "./Window.svelte";
   import Wallpaper from "./Wallpaper.svelte";
   import Loader from "../Loader.svelte";
   import MobileClock from "./MobileClock.svelte";
+  import MobileSettings from "./MobileSettings.svelte";
   import { sparkleDots } from "../../lib/halftone.js";
+  import { playSound } from "../../lib/sounds.js";
   import About from "../about.svelte";
   import Skills from "../skills.svelte";
   import Projects from "../projects.svelte";
   import Reach from "../reach.svelte";
+  import Credits from "../credits.svelte";
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
   let windows = $state([]);
+  /** @type {IconGrid | undefined} */
+  let iconGrid = $state();
+  let layoutCustomized = $state(false);
+  // Flips once the loader starts fading, so the icons animate in where they can be seen
+  let booted = $state(false);
   // Window ids from back to front; `windows` itself stays in open order for the taskbar
   let stackOrder = $state([]);
   let activeWindowId = $state(null);
@@ -26,22 +35,30 @@
 
   // Ink line icons; shaded areas use the shared #halftone pattern defined in the markup below
   const ICONS = {
-    about: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    work: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    projects: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    browser: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" style="fill: var(--color-paper)"/><path d="M12 2a10 10 0 0 1 0 20a4 10 0 0 0 0-20z" fill="url(#halftone)"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1.5"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.5"/></svg>`,
+    about: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.5 21v-1.5a4.5 4.5 0 0 1 4.5-4.5h6a4.5 4.5 0 0 1 4.5 4.5V21z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7.5" r="4" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    skills: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5.5 7.5 1 12l4.5 4.5M18.5 7.5 23 12l-4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><g transform="rotate(25 12 12)"><g style="fill: var(--color-paper); stroke: var(--color-paper)" stroke-width="3" stroke-linejoin="round"><rect x="10.2" y="4" width="3.6" height="2.3" rx="1" /><rect x="10.2" y="6.3" width="3.6" height="10.2" /><path d="M10.2 16.5h3.6L12 20z" /></g><rect x="10.2" y="4" width="3.6" height="2.3" rx="1" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="10.2" y="6.3" width="3.6" height="10.2" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.2 16.5h3.6L12 20z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.4 18.8 12 20l.6-1.2z" fill="currentColor"/></g></svg>`,
+    work: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    browser: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" style="fill: var(--color-paper)"/><path d="M12 2a10 10 0 0 0 0 20a4 10 0 0 1 0-20z" fill="url(#halftone)"/><path d="M12 2a10 10 0 0 1 0 20a4 10 0 0 0 0-20z" fill="url(#halftone)"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1.5"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.5"/></svg>`,
+    credits: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11v6" style="stroke: var(--color-paper)" stroke-width="5" stroke-linecap="round"/><circle cx="12" cy="7.5" r="2.4" style="fill: var(--color-paper)"/><path d="M12 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7.5" r="1.25" fill="currentColor"/></svg>`,
   };
 
   const desktopIcons = [
     { id: "about", title: "About Me", icon: ICONS.about, component: About },
-    { id: "skills", title: "Work", icon: ICONS.work, component: Skills },
+    { id: "skills", title: "Skills", icon: ICONS.skills, component: Skills },
     {
       id: "projects",
-      title: "Projects",
-      icon: ICONS.projects,
+      title: "Work",
+      icon: ICONS.work,
       component: Projects,
     },
     { id: "browser", title: "Browser", icon: ICONS.browser, component: Reach },
+    {
+      id: "credits",
+      title: "Credits",
+      icon: ICONS.credits,
+      component: Credits,
+      corner: "bottom-right", // default desktop spot; the mobile dock ignores it
+    },
   ];
 
   // One 24-unit tile covers a whole icon, so every dot twinkles independently
@@ -53,13 +70,8 @@
     fill: "var(--color-ink)",
   });
 
-  // Mobile dock order puts Browser first
-  const additionalIcons = [
-    desktopIcons[3],
-    desktopIcons[0],
-    desktopIcons[1],
-    desktopIcons[2],
-  ];
+  // Mobile dock labels, toggled from the settings menu
+  let showDockLabels = $state(true);
 
   onMount(() => {
     const timer = setInterval(() => {
@@ -101,32 +113,60 @@
         size: isMobileView
           ? { width: desktopWidth, height: desktopHeight - 60 }
           : { width: 700, height: 500 },
+        minimized: false,
       };
       windows = [...windows, newWindow];
       activateWindow(newWindow.id);
+      playSound("open");
     }
   }
 
   function closeWindow(id) {
+    // Already on its way out (e.g. a double-click on close)
+    if (closingWindowId === id) return;
     closingWindowId = id;
+    playSound("close");
 
     setTimeout(() => {
       windows = windows.filter((w) => w.id !== id);
       stackOrder = stackOrder.filter((wid) => wid !== id);
       // Focus falls to the next window down the stack, like on Windows
       if (activeWindowId === id) {
-        activeWindowId = stackOrder.at(-1) ?? null;
+        activeWindowId = topVisibleWindow();
       }
       closingWindowId = null;
     }, 300);
   }
 
-  // Bring a window to the front without disturbing the order of the others
+  // Bring a window to the front without disturbing the order of the others,
+  // restoring it first if it was minimized
   function activateWindow(id) {
+    if (windows.some((w) => w.id === id && w.minimized)) {
+      windows = windows.map((w) =>
+        w.id === id ? { ...w, minimized: false } : w,
+      );
+      playSound("open");
+    }
     activeWindowId = id;
     if (stackOrder.at(-1) !== id) {
       stackOrder = [...stackOrder.filter((wid) => wid !== id), id];
     }
+  }
+
+  function minimizeWindow(id) {
+    windows = windows.map((w) => (w.id === id ? { ...w, minimized: true } : w));
+    playSound("close");
+    if (activeWindowId === id) {
+      activeWindowId = topVisibleWindow();
+    }
+  }
+
+  // Topmost window that isn't minimized, if any
+  function topVisibleWindow() {
+    const visible = new Set(
+      windows.filter((w) => !w.minimized).map((w) => w.id),
+    );
+    return stackOrder.findLast((id) => visible.has(id)) ?? null;
   }
 
   function updateWindowPosition({ id, x, y }) {
@@ -181,7 +221,7 @@
     </defs>
   </svg>
 
-  <Loader />
+  <Loader onExit={() => (booted = true)} />
 
   <div
     class="desktop-background"
@@ -202,7 +242,9 @@
           {window}
           {isMobileView}
           isActive={activeWindowId === window.id}
+          minimized={window.minimized}
           onClose={() => closeWindow(window.id)}
+          onMinimize={() => minimizeWindow(window.id)}
           onActivate={() => activateWindow(window.id)}
           onMove={updateWindowPosition}
           onResize={updateWindowSize}
@@ -210,31 +252,30 @@
       </div>
     {/each}
 
-    {#if !isMobileView}
-      <div class="desktop-icons" in:fade={{ duration: 300, delay: 100 }}>
-        {#each desktopIcons as icon, i (icon.id)}
-          <div in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}>
-            <DesktopIcon
-              {icon}
-              onclick={() => handleIconClick(icon)}
-              isMobile={false}
-            />
-          </div>
-        {/each}
-      </div>
+    {#if !isMobileView && booted}
+      <IconGrid
+        bind:this={iconGrid}
+        bind:customized={layoutCustomized}
+        icons={desktopIcons}
+        onOpen={handleIconClick}
+      />
     {/if}
 
     {#if isMobileView}
       <MobileClock {currentTime} />
     {/if}
 
-    {#if isMobileView}
+    {#if isMobileView && booted}
+      <MobileSettings bind:showLabels={showDockLabels} />
+    {/if}
+
+    {#if isMobileView && booted}
       <div
         class="mobile-icons-additional"
         class:mobile-icons-hidden={activeWindowId}
         in:fade={{ duration: 300, delay: 100 }}
       >
-        {#each additionalIcons as icon, i (icon.id)}
+        {#each desktopIcons as icon, i (icon.id)}
           <div
             in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}
             class="mobile-icon-wrapper"
@@ -243,6 +284,7 @@
               {icon}
               onclick={() => handleIconClick(icon)}
               isMobile={true}
+              showLabel={showDockLabels}
             />
           </div>
         {/each}
@@ -257,7 +299,10 @@
       {desktopIcons}
       {currentTime}
       onActivateWindow={activateWindow}
+      onMinimizeWindow={minimizeWindow}
       onOpenWindow={openWindow}
+      showReset={layoutCustomized}
+      onResetLayout={() => iconGrid?.reset()}
     />
   {/if}
 </div>
@@ -295,21 +340,6 @@
     padding-top: 0;
   }
 
-  .desktop-icons {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 16px;
-    padding: 24px;
-    height: calc(100% - 30px);
-    overflow: auto;
-  }
-
-  .desktop-icons > div {
-    width: 120px;
-  }
-
   .mobile-icons-additional {
     position: fixed;
     bottom: 20px;
@@ -326,7 +356,8 @@
     border-radius: 20px;
     z-index: 1000;
     overflow-x: auto;
-    gap: 10px;
+    /* 16px between icons, narrowing on small phones so five icons always fit */
+    gap: clamp(2px, calc((100vw - 308px) / 4), 16px);
     border: var(--ink-border);
     box-shadow: var(--ink-shadow);
   }
@@ -359,36 +390,6 @@
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-  }
-
-  @media (max-height: 600px) {
-    .desktop-icons:not(.mobile-icons) {
-      flex-direction: row;
-      height: auto;
-      width: calc(100% - 48px);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .desktop-icons:not(.mobile-icons) {
-      gap: 12px;
-      padding: 16px;
-    }
-
-    .desktop-icons:not(.mobile-icons) > div {
-      width: 100px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .desktop-icons:not(.mobile-icons) {
-      gap: 8px;
-      padding: 12px;
-    }
-
-    .desktop-icons:not(.mobile-icons) > div {
-      width: 80px;
-    }
   }
 
   .window-wrapper {

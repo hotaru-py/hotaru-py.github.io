@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { tapToOpen } from "../lib/tapToOpen.js";
 
   const browserMethods = [
     {
@@ -10,7 +10,8 @@
     {
       name: "Email",
       url: "mailto:prajeshraam@gmail.com",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.5v15c0 .85-.65 1.5-1.5 1.5H1.5C.65 21 0 20.35 0 19.5v-15c0-.85.65-1.5 1.5-1.5h21c.85 0 1.5.65 1.5 1.5zm-1.5 0l-10.5 7-10.5-7h21zM22.5 19.5v-12.51l-10.5 7-10.5-7v12.51h21z"/></svg>`,
+      // Filled with rounded corners, like the other bookmark icons
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="1" y="4" width="22" height="16" rx="3.5"/><path d="M5 8.5l7 5 7-5" fill="none" style="stroke: var(--color-paper)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     },
     {
       name: "GitHub",
@@ -28,56 +29,13 @@
       icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>`,
     },*/
   ];
-
-  let activeLink;
-
-  onMount(() => {
-    function clearActiveLink(event) {
-      if (
-        !(event.target instanceof Element) ||
-        !event.target.closest(".browser-card")
-      ) {
-        activeLink = undefined;
-      }
-    }
-
-    document.addEventListener("touchstart", clearActiveLink);
-    return () => document.removeEventListener("touchstart", clearActiveLink);
-  });
-
-  function handleCardClick(event, url) {
-    if (!window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
-      return;
-    }
-
-    event.preventDefault();
-
-    if (activeLink !== url) {
-      activeLink = url;
-      return;
-    }
-
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
 </script>
 
 <div class="browser-container">
   <h2 class="browser-title">Bookmarks</h2>
   <div class="browser-grid">
     {#each browserMethods as method}
-      <div
-        class="browser-card"
-        class:mobile-card-active={activeLink === method.url}
-        role="button"
-        tabindex="0"
-        onclick={(event) => handleCardClick(event, method.url)}
-        onkeydown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            handleCardClick(event, method.url);
-          }
-        }}
-      >
+      <div class="browser-card" use:tapToOpen={method.url}>
         <div class="browser-row">
           <div class="browser-icon">
             {@html method.icon}
@@ -226,9 +184,8 @@
     transform: translateX(2px);
   }
 
-  @media (hover: none) and (pointer: coarse) {
-    .browser-card.mobile-card-active {
-      background-color: var(--color-moss-100);
-    }
+  /* First tap on a touch screen (see tapToOpen) */
+  .browser-card:global(.tap-armed) {
+    background-color: var(--color-moss-100);
   }
 </style>

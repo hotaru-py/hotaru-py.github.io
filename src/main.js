@@ -1,9 +1,10 @@
 import { mount } from "svelte";
 import "./app.css";
 import App from "./App.svelte";
-import { installSparkleHalftone } from "./lib/halftone.js";
+import { installSparkleHalftone, installWaveHalftone } from "./lib/halftone.js";
 
 installSparkleHalftone();
+installWaveHalftone();
 
 const app = mount(App, {
   target: document.getElementById("app"),
