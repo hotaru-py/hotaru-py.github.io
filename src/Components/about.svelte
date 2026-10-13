@@ -4,16 +4,13 @@
 <div class="about-container">
   <div class="about-header">
     <img src="/firefly.webp" alt="Hotaru" class="about-avatar" />
-    <h1 class="about-title">
-      Prajesh Raam <span class="highlight_smol">(hotaru)</span>
-    </h1>
+    <h1 class="about-title">👋 Hello, I'm Prajesh</h1>
   </div>
 
   <div class="about-content">
     <p class="about-paragraph">
-      👋 Hello, I'm <span class="highlight">Prajesh</span>, an undergrad
-      Computer Science student. I work on a few different things, including but
-      not limited to:
+      I'm a developer-designer, and an undergrad Computer Science student. I
+      work on a few different things, including but not limited to:
     </p>
 
     <ul class="about-list">
@@ -64,7 +61,7 @@
     height: 72px;
     border-radius: 50%;
     margin-right: 16px;
-    object-fit: cover;
+    object-fit: contain;
     background-color: var(--color-accent);
     border: var(--ink-border);
     box-shadow: 3px 3px 0 var(--color-ink);
@@ -124,5 +121,7 @@
     font-weight: 700;
     color: var(--color-ink);
     margin: 24px 0 12px 0;
+    padding-bottom: 12px;
+    border-bottom: var(--ink-border);
   }
 </style>

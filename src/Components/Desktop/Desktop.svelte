@@ -4,6 +4,8 @@
   import DesktopIcon from "./DesktopIcon.svelte";
   import Window from "./Window.svelte";
   import Wallpaper from "./Wallpaper.svelte";
+  import Loader from "../Loader.svelte";
+  import MobileClock from "./MobileClock.svelte";
   import { sparkleDots } from "../../lib/halftone.js";
   import About from "../about.svelte";
   import Skills from "../skills.svelte";
@@ -21,7 +23,6 @@
   let desktopHeight = $state(0);
   let isMobileView = $state(false);
   let currentTime = $state(new Date());
-  let startupComplete = $state(false);
 
   // Ink line icons; shaded areas use the shared #halftone pattern defined in the markup below
   const ICONS = {
@@ -63,10 +64,6 @@
   onMount(() => {
     const timer = setInterval(() => {
       currentTime = new Date();
-    }, 1000);
-
-    setTimeout(() => {
-      startupComplete = true;
     }, 1000);
 
     updateDesktopDimensions();
@@ -184,14 +181,7 @@
     </defs>
   </svg>
 
-  {#if !startupComplete}
-    <div class="startup-screen" out:fade={{ duration: 300 }}>
-      <div class="startup-logo">hotaru's PC</div>
-      <div class="startup-loading">
-        <div class="loading-bar"></div>
-      </div>
-    </div>
-  {/if}
+  <Loader />
 
   <div
     class="desktop-background"
@@ -232,6 +222,10 @@
           </div>
         {/each}
       </div>
+    {/if}
+
+    {#if isMobileView}
+      <MobileClock {currentTime} />
     {/if}
 
     {#if isMobileView}
@@ -319,7 +313,7 @@
   .mobile-icons-additional {
     position: fixed;
     bottom: 20px;
-    max-width: 90%;
+    max-width: calc(100% - 24px);
     width: auto;
     left: 50%;
     transform: translateX(-50%);
@@ -328,11 +322,11 @@
     justify-content: space-around;
     align-items: center;
     background-color: var(--color-paper);
-    padding: 12px 20px;
-    border-radius: 16px;
+    padding: 10px;
+    border-radius: 20px;
     z-index: 1000;
     overflow-x: auto;
-    gap: 16px;
+    gap: 10px;
     border: var(--ink-border);
     box-shadow: var(--ink-shadow);
   }
@@ -436,56 +430,6 @@
     100% {
       opacity: 0;
       transform: scale(0.85);
-    }
-  }
-
-  .startup-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: var(--color-paper);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-  }
-
-  .startup-logo {
-    font-size: 48px;
-    font-weight: 700;
-    color: var(--color-ink);
-    margin-bottom: 40px;
-    letter-spacing: 2px;
-  }
-
-  .startup-loading {
-    width: 200px;
-    height: 12px;
-    background: var(--color-paper);
-    border: var(--ink-border);
-    border-radius: 999px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .loading-bar {
-    width: 60px;
-    height: 100%;
-    background: var(--color-accent);
-    border-right: var(--ink-border);
-    position: absolute;
-    animation: loading 1s ease-in-out forwards;
-  }
-
-  @keyframes loading {
-    0% {
-      left: -60px;
-    }
-    100% {
-      left: 200px;
     }
   }
 </style>

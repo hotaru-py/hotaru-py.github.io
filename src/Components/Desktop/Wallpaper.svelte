@@ -18,9 +18,14 @@
   // Cursor drag: nearby goo gets swept along with the cursor's motion
   const DRAG = 7;
   const MAX_POINTER_SPEED = 4000;
-  const POINTER_REACH = 0.3; // vmin
+  const POINTER_REACH = 0.3; // of the blob unit
 
-  // Blob layout in vmin units: many small particles, so a swipe can cut a clean gap
+  // On narrow screens the blob is sized from the screen's area instead of its short
+  // side, which would make it small on a tall phone. Same shape and motion, just scaled up.
+  const MOBILE_MAX_WIDTH = 768;
+  const MOBILE_UNIT = 1.05; // of sqrt(width * height)
+
+  // Blob layout in blob units: many small particles, so a swipe can cut a clean gap
   const ring = (count, dist, r, phase = 0) =>
     Array.from({ length: count }, (_, i) => ({
       angle: phase + (i / count) * Math.PI * 2,
@@ -65,7 +70,8 @@
     const lut = buildColorLut();
     let width = 0;
     let height = 0;
-    let vmin = 0;
+    let unit = 0; // blob size basis: the short side on desktop
+    let frames = 0;
     let image = null;
     let field = null;
     let fieldScale = 1;
@@ -92,7 +98,7 @@
     // Where each particle wants to be, relative to the blob's center
     function target(p, i, t) {
       const angle = p.angle + t * p.spin;
-      const dist = p.dist * vmin * (1 + 0.15 * Math.sin(t * 0.6 + i));
+      const dist = p.dist * unit * (1 + 0.15 * Math.sin(t * 0.6 + i));
       return [
         anchor.x + Math.cos(angle) * dist,
         anchor.y + Math.sin(angle) * dist,
@@ -111,7 +117,11 @@
     function resize() {
       width = window.innerWidth;
       height = window.innerHeight;
-      vmin = Math.min(width, height);
+      const mobile = width <= MOBILE_MAX_WIDTH;
+      unit = mobile
+        ? Math.sqrt(width * height) * MOBILE_UNIT
+        : Math.min(width, height);
+      frames = 0; // resample the clock backdrop on the next draw
       canvas.width = Math.ceil(width / SCALE);
       canvas.height = Math.ceil(height / SCALE);
       image = ctx.createImageData(canvas.width, canvas.height);
@@ -134,7 +144,7 @@
     }
 
     function step(t, dt) {
-      const reach = vmin * POINTER_REACH;
+      const reach = unit * POINTER_REACH;
       const speed = Math.hypot(pointer.vx, pointer.vy);
       const clamp = speed > MAX_POINTER_SPEED ? MAX_POINTER_SPEED / speed : 1;
       const pvx = pointer.vx * clamp;
@@ -148,7 +158,7 @@
         ANCHOR_SPRING * (driftY - anchor.y) - ANCHOR_DAMPING * anchor.vy;
       if (pointer.active) {
         const d = Math.hypot(pointer.x - anchor.x, pointer.y - anchor.y);
-        const blobReach = vmin * 0.5;
+        const blobReach = unit * 0.5;
         if (d < blobReach) {
           const falloff = 1 - d / blobReach;
           aax += pvx * ANCHOR_DRAG * falloff;
@@ -195,7 +205,7 @@
       const h = canvas.height;
       field.fill(0);
       for (const p of particles) {
-        const r = p.r * vmin;
+        const r = p.r * unit;
         const toIndex = GAUSS_STEPS / GAUSS_CUTOFF / (r * r);
         const extent = r * Math.sqrt(GAUSS_CUTOFF);
         const x0 = Math.max(0, Math.floor((p.x - extent) / SCALE));
@@ -215,8 +225,47 @@
       }
     }
 
+    // The home screen clock sits mid-screen; tell it what the wallpaper looks like there
+    // so its ink can adapt (deeper green over the blob, paper if it ever gets dark)
+    const inkRgb = cssRgb("--color-ink");
+    const deepRgb = cssRgb("--color-moss-900");
+    const paperRgb = cssRgb("--color-paper");
+    let lastClockInk = "";
+
+    function sampleClockBackdrop() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const x0 = Math.floor(w * 0.2);
+      const x1 = Math.ceil(w * 0.8);
+      const y0 = Math.floor(h * 0.44);
+      const y1 = Math.ceil(h * 0.56);
+      let sum = 0;
+      let n = 0;
+      for (let y = y0; y < y1; y += 2) {
+        for (let x = x0; x < x1; x += 2) {
+          sum += field[y * w + x];
+          n++;
+        }
+      }
+      const idx = Math.min(255, ((sum / n) * fieldScale) | 0);
+      const bg = [lut[idx * 3], lut[idx * 3 + 1], lut[idx * 3 + 2]];
+
+      const dark = luminance(bg) < 0.18;
+      const k = idx / 255;
+      const rgb = dark
+        ? paperRgb
+        : inkRgb.map((c, i) => c + (deepRgb[i] - c) * k);
+      const ink = `rgb(${rgb.map(Math.round).join(" ")})`;
+      if (ink === lastClockInk) return;
+      lastClockInk = ink;
+      canvas
+        .closest(".desktop-container")
+        ?.style.setProperty("--clock-ink", ink);
+    }
+
     function draw() {
       accumulate();
+      if (frames++ % 8 === 0) sampleClockBackdrop();
       const { data } = image;
       for (let i = 0, o = 0; i < field.length; i++, o += 4) {
         const c = Math.min(255, (field[i] * fieldScale) | 0) * 3;
@@ -318,6 +367,21 @@
       }
     }
     return lut;
+  }
+
+  function cssRgb(token) {
+    return hexToRgb(
+      getComputedStyle(document.documentElement).getPropertyValue(token).trim(),
+    );
+  }
+
+  // WCAG relative luminance of an sRGB color (0..255 channels)
+  function luminance([r, g, b]) {
+    const lin = (c) => {
+      c /= 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
   }
 
   function hexToRgb(hex) {

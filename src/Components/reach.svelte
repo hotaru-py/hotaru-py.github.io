@@ -1,4 +1,6 @@
 <script>
+  import { onMount } from "svelte";
+
   const browserMethods = [
     {
       name: "LinkedIn",
@@ -26,13 +28,56 @@
       icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>`,
     },*/
   ];
+
+  let activeLink;
+
+  onMount(() => {
+    function clearActiveLink(event) {
+      if (
+        !(event.target instanceof Element) ||
+        !event.target.closest(".browser-card")
+      ) {
+        activeLink = undefined;
+      }
+    }
+
+    document.addEventListener("touchstart", clearActiveLink);
+    return () => document.removeEventListener("touchstart", clearActiveLink);
+  });
+
+  function handleCardClick(event, url) {
+    if (!window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (activeLink !== url) {
+      activeLink = url;
+      return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
 </script>
 
 <div class="browser-container">
   <h2 class="browser-title">Bookmarks</h2>
   <div class="browser-grid">
     {#each browserMethods as method}
-      <div class="browser-card">
+      <div
+        class="browser-card"
+        class:mobile-card-active={activeLink === method.url}
+        role="button"
+        tabindex="0"
+        onclick={(event) => handleCardClick(event, method.url)}
+        onkeydown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleCardClick(event, method.url);
+          }
+        }}
+      >
         <div class="browser-row">
           <div class="browser-icon">
             {@html method.icon}
@@ -169,11 +214,21 @@
     text-decoration: none;
     padding: 4px 8px;
     margin-left: auto;
-    transition: transform 0.2s ease;
+    border-radius: 6px;
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
     flex-shrink: 0;
   }
 
   .browser-link:hover {
     transform: translateX(2px);
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .browser-card.mobile-card-active {
+      background-color: var(--color-moss-100);
+    }
   }
 </style>

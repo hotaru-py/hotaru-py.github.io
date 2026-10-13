@@ -1,5 +1,6 @@
 <script>
   import { onMount } from "svelte";
+  import Logo from "../Logo.svelte";
   import { fade, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
@@ -84,7 +85,7 @@
         class:active={isStartMenuOpen}
         onclick={toggleStartMenu}
       >
-        <img src="/firefly.webp" alt="hotaru logo" class="start-icon" />
+        <span class="start-icon"><Logo /></span>
         <span class="start-text">Start</span>
       </button>
 
@@ -187,12 +188,12 @@
     margin: 6px;
     font-weight: 700;
     font-size: 14px;
-    background: var(--color-ink);
-    color: var(--color-paper);
+    background: var(--color-accent);
+    color: var(--color-ink);
     border: var(--ink-border);
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 2px 2px 0 var(--color-accent);
+    box-shadow: 2px 2px 0 var(--color-ink);
     transition:
       transform 0.15s ease,
       box-shadow 0.15s ease;
@@ -200,7 +201,7 @@
 
   .start-button:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0 var(--color-accent);
+    box-shadow: 3px 3px 0 var(--color-ink);
   }
 
   .start-button.active {
@@ -209,11 +210,9 @@
   }
 
   .start-icon {
-    width: 20px;
-    height: 20px;
+    display: flex;
+    height: 18px;
     margin-right: 8px;
-    border-radius: 50%;
-    background: var(--color-paper);
   }
 
   .start-menu {

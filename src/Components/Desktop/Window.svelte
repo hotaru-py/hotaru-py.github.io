@@ -375,7 +375,7 @@
 
   .mobile-back-button {
     background: var(--color-paper);
-    border: var(--ink-border);
+    border: none;
     font-size: 20px;
     color: var(--color-ink);
     width: 36px;
@@ -387,6 +387,10 @@
     cursor: pointer;
     padding: 0;
     margin-right: 12px;
+  }
+
+  .mobile-back-button:focus-visible {
+    outline: none;
   }
 
   .mobile-back-button:active {

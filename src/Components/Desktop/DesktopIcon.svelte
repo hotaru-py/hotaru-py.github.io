@@ -28,14 +28,8 @@
       {@html icon.icon}
     </div>
   </div>
-  {#if !isMobile || !icon.title.includes(" ")}
-    <div class="icon-title" class:mobile-icon-title={isMobile}>
-      {icon.title}
-    </div>
-  {:else}
-    <div class="icon-title" class:mobile-icon-title={isMobile}>
-      {icon.title.split(" ")[0]}
-    </div>
+  {#if !isMobile}
+    <div class="icon-title">{icon.title}</div>
   {/if}
 </div>
 
@@ -53,9 +47,8 @@
 
   .mobile-icon {
     width: auto;
-    min-width: 60px;
-    max-width: 70px;
-    padding: 6px 2px;
+    padding: 0;
+    border-radius: 14px;
   }
 
   .desktop-icon:focus {
@@ -91,10 +84,10 @@
   }
 
   .mobile-icon-container {
-    width: 42px;
-    height: 42px;
-    margin-bottom: 4px;
-    border-radius: 10px;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 0;
+    border-radius: 14px;
   }
 
   .desktop-icon:hover .icon-container {
@@ -121,13 +114,13 @@
   }
 
   .mobile-icon-container .icon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
   }
 
   .mobile-icon-container .icon :global(svg) {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
   }
 
   .icon-title {
@@ -139,15 +132,6 @@
     background-color: var(--color-paper);
     padding: 2px 6px;
     border-radius: 4px;
-  }
-
-  .mobile-icon-title {
-    font-size: 10px;
-    font-weight: 600;
-    max-width: 60px;
-    background-color: transparent;
-    padding: 0;
-    color: var(--color-ink);
   }
 
   @media (max-width: 768px) {
@@ -165,7 +149,7 @@
       font-size: 28px;
     }
 
-    .icon-title:not(.mobile-icon-title) {
+    .icon-title {
       font-size: 12px;
       max-width: 80px;
       padding: 2px 4px;
@@ -188,7 +172,7 @@
       font-size: 26px;
     }
 
-    .icon-title:not(.mobile-icon-title) {
+    .icon-title {
       font-size: 11px;
       max-width: 70px;
     }
