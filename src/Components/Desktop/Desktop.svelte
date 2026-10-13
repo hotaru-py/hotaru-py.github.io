@@ -10,14 +10,14 @@
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
-  let windows = [];
-  let activeWindowId = null;
-  let closingWindowId = null;
-  let desktopWidth = 0;
-  let desktopHeight = 0;
-  let isMobileView = false;
-  let currentTime = new Date();
-  let startupComplete = false;
+  let windows = $state([]);
+  let activeWindowId = $state(null);
+  let closingWindowId = $state(null);
+  let desktopWidth = $state(0);
+  let desktopHeight = $state(0);
+  let isMobileView = $state(false);
+  let currentTime = $state(new Date());
+  let startupComplete = $state(false);
 
   const desktopIcons = [
     {
@@ -141,15 +141,13 @@
     activeWindowId = id;
   }
 
-  function updateWindowPosition(event) {
-    const { id, x, y } = event.detail;
+  function updateWindowPosition({ id, x, y }) {
     windows = windows.map((w) =>
       w.id === id ? { ...w, position: { x, y } } : w,
     );
   }
 
-  function updateWindowSize(event) {
-    const { id, width, height } = event.detail;
+  function updateWindowSize({ id, width, height }) {
     windows = windows.map((w) =>
       w.id === id ? { ...w, size: { width, height } } : w,
     );
@@ -195,10 +193,10 @@
           {window}
           {isMobileView}
           isActive={activeWindowId === window.id}
-          on:close={() => closeWindow(window.id)}
-          on:activate={() => activateWindow(window.id)}
-          on:move={updateWindowPosition}
-          on:resize={updateWindowSize}
+          onClose={() => closeWindow(window.id)}
+          onActivate={() => activateWindow(window.id)}
+          onMove={updateWindowPosition}
+          onResize={updateWindowSize}
         />
       </div>
     {/each}
@@ -209,7 +207,7 @@
           <div in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}>
             <DesktopIcon
               {icon}
-              on:click={() => handleIconClick(icon)}
+              onclick={() => handleIconClick(icon)}
               isMobile={false}
             />
           </div>
@@ -230,7 +228,7 @@
           >
             <DesktopIcon
               {icon}
-              on:click={() => handleIconClick(icon)}
+              onclick={() => handleIconClick(icon)}
               isMobile={true}
             />
           </div>
@@ -245,8 +243,8 @@
       {activeWindowId}
       {desktopIcons}
       {currentTime}
-      on:activateWindow={(e) => activateWindow(e.detail)}
-      on:openWindow={(e) => openWindow(e.detail)}
+      onActivateWindow={activateWindow}
+      onOpenWindow={openWindow}
     />
   {/if}
 </div>

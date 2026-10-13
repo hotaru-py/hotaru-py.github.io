@@ -1,24 +1,27 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  /**
+   * @typedef {Object} Props
+   * @property {any} icon
+   * @property {boolean} [isMobile]
+   * @property {() => void} [onclick]
+   */
 
-  export let icon;
-  export let isMobile = false;
-
-  const dispatch = createEventDispatcher();
+  /** @type {Props} */
+  let { icon, isMobile = false, onclick } = $props();
 
   function handleClick() {
-    dispatch("click");
+    onclick?.();
   }
 </script>
 
 <div
   class="desktop-icon"
   class:mobile-icon={isMobile}
-  on:click={handleClick}
+  onclick={handleClick}
   role="button"
   tabindex="0"
   aria-label={`Open ${icon.title}`}
-  on:keydown={(e) => e.key === "Enter" && handleClick()}
+  onkeydown={(e) => e.key === "Enter" && handleClick()}
 >
   <div class="icon-container" class:mobile-icon-container={isMobile}>
     <div class="icon">

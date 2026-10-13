@@ -1,35 +1,54 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { scale, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
-  export let window;
-  export let isActive = false;
-  export let isMobileView = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} window
+   * @property {boolean} [isActive]
+   * @property {boolean} [isMobileView]
+   * @property {() => void} [onClose]
+   * @property {() => void} [onActivate]
+   * @property {(pos: { id: any, x: number, y: number }) => void} [onMove]
+   * @property {(size: { id: any, width: number, height: number }) => void} [onResize]
+   */
 
-  const dispatch = createEventDispatcher();
+  /** @type {Props} */
+  let {
+    window,
+    isActive = false,
+    isMobileView = false,
+    onClose,
+    onActivate,
+    onMove,
+    onResize,
+  } = $props();
+
+  // The window owns its position/size after mount; props only seed them
+  const { position, size } = untrack(() => window);
 
   // Variables to track dragging and resizing
   let isDragging = false;
   let isResizing = false;
   let startX = 0;
   let startY = 0;
-  let offsetX = window.position.x;
-  let offsetY = window.position.y;
-  let currentX = window.position.x;
-  let currentY = window.position.y;
-  let startWidth = window.size.width;
-  let startHeight = window.size.height;
-  let currentWidth = window.size.width;
-  let currentHeight = window.size.height;
-  let windowElement;
+  let offsetX = position.x;
+  let offsetY = position.y;
+  let currentX = $state(position.x);
+  let currentY = $state(position.y);
+  let startWidth = size.width;
+  let startHeight = size.height;
+  let currentWidth = $state(size.width);
+  let currentHeight = $state(size.height);
+  let windowElement = $state();
 
   function close() {
-    dispatch("close");
+    onClose?.();
   }
 
   function activate() {
-    dispatch("activate");
+    onActivate?.();
   }
 
   onMount(() => {
@@ -96,7 +115,7 @@
       document.removeEventListener("mousemove", handleResizeMouseMove);
       document.removeEventListener("mouseup", handleResizeMouseUp);
 
-      dispatch("resize", {
+      onResize?.({
         id: window.id,
         width: currentWidth,
         height: currentHeight,
@@ -122,7 +141,7 @@
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
 
-      dispatch("move", { id: window.id, x: currentX, y: currentY });
+      onMove?.({ id: window.id, x: currentX, y: currentY });
     }
   }
 </script>
@@ -132,7 +151,7 @@
   class:active={isActive}
   class:mobile-window-container={isMobileView}
   style={isMobileView ? "" : `left: ${currentX}px; top: ${currentY}px;`}
-  on:mousedown={handleMouseDown}
+  onmousedown={handleMouseDown}
   bind:this={windowElement}
 >
   <div
@@ -148,7 +167,7 @@
         <div class="window-controls">
           <button
             class="window-control close"
-            on:click={close}
+            onclick={close}
             aria-label="Close"
           >
             <span>×</span>
@@ -161,7 +180,7 @@
       {#if isMobileView}
         <div class="mobile-header">
           <div class="mobile-header-content">
-            <button class="mobile-back-button" on:click={close}>
+            <button class="mobile-back-button" onclick={close}>
               <svg
                 width="20"
                 height="20"
@@ -180,13 +199,13 @@
           </div>
         </div>
       {/if}
-      <svelte:component this={window.component} isMobile={isMobileView} />
+      <window.component isMobile={isMobileView} />
     </div>
 
     {#if !isMobileView}
       <div
         class="resize-handle"
-        on:mousedown={handleResizeMouseDown}
+        onmousedown={handleResizeMouseDown}
         aria-label="Resize window"
       ></div>
     {/if}

@@ -1,17 +1,30 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { fade, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
-  export let windows = [];
-  export let activeWindowId = null;
-  export let desktopIcons = [];
-  export let currentTime = new Date();
+  /**
+   * @typedef {Object} Props
+   * @property {any} [windows]
+   * @property {any} [activeWindowId]
+   * @property {any} [desktopIcons]
+   * @property {any} [currentTime]
+   * @property {(windowId: any) => void} [onActivateWindow]
+   * @property {(icon: any) => void} [onOpenWindow]
+   */
 
-  let isStartMenuOpen = false;
-  let startMenuContainer;
+  /** @type {Props} */
+  let {
+    windows = [],
+    activeWindowId = null,
+    desktopIcons = [],
+    currentTime = new Date(),
+    onActivateWindow,
+    onOpenWindow,
+  } = $props();
 
-  const dispatch = createEventDispatcher();
+  let isStartMenuOpen = $state(false);
+  let startMenuContainer = $state();
 
   onMount(() => {
     function handleClickOutside(event) {
@@ -38,7 +51,7 @@
   }
 
   function activateWindow(windowId) {
-    dispatch("activateWindow", windowId);
+    onActivateWindow?.(windowId);
   }
 
   function handleTaskbarButtonClick(windowId) {
@@ -46,7 +59,7 @@
   }
 
   function openWindow(iconData) {
-    dispatch("openWindow", iconData);
+    onOpenWindow?.(iconData);
     isStartMenuOpen = false;
   }
 
@@ -69,7 +82,7 @@
       <button
         class="start-button"
         class:active={isStartMenuOpen}
-        on:click={toggleStartMenu}
+        onclick={toggleStartMenu}
       >
         <img src="/firefly.webp" alt="hotaru logo" class="start-icon" />
         <span class="start-text">Start</span>
@@ -97,7 +110,7 @@
             {#each desktopIcons as icon, i}
               <div
                 class="start-menu-item"
-                on:click={() => openWindow(icon)}
+                onclick={() => openWindow(icon)}
                 in:slide={{
                   delay: 100 + i * 50,
                   duration: 150,
@@ -120,7 +133,7 @@
         <button
           class="taskbar-window-button"
           class:active={activeWindowId === window.id}
-          on:click={() => handleTaskbarButtonClick(window.id)}
+          onclick={() => handleTaskbarButtonClick(window.id)}
           in:slide={{ duration: 200, easing: cubicOut }}
           out:slide={{ duration: 200, easing: cubicOut }}
         >
