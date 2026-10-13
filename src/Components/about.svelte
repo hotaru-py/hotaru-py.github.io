@@ -11,20 +11,26 @@
 
   <div class="about-content">
     <p class="about-paragraph">
-      👋 Hello, I'm <span class="highlight">hotaru</span>, an undergrad Computer
-      Science student. I do a few random things like:
+      👋 Hello, I'm <span class="highlight">Prajesh</span>, an undergrad
+      Computer Science student. I work on a few different things, including but
+      not limited to:
     </p>
 
     <ul class="about-list">
+      <li><span class="highlight">software development</span> across stacks</li>
       <li>
-        do <span class="highlight">software development of all kinds</span>
+        designing <span class="highlight"
+          >visually-appealing, usable and accessible</span
+        > experiences
       </li>
       <li>
-        design <span class="highlight">visually-appealing and usable</span> experiences
+        <span class="highlight">graphic design</span> and the occasional
+        <span class="highlight">doodling</span> (wannabe multimedia design)
       </li>
-      <li>design <span class="highlight">good-looking</span> graphics</li>
-      <!-- <li><span class="highlight">doodle</span> (and soon, animate stuff!)</li> -->
-      <li><span class="highlight">doodle</span> randomly</li>
+      <li>
+        <span class="highlight">product and interaction design</span> in the long
+        run
+      </li>
     </ul>
 
     <h3 class="about-heading">Education</h3>
@@ -49,7 +55,7 @@
     display: flex;
     align-items: center;
     padding-bottom: 16px;
-    border-bottom: 1px solid #eaeaea;
+    border-bottom: var(--ink-border);
     margin-bottom: 20px;
   }
 
@@ -59,14 +65,16 @@
     border-radius: 50%;
     margin-right: 16px;
     object-fit: cover;
-    background-color: rgba(194, 239, 211, 0.7);
+    background-color: var(--color-accent);
+    border: var(--ink-border);
+    box-shadow: 3px 3px 0 var(--color-ink);
     padding: 4px;
   }
 
   .about-title {
     font-size: 24px;
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 700;
+    color: var(--color-ink);
     margin: 0;
   }
 
@@ -78,31 +86,31 @@
     font-size: 16px;
     line-height: 1.6;
     margin-bottom: 16px;
-    color: #4a4a4a;
+    color: var(--color-ink-soft);
   }
 
   .about-subtitle {
     display: block;
     font-size: 14px;
-    color: #777;
+    color: var(--color-ink-muted);
     margin-top: 4px;
   }
 
   .highlight {
-    color: #1b4965;
-    font-weight: 600;
+    color: var(--color-ink);
+    font-weight: 700;
   }
 
   .highlight_smol {
     font-size: 16px;
-    color: #445a67;
+    color: var(--color-ink-muted);
     font-weight: 600;
   }
 
   .about-list {
     margin-bottom: 20px;
     padding-left: 20px;
-    color: #4a4a4a;
+    color: var(--color-ink-soft);
     line-height: 1.6;
     list-style-type: disc;
   }
@@ -113,8 +121,8 @@
 
   .about-heading {
     font-size: 18px;
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 700;
+    color: var(--color-ink);
     margin: 24px 0 12px 0;
   }
 </style>

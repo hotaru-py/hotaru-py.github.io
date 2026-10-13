@@ -108,7 +108,8 @@
 
           <div class="start-menu-items">
             {#each desktopIcons as icon, i}
-              <div
+              <button
+                type="button"
                 class="start-menu-item"
                 onclick={() => openWindow(icon)}
                 in:slide={{
@@ -121,7 +122,7 @@
                   {@html icon.icon}
                 </div>
                 <div class="start-menu-item-text">{icon.title}</div>
-              </div>
+              </button>
             {/each}
           </div>
         </div>
@@ -156,7 +157,7 @@
 
 <style>
   .taskbar-container {
-    padding: 12px 16px;
+    padding: 12px 16px 16px;
     position: relative;
     z-index: 1000;
     background-color: transparent;
@@ -164,15 +165,14 @@
 
   .taskbar {
     height: 50px;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: var(--color-paper);
     display: flex;
     border-radius: 12px;
-    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
+    border: var(--ink-border);
+    box-shadow: var(--ink-shadow);
     width: 100%;
+    box-sizing: border-box;
     z-index: 1000;
-    border: 1px solid rgba(255, 255, 255, 0.6);
   }
 
   .start-button-container {
@@ -182,67 +182,75 @@
   .start-button {
     display: flex;
     align-items: center;
-    height: 38px;
+    height: 34px;
     padding: 0 12px;
     margin: 6px;
-    font-weight: 500;
+    font-weight: 700;
     font-size: 14px;
-    background: linear-gradient(to right, #a3d8e9, #8bc6f4);
-    color: #2c3e50;
-    border: none;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border: var(--ink-border);
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 2px 0 var(--color-accent);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
   .start-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--color-accent);
   }
 
   .start-button.active {
-    background: linear-gradient(to right, #8bc6f4, #7ab6e4);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-    transform: translateY(1px);
+    transform: translate(2px, 2px);
+    box-shadow: none;
   }
 
   .start-icon {
     width: 20px;
     height: 20px;
     margin-right: 8px;
-    border-radius: 4px;
+    border-radius: 50%;
+    background: var(--color-paper);
   }
 
   .start-menu {
     position: absolute;
-    bottom: 55px;
+    bottom: 58px;
     left: 0;
     width: 280px;
-    background-color: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background-color: var(--color-paper);
+    border: var(--ink-border);
     border-radius: 12px;
-    box-shadow:
-      0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+    box-shadow: 6px 6px 0 var(--color-ink);
     display: flex;
     flex-direction: column;
     z-index: 1001;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.7);
   }
 
   .start-menu-header {
-    background: rgba(255, 255, 255, 0.9);
-    color: #2c3e50;
+    position: relative;
+    color: var(--color-ink);
     padding: 16px;
-    height: 70px;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+    border-bottom: var(--ink-border);
+  }
+
+  .start-menu-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--halftone);
+    background-size: var(--halftone-size);
+    mask-image: var(--halftone-fade);
+    opacity: 0.55;
+    pointer-events: none;
   }
 
   .menu-header-logo {
+    position: relative;
     display: flex;
     align-items: center;
   }
@@ -250,13 +258,13 @@
   .menu-logo-container {
     width: 38px;
     height: 38px;
-    background-color: #a8e6cf;
+    background-color: var(--color-accent);
+    border: var(--ink-border);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .menu-logo {
@@ -265,47 +273,56 @@
   }
 
   .menu-title {
-    font-weight: 500;
+    font-weight: 700;
     font-size: 18px;
     letter-spacing: 0.5px;
-    color: #2c3e50;
+    color: var(--color-ink);
   }
 
   .start-menu-items {
-    padding: 12px;
-    background-color: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .start-menu-item {
     display: flex;
-    padding: 12px;
+    width: 100%;
+    padding: 10px 12px;
     align-items: center;
     cursor: pointer;
     border-radius: 8px;
-    transition: all 0.2s ease;
-    margin-bottom: 4px;
-    background-color: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 2px solid transparent;
+    background: none;
+    font: inherit;
+    color: var(--color-ink);
+    text-align: left;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
   .start-menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.05),
-      0 2px 4px -1px rgba(0, 0, 0, 0.03),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.8);
-    transform: translateY(-1px);
+    border-color: var(--color-ink);
+    box-shadow: 3px 3px 0 var(--color-ink);
+  }
+
+  /* Halftone shading sparkles on hover */
+  @media (prefers-reduced-motion: no-preference) {
+    .start-menu-item:hover .start-menu-item-icon,
+    .taskbar-window-button:hover .window-icon :global([fill="url(#halftone)"]) {
+      fill: url(#halftone-sparkle);
+    }
   }
 
   .start-menu-item-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
     margin-right: 12px;
     width: 24px;
     height: 24px;
-    text-align: center;
   }
 
   .start-menu-item-icon :global(svg) {
@@ -315,8 +332,7 @@
 
   .start-menu-item-text {
     font-size: 14px;
-    color: #2c3e50;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .window-buttons {
@@ -324,37 +340,39 @@
     flex-grow: 1;
     align-items: center;
     padding: 0 8px;
+    gap: 8px;
     overflow-x: hidden;
   }
 
   .taskbar-window-button {
+    position: relative;
     display: flex;
     align-items: center;
-    height: 36px;
-    margin: 4px;
+    height: 34px;
     padding: 0 12px;
-    background: rgba(255, 255, 255, 0.5);
-    color: #2c3e50;
-    border: 1px solid rgba(163, 216, 233, 0.3);
+    background: var(--color-paper);
+    color: var(--color-ink-soft);
+    border: var(--ink-border);
     border-radius: 8px;
     min-width: 120px;
     max-width: 200px;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+    font: inherit;
+    transition:
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
   .taskbar-window-button:hover:not(.active) {
-    background: rgba(163, 216, 233, 0.2);
+    box-shadow: 2px 2px 0 var(--color-ink);
   }
 
   .taskbar-window-button.active {
-    background: rgba(163, 216, 233, 0.3);
-    border-color: rgba(139, 198, 244, 0.5);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    color: var(--color-ink);
+    font-weight: 700;
+    background: var(--color-moss-100);
   }
 
   .window-icon {
@@ -364,6 +382,7 @@
     margin-right: 8px;
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
   }
 
   .window-icon :global(svg) {
@@ -382,22 +401,22 @@
     align-items: center;
     margin-left: auto;
     padding: 0 12px;
-    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    border-left: var(--ink-border);
   }
 
   .system-time {
-    color: #2c3e50;
+    color: var(--color-ink);
     font-size: 13px;
     text-align: center;
     padding: 0 8px;
   }
 
   .time {
-    font-weight: 500;
+    font-weight: 700;
   }
 
   .date {
     font-size: 10px;
-    opacity: 0.8;
+    color: var(--color-ink-muted);
   }
 </style>

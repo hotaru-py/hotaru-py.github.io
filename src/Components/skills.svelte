@@ -1,82 +1,36 @@
 <script>
-  const skills = {
-    frontend: [
-      "Svelte",
-      "React",
-      "React Native",
-      "Next.js",
-      "Tailwind CSS",
-      "JavaScript",
-      "TypeScript",
-      "Liquid (Shopify)",
-    ],
-    backend: [
-      "Python",
-      "FastAPI",
-      "Flask",
-      "Node.js",
-      "C#",
-      "C/C++",
-      "PostgreSQL",
-      "MySQL",
-      "GraphQL",
-    ],
-    design: ["Figma", "Inkscape", "Canva"],
-    art: [
-      "Krita",
-      "Inkscape",
-      "Pen & Paper",
-      "Storyboarder",
-      "Premiere Pro",
-      "After Effects",
-    ],
-    misc: ["Unity Engine", "Blender", "Game Development"],
-  };
-
   const skillCategories = [
     {
-      name: "Frontend Development",
-      items: skills.frontend,
+      name: "Full-Stack Development",
+      items: [
+        "React",
+        "Next.js",
+        "JavaScript / TypeScript",
+        "Shopify Liquid",
+        "Svelte",
+        "Python",
+        "FastAPI",
+        "Flask",
+        "Node.js",
+        "SQL",
+      ],
     },
     {
-      name: "Backend Development",
-      items: skills.backend,
-    },
-    {
-      name: "Design Tools",
-      items: skills.design,
-    },
-    {
-      name: "Art & Video Editing (amateur)",
-      items: skills.art,
-    },
-    {
-      name: "Other Miscellaneous",
-      items: skills.misc,
+      name: "Design & Creative",
+      items: [
+        "Figma",
+        "Inkscape",
+        "Krita",
+        "Canva",
+        "Premiere Pro",
+        "Blender",
+        "Pen & Paper",
+      ],
     },
   ];
 </script>
 
 <div class="skills-container">
-  <h2 class="skills-title">Skills</h2>
-
-  <div class="skills-grid">
-    {#each skillCategories as category}
-      <div class="skill-card">
-        <div class="skill-header">
-          <h3 class="skill-category-name">
-            {category.name}
-          </h3>
-        </div>
-        <div class="skill-pills">
-          {#each category.items as skill}
-            <span class="skill-pill">{skill}</span>
-          {/each}
-        </div>
-      </div>
-    {/each}
-  </div>
-
   <div class="skills-description">
     <h2 class="skills-title">Work Experience</h2>
     <p class="about-paragraph">
@@ -88,9 +42,31 @@
           rel="noopener noreferrer"
           class="company-link">Miniture</a
         >
-        (March 2025 - Now)
+        (March 2025 - February 2026)
       </span>
     </p>
+  </div>
+
+  <h2 class="skills-title">Skills</h2>
+
+  <div class="skills-grid">
+    {#each skillCategories as category}
+      <div class="skill-card">
+        <div class="skill-header">
+          <h3 class="skill-category-name">
+            {category.name}
+          </h3>
+          {#if category.blurb}
+            <p class="skill-blurb">{category.blurb}</p>
+          {/if}
+        </div>
+        <div class="skill-pills">
+          {#each category.items as skill}
+            <span class="skill-pill">{skill}</span>
+          {/each}
+        </div>
+      </div>
+    {/each}
   </div>
 </div>
 
@@ -118,37 +94,60 @@
 
   .skills-title {
     font-size: 20px;
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 700;
+    color: var(--color-ink);
     margin: 0 0 16px 0;
     padding-bottom: 12px;
-    border-bottom: 1px solid #eaeaea;
+    border-bottom: var(--ink-border);
   }
 
   .skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: 1fr;
     gap: 20px;
     margin-bottom: 24px;
-    padding-right: 8px;
+    padding: 0 8px 8px 0;
+    isolation: isolate;
   }
 
   .skill-card {
-    background-color: white;
+    position: relative;
+    background-color: var(--color-paper);
     border-radius: 12px;
     padding: 16px;
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
+    border: var(--ink-border);
+    top: 0;
+    left: 0;
+    /* Offsets, not transform: a transform would lift the halftone shadow above the card */
     transition:
-      transform 0.2s ease,
-      box-shadow 0.2s ease;
+      top 0.15s ease,
+      left 0.15s ease;
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(163, 216, 233, 0.3);
+  }
+
+  /* Halftone drop shadow; the grid isolates it so it stays behind the card */
+  .skill-card::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background-image: var(--halftone);
+    background-size: var(--halftone-shadow-size);
+    transform: translate(6px, 6px);
+    transition: transform 0.15s ease;
+    z-index: -1;
   }
 
   .skill-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
+    top: -2px;
+    left: -2px;
+  }
+
+  .skill-card:hover::after {
+    transform: translate(8px, 8px);
+    background-image: var(--halftone-sparkle, var(--halftone));
+    background-size: var(--halftone-sparkle-size, var(--halftone-shadow-size));
   }
 
   .skill-header {
@@ -157,12 +156,18 @@
 
   .skill-category-name {
     font-size: 16px;
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 700;
+    color: var(--color-ink);
     margin: 0;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+  }
+
+  .skill-blurb {
+    font-size: 13px;
+    color: var(--color-ink-muted);
+    margin: 4px 0 0 0;
   }
 
   .skill-pills {
@@ -172,29 +177,33 @@
   }
 
   .skill-pill {
-    background-color: rgba(163, 216, 233, 0.3);
-    padding: 4px 10px;
-    border-radius: 16px;
+    background-color: var(--color-paper);
+    border: 1.5px solid var(--color-ink);
+    padding: 3px 10px;
+    border-radius: 999px;
     font-size: 13px;
-    color: #2c3e50;
+    font-weight: 600;
+    color: var(--color-ink);
     white-space: nowrap;
-    transition: transform 0.2s ease;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
   }
 
   .skill-pill:hover {
-    transform: translateY(-2px);
-    background-color: rgba(139, 198, 244, 0.3);
+    background-color: var(--color-ink);
+    color: var(--color-paper);
   }
 
   .skills-description {
-    margin-top: 8px;
+    margin-bottom: 24px;
   }
 
   .skills-description p {
     margin-bottom: 16px;
     font-size: 15px;
     line-height: 1.6;
-    color: #4a4a4a;
+    color: var(--color-ink-soft);
   }
 
   .skills-description p:last-child {
@@ -205,39 +214,23 @@
     font-size: 16px;
     line-height: 1.6;
     margin-bottom: 16px;
-    color: #4a4a4a;
+    color: var(--color-ink);
+    font-weight: 600;
   }
 
   .about-subtitle {
     display: block;
     font-size: 14px;
-    color: #777;
+    color: var(--color-ink-muted);
     margin-top: 4px;
   }
 
   .company-link {
-    color: #1b4965;
-    text-decoration: none;
-    transition: color 0.2s ease;
-    position: relative;
-  }
-
-  .company-link:hover {
-    color: #3d89c9;
-  }
-
-  .company-link::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background-color: #3d89c9;
-    transition: width 0.3s ease;
-  }
-
-  .company-link:hover::after {
-    width: 100%;
+    color: var(--color-ink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
   }
 </style>

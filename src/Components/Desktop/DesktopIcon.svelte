@@ -46,10 +46,9 @@
     align-items: center;
     width: 100px;
     cursor: pointer;
-    color: #2c3e50;
+    color: var(--color-ink);
     padding: 8px;
     border-radius: 8px;
-    transition: all 0.2s ease;
   }
 
   .mobile-icon {
@@ -59,14 +58,20 @@
     padding: 6px 2px;
   }
 
-  .desktop-icon:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-  }
-
   .desktop-icon:focus {
     outline: none;
-    background-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .desktop-icon:focus-visible .icon-container {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  /* Halftone shading sparkles on hover */
+  @media (prefers-reduced-motion: no-preference) {
+    .desktop-icon:hover .icon :global([fill="url(#halftone)"]) {
+      fill: url(#halftone-sparkle);
+    }
   }
 
   .icon-container {
@@ -76,10 +81,13 @@
     width: 60px;
     height: 60px;
     margin-bottom: 8px;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: var(--color-paper);
+    border: var(--ink-border);
     border-radius: 12px;
-    backdrop-filter: blur(4px);
-    transition: transform 0.2s ease;
+    box-shadow: 3px 3px 0 var(--color-ink);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
   .mobile-icon-container {
@@ -90,11 +98,13 @@
   }
 
   .desktop-icon:hover .icon-container {
-    transform: scale(1.05);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--color-ink);
   }
 
-  .icon-container.active .icon {
-    box-shadow: 0 0 0 2px rgba(139, 198, 244, 0.5);
+  .desktop-icon:active .icon-container {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--color-ink);
   }
 
   .icon {
@@ -123,14 +133,12 @@
   .icon-title {
     text-align: center;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     word-break: break-word;
     max-width: 100px;
-    background-color: rgba(255, 255, 255, 0.6);
-    padding: 3px 6px;
+    background-color: var(--color-paper);
+    padding: 2px 6px;
     border-radius: 4px;
-    backdrop-filter: blur(2px);
-    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
   }
 
   .mobile-icon-title {
@@ -139,7 +147,7 @@
     max-width: 60px;
     background-color: transparent;
     padding: 0;
-    color: #2c3e50;
+    color: var(--color-ink);
   }
 
   @media (max-width: 768px) {

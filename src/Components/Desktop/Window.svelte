@@ -180,7 +180,11 @@
       {#if isMobileView}
         <div class="mobile-header">
           <div class="mobile-header-content">
-            <button class="mobile-back-button" onclick={close}>
+            <button
+              class="mobile-back-button"
+              onclick={close}
+              aria-label="Back"
+            >
               <svg
                 width="20"
                 height="20"
@@ -213,12 +217,13 @@
 </div>
 
 <style>
+  /* Stacking between windows is set on the wrapper in Desktop.svelte */
   .window-container {
     position: absolute;
-    z-index: 10;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 4px 4px 0 var(--color-ink);
     border-radius: 12px;
     overflow: hidden;
+    transition: box-shadow 0.15s ease;
   }
 
   .mobile-window-container {
@@ -232,18 +237,18 @@
   }
 
   .window-container.active {
-    z-index: 100;
+    box-shadow: 7px 7px 0 var(--color-ink);
   }
 
   .window {
-    background-color: white;
+    background-color: var(--color-paper);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: var(--ink-border);
     position: relative;
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
   }
 
   .mobile-window-inner {
@@ -256,23 +261,43 @@
 
   .title-bar {
     height: 40px;
-    background: linear-gradient(to right, #e6f7ff, #d1f0ff);
-    color: #2c3e50;
+    flex-shrink: 0;
+    position: relative;
+    background: var(--color-paper);
+    color: var(--color-ink-muted);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
-    font-weight: 500;
+    padding: 0 10px 0 16px;
+    font-weight: 600;
     user-select: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: var(--ink-border);
     cursor: move;
   }
 
+  /* Halftone band that fades in toward the controls on the focused window */
+  .title-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--halftone);
+    background-size: var(--halftone-size);
+    mask-image: var(--halftone-fade);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+  }
+
   .title-bar.active {
-    background: linear-gradient(to right, #a3d8e9, #8bc6f4);
+    color: var(--color-ink);
+  }
+
+  .title-bar.active::before {
+    opacity: 0.55;
   }
 
   .title-text {
+    position: relative;
     flex-grow: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -282,6 +307,7 @@
   }
 
   .window-controls {
+    position: relative;
     display: flex;
     height: 100%;
     align-items: center;
@@ -291,31 +317,30 @@
     width: 24px;
     height: 24px;
     margin-left: 8px;
-    border: none;
-    color: #2c3e50;
+    border: var(--ink-border);
+    color: var(--color-ink);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
-    background: transparent;
-    transition: all 0.2s ease;
+    line-height: 1;
+    background: var(--color-paper);
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
   }
 
   .window-control:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  .window-control.close:hover {
-    background-color: #ffecec;
-    color: #e53935;
+    background-color: var(--color-ink);
+    color: var(--color-paper);
   }
 
   .window-content {
     flex-grow: 1;
     overflow: auto;
-    background-color: white;
+    background-color: var(--color-paper);
     padding: 16px;
   }
 
@@ -335,10 +360,10 @@
     display: flex;
     align-items: center;
     padding: 12px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: var(--ink-border);
     position: sticky;
     top: 0;
-    background-color: white;
+    background-color: var(--color-paper);
     z-index: 10;
   }
 
@@ -349,29 +374,30 @@
   }
 
   .mobile-back-button {
-    background: none;
-    border: none;
+    background: var(--color-paper);
+    border: var(--ink-border);
     font-size: 20px;
-    color: #2c3e50;
+    color: var(--color-ink);
     width: 36px;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 8px;
     cursor: pointer;
     padding: 0;
     margin-right: 12px;
   }
 
   .mobile-back-button:active {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: var(--color-ink);
+    color: var(--color-paper);
   }
 
   .mobile-title {
     font-size: 18px;
-    font-weight: 500;
-    color: #2c3e50;
+    font-weight: 700;
+    color: var(--color-ink);
   }
 
   .resize-handle {
@@ -391,8 +417,8 @@
     bottom: 4px;
     width: 8px;
     height: 8px;
-    border-right: 2px solid rgba(0, 0, 0, 0.3);
-    border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+    border-right: var(--ink-border);
+    border-bottom: var(--ink-border);
     border-bottom-right-radius: 2px;
   }
 </style>

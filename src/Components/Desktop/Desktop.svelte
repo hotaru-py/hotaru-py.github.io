@@ -3,6 +3,8 @@
   import Taskbar from "./Taskbar.svelte";
   import DesktopIcon from "./DesktopIcon.svelte";
   import Window from "./Window.svelte";
+  import Wallpaper from "./Wallpaper.svelte";
+  import { sparkleDots } from "../../lib/halftone.js";
   import About from "../about.svelte";
   import Skills from "../skills.svelte";
   import Projects from "../projects.svelte";
@@ -11,6 +13,8 @@
   import { cubicOut } from "svelte/easing";
 
   let windows = $state([]);
+  // Window ids from back to front; `windows` itself stays in open order for the taskbar
+  let stackOrder = $state([]);
   let activeWindowId = $state(null);
   let closingWindowId = $state(null);
   let desktopWidth = $state(0);
@@ -19,58 +23,41 @@
   let currentTime = $state(new Date());
   let startupComplete = $state(false);
 
+  // Ink line icons; shaded areas use the shared #halftone pattern defined in the markup below
+  const ICONS = {
+    about: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    work: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    projects: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    browser: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" style="fill: var(--color-paper)"/><path d="M12 2a10 10 0 0 1 0 20a4 10 0 0 0 0-20z" fill="url(#halftone)"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1.5"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.5"/></svg>`,
+  };
+
   const desktopIcons = [
-    {
-      id: "about",
-      title: "About Me",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="#f1f8e9" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 13H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      component: About,
-    },
-    {
-      id: "skills",
-      title: "Work",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="#e1f5fe" stroke="#039be5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      component: Skills,
-    },
+    { id: "about", title: "About Me", icon: ICONS.about, component: About },
+    { id: "skills", title: "Work", icon: ICONS.work, component: Skills },
     {
       id: "projects",
       title: "Projects",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="#fff8e1" stroke="#ffb300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      icon: ICONS.projects,
       component: Projects,
     },
-    {
-      id: "browser",
-      title: "Browser",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1976d2" stroke-width="1"/><line x1="2" y1="12" x2="22" y2="12" stroke="#1976d2" stroke-width="1"/><line x1="12" y1="2" x2="12" y2="22" stroke="#1976d2" stroke-width="1"/></svg>`,
-      component: Reach,
-    },
+    { id: "browser", title: "Browser", icon: ICONS.browser, component: Reach },
   ];
 
+  // One 24-unit tile covers a whole icon, so every dot twinkles independently
+  const iconSparkle = sparkleDots({
+    cols: 12,
+    rows: 12,
+    pitch: 2,
+    radius: 0.6,
+    fill: "var(--color-ink)",
+  });
+
+  // Mobile dock order puts Browser first
   const additionalIcons = [
-    {
-      id: "browser",
-      title: "Browser",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1976d2" stroke-width="1"/><line x1="2" y1="12" x2="22" y2="12" stroke="#1976d2" stroke-width="1"/><line x1="12" y1="2" x2="12" y2="22" stroke="#1976d2" stroke-width="1"/></svg>`,
-      component: Reach,
-    },
-    {
-      id: "about",
-      title: "About Me",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="#f1f8e9" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 13H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      component: About,
-    },
-    {
-      id: "skills",
-      title: "Work",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="#e1f5fe" stroke="#039be5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      component: Skills,
-    },
-    {
-      id: "projects",
-      title: "Projects",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="#fff8e1" stroke="#ffb300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      component: Projects,
-    },
+    desktopIcons[3],
+    desktopIcons[0],
+    desktopIcons[1],
+    desktopIcons[2],
   ];
 
   onMount(() => {
@@ -105,7 +92,7 @@
     const existingWindow = windows.find((w) => w.id === iconData.id);
 
     if (existingWindow) {
-      activeWindowId = iconData.id;
+      activateWindow(iconData.id);
     } else {
       const newWindow = {
         id: iconData.id,
@@ -119,7 +106,7 @@
           : { width: 700, height: 500 },
       };
       windows = [...windows, newWindow];
-      activeWindowId = newWindow.id;
+      activateWindow(newWindow.id);
     }
   }
 
@@ -128,17 +115,21 @@
 
     setTimeout(() => {
       windows = windows.filter((w) => w.id !== id);
-      if (windows.length > 0 && activeWindowId === id) {
-        activeWindowId = windows[windows.length - 1].id;
-      } else if (windows.length === 0) {
-        activeWindowId = null;
+      stackOrder = stackOrder.filter((wid) => wid !== id);
+      // Focus falls to the next window down the stack, like on Windows
+      if (activeWindowId === id) {
+        activeWindowId = stackOrder.at(-1) ?? null;
       }
       closingWindowId = null;
     }, 300);
   }
 
+  // Bring a window to the front without disturbing the order of the others
   function activateWindow(id) {
     activeWindowId = id;
+    if (stackOrder.at(-1) !== id) {
+      stackOrder = [...stackOrder.filter((wid) => wid !== id), id];
+    }
   }
 
   function updateWindowPosition({ id, x, y }) {
@@ -167,6 +158,32 @@
 </script>
 
 <div class="desktop-container">
+  <Wallpaper />
+
+  <!-- Shared halftone fill for the icons -->
+  <svg class="svg-defs" aria-hidden="true">
+    <defs>
+      <pattern
+        id="halftone"
+        width="2"
+        height="2"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(45)"
+      >
+        <circle cx="1" cy="1" r="0.6" style="fill: var(--color-ink)" />
+      </pattern>
+      <pattern
+        id="halftone-sparkle"
+        width="24"
+        height="24"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(45)"
+      >
+        {@html iconSparkle}
+      </pattern>
+    </defs>
+  </svg>
+
   {#if !startupComplete}
     <div class="startup-screen" out:fade={{ duration: 300 }}>
       <div class="startup-logo">hotaru's PC</div>
@@ -188,6 +205,8 @@
         class:mobile-window={isMobileView}
         class:active={activeWindowId === window.id}
         class:closing={closingWindowId === window.id}
+        style:z-index={(isMobileView ? 1001 : 10) +
+          stackOrder.indexOf(window.id)}
       >
         <Window
           {window}
@@ -254,7 +273,12 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
-    font-family: "Inter", "Segoe UI", sans-serif;
+  }
+
+  .svg-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
   }
 
   .desktop-container {
@@ -263,7 +287,8 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: linear-gradient(135deg, #c2efd3, #a3d8e9);
+    position: relative;
+    isolation: isolate;
   }
 
   .desktop-background {
@@ -302,18 +327,19 @@
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--color-paper);
     padding: 12px 20px;
-    border-radius: 24px;
+    border-radius: 16px;
     z-index: 1000;
     overflow-x: auto;
     gap: 16px;
-    border: 1.5px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: var(--ink-border);
+    box-shadow: var(--ink-shadow);
   }
 
   .mobile-icons-hidden {
     opacity: 0;
+    pointer-events: none;
     transform: translateX(-50%) translateY(50px);
     transition:
       opacity 0.3s ease,
@@ -339,7 +365,6 @@
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    z-index: 1000 !important;
   }
 
   @media (max-height: 600px) {
@@ -382,11 +407,6 @@
     opacity: 0;
     transform: scale(0.85);
     animation: window-open 200ms cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
-    z-index: 10;
-  }
-
-  .window-wrapper.active {
-    z-index: 100;
   }
 
   .window-wrapper.closing {
@@ -425,7 +445,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, #c2efd3, #a3d8e9);
+    background: var(--color-paper);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -435,17 +455,18 @@
 
   .startup-logo {
     font-size: 48px;
-    font-weight: 300;
-    color: #2c3e50;
+    font-weight: 700;
+    color: var(--color-ink);
     margin-bottom: 40px;
     letter-spacing: 2px;
   }
 
   .startup-loading {
     width: 200px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 3px;
+    height: 12px;
+    background: var(--color-paper);
+    border: var(--ink-border);
+    border-radius: 999px;
     overflow: hidden;
     position: relative;
   }
@@ -453,8 +474,8 @@
   .loading-bar {
     width: 60px;
     height: 100%;
-    background: linear-gradient(to right, #a3d8e9, #8bc6f4);
-    border-radius: 3px;
+    background: var(--color-accent);
+    border-right: var(--ink-border);
     position: absolute;
     animation: loading 1s ease-in-out forwards;
   }
