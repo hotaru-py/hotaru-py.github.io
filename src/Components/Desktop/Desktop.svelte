@@ -5,7 +5,6 @@
   import IconGrid from "./IconGrid.svelte";
   import Window from "./Window.svelte";
   import Wallpaper from "./Wallpaper.svelte";
-  import Loader from "../Loader.svelte";
   import MobileClock from "./MobileClock.svelte";
   import MobileSettings from "./MobileSettings.svelte";
   import WelcomeNotice from "./WelcomeNotice.svelte";
@@ -19,12 +18,20 @@
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [booted] Flips once the loader starts fading, so the icons animate in where they can be seen
+   * @property {() => void} [onSwitchMode] Switches the site to Simple Mode
+   */
+
+  /** @type {Props} */
+  let { booted = true, onSwitchMode } = $props();
+
   let windows = $state([]);
   /** @type {IconGrid | undefined} */
   let iconGrid = $state();
   let layoutCustomized = $state(false);
   // Flips once the loader starts fading, so the icons animate in where they can be seen
-  let booted = $state(false);
   // Window ids from back to front; `windows` itself stays in open order for the taskbar
   let stackOrder = $state([]);
   let activeWindowId = $state(null);
@@ -222,8 +229,6 @@
     </defs>
   </svg>
 
-  <Loader onExit={() => (booted = true)} />
-
   {#if booted}
     <WelcomeNotice isMobile={isMobileView} />
   {/if}
@@ -271,7 +276,7 @@
     {/if}
 
     {#if isMobileView && booted}
-      <MobileSettings bind:showLabels={showDockLabels} />
+      <MobileSettings bind:showLabels={showDockLabels} {onSwitchMode} />
     {/if}
 
     {#if isMobileView && booted}
@@ -306,6 +311,7 @@
       onActivateWindow={activateWindow}
       onMinimizeWindow={minimizeWindow}
       onOpenWindow={openWindow}
+      {onSwitchMode}
       showReset={layoutCustomized}
       onResetLayout={() => iconGrid?.reset()}
     />

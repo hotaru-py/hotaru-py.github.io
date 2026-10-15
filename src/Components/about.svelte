@@ -6,57 +6,44 @@
   preloadImages([avatar]);
 </script>
 
+<script>
+  import { about, emphasis, schoolName } from "../lib/siteContent.js";
+</script>
+
 <div class="about-container">
   <div class="about-header">
     <img src={avatar} alt="Hotaru" class="about-avatar" />
     <h1 class="about-title">
-      Hello, I'm Prajesh (^_^)/ <span class="pronouns">(he/him)</span>
+      {about.greeting} <span class="pronouns">({about.pronouns})</span>
     </h1>
   </div>
 
   <div class="about-content">
-    <p class="about-paragraph">
-      I'm an engineer by day, designer by night, artist throughout. Currently an
-      undergrad engineering student and a full-stack developer.
-    </p>
-    <p class="about-paragraph">
-      Working on a few different things, including but not limited to:
-    </p>
+    {#each about.intro as paragraph}
+      <p class="about-paragraph">{paragraph}</p>
+    {/each}
 
     <ul class="about-list">
-      <li>
-        <span class="highlight">software development</span> across platforms and stacks
-      </li>
-      <li>
-        designing <span class="highlight"
-          >visually appealing, usable, and accessible</span
-        > experiences
-      </li>
-      <li>
-        <span class="highlight">graphic & UI/UX design</span>
-      </li>
-      <li>
-        <span class="highlight">product and interaction design</span> in the long
-        run
-      </li>
+      {#each about.interests as item}
+        <li>
+          {#each emphasis(item) as part}{#if part.strong}<span class="highlight"
+                >{part.text}</span
+              >{:else}{part.text}{/if}{/each}
+        </li>
+      {/each}
     </ul>
 
-    <p class="about-paragraph">
-      If I’m not doing the above, I’m probably at the piano, doodling at my
-      desk, on the tennis court, watching the evolution of the Intel Inside
-      jingle for the gazillionth time, bingeing anime or TV, watching rich
-      people race expensive cars in circles, listening to my curated Mr.
-      Worldwide playlist with Hatsune Miku sitting between Olivia Rodrigo and
-      Kanye West, or just kicking back and taking a nap.
-    </p>
+    <p class="about-paragraph">{about.outro}</p>
 
     <h3 class="about-heading">Education</h3>
-    <p class="about-paragraph">
-      Shiv Nadar University Chennai
-      <span class="about-subtitle"
-        >B.Tech Artificial Intelligence and Data Science (2023-2027)</span
-      >
-    </p>
+    {#each about.education as entry}
+      <p class="about-paragraph">
+        {schoolName(entry)}
+        {#each entry.lines as line}
+          <span class="about-subtitle">{line}</span>
+        {/each}
+      </p>
+    {/each}
   </div>
 </div>
 

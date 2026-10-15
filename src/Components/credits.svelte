@@ -1,38 +1,26 @@
 <script>
   import { xylophone } from "../lib/xylophone.js";
+  import { credits } from "../lib/siteContent.js";
 
-  const inspirationLinks = [
-    {
-      label: "sharyap.com",
-      url: "https://sharyap.com",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-    },
-    {
-      label: "YouTube",
-      url: "https://www.youtube.com/c/sharyap",
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>`,
-    },
-  ];
-
-  // Attribution links exactly as Pixabay asks for them
-  const PIXABAY_XYLOPHONE =
-    "https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818";
-  const PIXABAY_CLICKS =
-    "https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501";
+  // Icon for each inspiration pill, by its id in siteContent.js
+  const ICONS = {
+    website: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+    youtube: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>`,
+  };
 </script>
 
 <div class="credits-container">
-  <h2 class="credits-title">What made this website?</h2>
+  <h2 class="credits-title">{credits.heading}</h2>
 
   <div class="credits-grid">
     <section class="credit-card">
       <h3 class="credit-heading">Inspiration</h3>
       <p class="credit-text">
-        Website inspired by <strong>shar</strong>
-        <span class="credit-aside">(wholesome content, do watch)</span>
+        {credits.inspiration.lead} <strong>{credits.inspiration.name}</strong>
+        <span class="credit-aside">({credits.inspiration.aside})</span>
       </p>
       <div class="credit-links">
-        {#each inspirationLinks as link}
+        {#each credits.inspiration.links as link}
           <a
             class="credit-pill"
             use:xylophone
@@ -40,7 +28,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span class="credit-pill-icon">{@html link.icon}</span>
+            <span class="credit-pill-icon">{@html ICONS[link.id]}</span>
             {link.label}
           </a>
         {/each}
@@ -50,55 +38,25 @@
     <section class="credit-card">
       <h3 class="credit-heading">Profile Picture &amp; Favicon</h3>
       <p class="credit-text">
-        <strong>Firefly</strong> from <em>Honkai: Star Rail</em>
+        <strong>{credits.avatar.character}</strong> from
+        <em>{credits.avatar.source}</em>
       </p>
-      <p class="credit-text credit-note">
-        Character and artwork © HoYoverse. Non-commercial usage.
-      </p>
+      <p class="credit-text credit-note">{credits.avatar.note}</p>
     </section>
 
     <section class="credit-card">
       <h3 class="credit-heading">Sounds</h3>
       <ul class="credit-list">
-        <li>
-          Xylophone sounds by
-          <a
-            class="credit-link"
-            href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818"
-            target="_blank"
-            rel="noopener noreferrer">freesound_community</a
-          >
-          from
-          <a
-            class="credit-link"
-            href={PIXABAY_XYLOPHONE}
-            target="_blank"
-            rel="noopener noreferrer">Pixabay</a
-          >
-        </li>
-        <li>
-          Mouse click sounds by
-          <a
-            class="credit-link"
-            href="https://pixabay.com/users/justsomesounds-53130806/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501"
-            target="_blank"
-            rel="noopener noreferrer">JustSomeSounds</a
-          >
-          and
-          <a
-            class="credit-link"
-            href="https://pixabay.com/users/u_u4pf5h7zip-50459877/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=345983"
-            target="_blank"
-            rel="noopener noreferrer">u_u4pf5h7zip</a
-          >
-          from
-          <a
-            class="credit-link"
-            href={PIXABAY_CLICKS}
-            target="_blank"
-            rel="noopener noreferrer">Pixabay</a
-          >
-        </li>
+        {#each credits.sounds as line}
+          <li>
+            {#each line as part, i}{#if i > 0}{" "}{/if}{#if typeof part === "string"}{part}{:else}<a
+                  class="credit-link"
+                  href={part.url}
+                  target="_blank"
+                  rel="noopener noreferrer">{part.text}</a
+                >{/if}{/each}
+          </li>
+        {/each}
       </ul>
     </section>
   </div>

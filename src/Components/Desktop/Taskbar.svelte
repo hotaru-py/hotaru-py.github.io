@@ -17,6 +17,7 @@
    * @property {(icon: any) => void} [onOpenWindow]
    * @property {boolean} [showReset] Only offered once the icons have been moved
    * @property {() => void} [onResetLayout]
+   * @property {() => void} [onSwitchMode] Switches the site to Simple Mode
    */
 
   /** @type {Props} */
@@ -30,6 +31,7 @@
     onOpenWindow,
     showReset = false,
     onResetLayout,
+    onSwitchMode,
   } = $props();
 
   let isStartMenuOpen = $state(false);
@@ -88,6 +90,12 @@
     } else {
       activateWindow(windowId);
     }
+  }
+
+  function switchToSimple() {
+    isStartMenuOpen = false;
+    playSound("close");
+    onSwitchMode?.();
   }
 
   function openWindow(iconData) {
@@ -156,6 +164,33 @@
                 <div class="start-menu-item-text">{icon.title}</div>
               </button>
             {/each}
+          </div>
+
+          <div class="start-menu-footer">
+            <button
+              type="button"
+              class="start-menu-item"
+              onclick={switchToSimple}
+            >
+              <div class="start-menu-item-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  ><path
+                    d="M14 2.5H6.5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8z"
+                    style="fill: var(--color-paper)"
+                  /><path d="M14 2.5V8h5.5z" fill="url(#halftone)" /><path
+                    d="M8 11.5h8M8 15h5.5M8 18.5h7"
+                  /></svg
+                >
+              </div>
+              <div class="start-menu-item-text">Switch to Simple Mode</div>
+            </button>
           </div>
         </div>
       {/if}
@@ -357,6 +392,11 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+  }
+
+  .start-menu-footer {
+    padding: 8px 10px 10px;
+    border-top: var(--ink-border);
   }
 
   .start-menu-item {

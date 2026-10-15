@@ -1,52 +1,25 @@
 <script>
   import { xylophone } from "../lib/xylophone.js";
-
-  const skillCategories = [
-    {
-      name: "Full-Stack Development",
-      items: [
-        "React",
-        "Next.js",
-        "JavaScript / TypeScript",
-        "Shopify Liquid",
-        "Svelte",
-        "Python",
-        "FastAPI",
-        "Flask",
-        "Node.js",
-        "SQL",
-      ],
-    },
-    {
-      name: "Design & Creative",
-      items: [
-        "Figma",
-        "Inkscape",
-        "Krita",
-        "Canva",
-        "Premiere Pro",
-        "Blender",
-        "Pen & Paper",
-      ],
-    },
-  ];
+  import { experience, skillCategories } from "../lib/siteContent.js";
 </script>
 
 <div class="skills-container">
   <div class="skills-description">
     <h2 class="skills-title">Work Experience</h2>
-    <p class="about-paragraph">
-      Software Development Engineering Intern
-      <span class="about-subtitle">
-        <a
-          href="https://miniture.in"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="company-link">Miniture</a
-        >
-        (March 2025 - February 2026)
-      </span>
-    </p>
+    {#each experience as job}
+      <p class="about-paragraph">
+        {job.role}
+        <span class="about-subtitle">
+          <a
+            href={job.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="company-link">{job.company}</a
+          >
+          ({job.period})
+        </span>
+      </p>
+    {/each}
   </div>
 
   <h2 class="skills-title">Skills</h2>

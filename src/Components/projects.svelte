@@ -12,70 +12,20 @@
   import { onMount } from "svelte";
   import { tapToOpen } from "../lib/tapToOpen.js";
   import { fetchStars } from "../lib/githubStars.js";
+  import {
+    liveWork,
+    projects,
+    githubProfile,
+    starLabel,
+  } from "../lib/siteContent.js";
 
-  const liveWork = [
-    {
-      name: "Miniture",
-      url: "https://www.miniture.in",
-      domain: "miniture.in",
-      image: minitureShot,
-    },
-    {
-      name: "SSN-SNUC INVENTE '26",
-      url: "https://invente-2026.vercel.app/",
-      domain: "invente-2026.vercel.app",
-      image: inventeShot,
-    },
-    {
-      name: "SSN-SNUC INSTINCTS '26",
-      url: "https://www.ssnsnucinstincts.com/",
-      domain: "ssnsnucinstincts.com",
-      image: instinctsShot,
-    },
-    {
-      name: "The Curation Company",
-      url: "https://www.thecurationcompany.in/",
-      domain: "thecurationcompany.in",
-      image: tccShot,
-    },
-  ];
-
-  const projects = [
-    {
-      name: "My Personal Website (this one!)",
-      description: "My personal website, with a desktop/mobile-like interface",
-      link: "https://github.com/hotaru-hspr/hotaru-hspr.github.io",
-    },
-    {
-      name: "Eunoia",
-      description:
-        "AI-powered DIY learning platform that turns objects at hand into hands-on projects using computer vision & RAG",
-      link: "https://github.com/Try3D/Eunoia",
-    },
-    {
-      name: "Minimalist ROG Grub Theme",
-      description: "Minimalist theme for the Grub Bootloader",
-      link: "https://github.com/hotaru-py/rog-grub",
-      // Shown until (or if) the live count can't be fetched
-      stars: { repo: "hotaru-py/rog-grub", fallback: 27 },
-    },
-    {
-      name: "Starboard",
-      description:
-        "A fast, versatile, extensible and highly flexible platform for optimal ship routing",
-      link: "https://github.com/hotaru-hspr/Starboard",
-    },
-    {
-      name: "SNUGPA",
-      description: "CGPA/SGPA Calculator for SNU Chennai",
-      link: "https://github.com/EditaCTF/SNUC_Grade_Calculator",
-    },
-    {
-      name: "CacheSim",
-      description: "Animated Cache Simulation using Svelte & FastAPI",
-      link: "https://github.com/hotaru-py/CacheSim",
-    },
-  ];
+  // Screenshot for each live site, by its id in siteContent.js
+  const shots = {
+    miniture: minitureShot,
+    invente: inventeShot,
+    instincts: instinctsShot,
+    tcc: tccShot,
+  };
 
   /** @type {Record<string, number>} */
   let liveStars = $state({});
@@ -89,9 +39,8 @@
     }
   });
 
-  function starLabel({ repo, fallback }) {
-    const count = liveStars[repo] ?? fallback;
-    return `${count} ${count === 1 ? "star" : "stars"} on GitHub`;
+  function starText({ repo, fallback }) {
+    return starLabel(liveStars[repo] ?? fallback);
   }
 </script>
 
@@ -102,7 +51,10 @@
     {#each liveWork as site}
       <div class="project-card live-card" use:tapToOpen={site.url}>
         <div class="live-shot">
-          <img src={site.image} alt="Screenshot of the {site.name} website" />
+          <img
+            src={shots[site.id]}
+            alt="Screenshot of the {site.name} website"
+          />
         </div>
         <div class="live-body">
           <h3 class="project-name">{site.name}</h3>
@@ -122,7 +74,7 @@
   <h2 class="projects-title">
     Featured Personal Projects
     <a
-      href="https://github.com/hotaru-py"
+      href={githubProfile}
       target="_blank"
       rel="noopener noreferrer"
       class="github-icon-link"
@@ -159,7 +111,7 @@
                 d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95z"
               />
             </svg>
-            {starLabel(project.stars)}
+            {starText(project.stars)}
           </span>
         {/if}
         <a
