@@ -7,11 +7,11 @@
   /**
    * @typedef {Object} Props
    * @property {boolean} [showLabels] Dock labels on/off (on by default); restored from and saved to storage here
-   * @property {() => void} [onSwitchMode] Switches the site to Simple Mode
+   * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
    */
 
   /** @type {Props} */
-  let { showLabels = $bindable(true), onSwitchMode } = $props();
+  let { showLabels = $bindable(true), onSwitchUser } = $props();
 
   const LABELS_KEY = "dock-labels";
 
@@ -54,10 +54,10 @@
     if (!muted) playSound("open");
   }
 
-  function switchToSimple() {
+  function switchUser() {
     open = false;
     playSound("close");
-    onSwitchMode?.();
+    onSwitchUser?.();
   }
 
   function toggleLabels() {
@@ -118,8 +118,8 @@
           ><span class="knob"></span></span
         >
       </button>
-      <button type="button" class="row switch-mode" onclick={switchToSimple}>
-        <span>Switch to Simple Mode</span>
+      <button type="button" class="row switch-mode" onclick={switchUser}>
+        <span>Switch User</span>
         <span class="arrow" aria-hidden="true">→</span>
       </button>
     </div>

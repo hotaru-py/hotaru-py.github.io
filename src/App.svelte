@@ -28,24 +28,37 @@
   ).matches;
 
   /**
-   * Switches modes with a crossfade (View Transitions API) where the browser supports
+   * Swaps screens with a crossfade (View Transitions API) where the browser supports
    * it; elsewhere, or with reduced motion, it just swaps.
-   * @param {"full" | "simple"} next
+   * @param {() => void} update
    */
+  function crossfade(update) {
+    const apply = () => {
+      update();
+      flushSync();
+      window.scrollTo(0, 0);
+    };
+    if (!document.startViewTransition || reduceMotion) apply();
+    else document.startViewTransition(apply);
+  }
+
+  /** @param {"full" | "simple"} next */
   async function choose(next) {
     // The new screen has to render synchronously inside the transition, so make sure
     // the desktop's code is already here
     if (next === "full") await ensureDesktop();
-
-    const apply = () => {
+    crossfade(() => {
       mode = next;
       saveMode(next);
-      flushSync();
-      window.scrollTo(0, 0);
-    };
+    });
+  }
 
-    if (!document.startViewTransition || reduceMotion) apply();
-    else document.startViewTransition(apply);
+  // "Switch User": back to the login screen to pick a mode again. The saved choice
+  // stays until a new one is picked, so a reload returns to the current mode.
+  function switchUser() {
+    crossfade(() => {
+      mode = null;
+    });
   }
 
   // Lets the page scroll in Simple Mode; the desktop and login screen are fixed
@@ -61,11 +74,11 @@
 {#if mode === "full"}
   {#if Desktop}
     <main class="desktop-main">
-      <Desktop {booted} onSwitchMode={() => choose("simple")} />
+      <Desktop {booted} onSwitchUser={switchUser} />
     </main>
   {/if}
 {:else if mode === "simple"}
-  <SimpleMode onSwitchMode={() => choose("full")} />
+  <SimpleMode onSwitchUser={switchUser} />
 {:else if booted}
   <ModePicker onChoose={choose} />
 {/if}

@@ -1,7 +1,9 @@
-# Personal Website!
+# hotaru's PC
 
-Desktop-like (on desktop) and mobile-like (on mobile) environment for my portfolio website! (still WIP).
+An interactive, versatile portfolio website (for me :3), available in three forms:
 
-## Note to self:
+- **Desktop / mobile mode**: an OS-like environment that adapts to your device
+- **Simple mode**: a clean, Markdown-style reader
+- **llms.txt**: a plain-text version for AI agents and LLMs
 
-Run `npm run build; npx gh-pages -d dist` to deploy it to GitHub Pages.
+Built with Svelte. WIP and evolving since 2024.

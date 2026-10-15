@@ -21,11 +21,11 @@
   /**
    * @typedef {Object} Props
    * @property {boolean} [booted] Flips once the loader starts fading, so the icons animate in where they can be seen
-   * @property {() => void} [onSwitchMode] Switches the site to Simple Mode
+   * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
    */
 
   /** @type {Props} */
-  let { booted = true, onSwitchMode } = $props();
+  let { booted = true, onSwitchUser } = $props();
 
   let windows = $state([]);
   /** @type {IconGrid | undefined} */
@@ -276,7 +276,7 @@
     {/if}
 
     {#if isMobileView && booted}
-      <MobileSettings bind:showLabels={showDockLabels} {onSwitchMode} />
+      <MobileSettings bind:showLabels={showDockLabels} {onSwitchUser} />
     {/if}
 
     {#if isMobileView && booted}
@@ -311,7 +311,7 @@
       onActivateWindow={activateWindow}
       onMinimizeWindow={minimizeWindow}
       onOpenWindow={openWindow}
-      {onSwitchMode}
+      {onSwitchUser}
       showReset={layoutCustomized}
       onResetLayout={() => iconGrid?.reset()}
     />

@@ -4,6 +4,7 @@
   import { cubicOut } from "svelte/easing";
   import Wallpaper from "./Desktop/Wallpaper.svelte";
   import Logo from "./Logo.svelte";
+  import { sparkleDots } from "../lib/halftone.js";
 
   /**
    * @typedef {Object} Props
@@ -12,6 +13,15 @@
 
   /** @type {Props} */
   let { onChoose } = $props();
+
+  // Twinkling version of the icon halftone, swapped in on hover (same as the desktop icons)
+  const iconSparkle = sparkleDots({
+    cols: 12,
+    rows: 12,
+    pitch: 2,
+    radius: 0.6,
+    fill: "var(--color-ink)",
+  });
 
   // Phones get the phone-style version of the "full" experience
   let isPhone = $state(false);
@@ -31,8 +41,19 @@
   const EXIT_MS = 480;
   let leaving = $state(false);
 
+  // Hovering (or focusing) Simple Mode previews it: the green glow fades and the text
+  // turns monospace
+  let previewSimple = $state(false);
+
+  // Once a user is picked the preview is locked in, so the exit doesn't flick back to
+  // the green look when the pointer or focus moves away
+  function setPreview(on) {
+    if (!leaving) previewSimple = on;
+  }
+
   function select(mode) {
     if (leaving) return;
+    previewSimple = mode === "simple";
     leaving = true;
     setTimeout(() => onChoose(mode), reduceMotion ? 0 : EXIT_MS);
   }
@@ -43,20 +64,27 @@
       name: "Full Desktop Experience",
       detail: isPhone
         ? "Apps, a dock and a wallpaper that reacts to your touch."
-        : "Windows, icons and a wallpaper that reacts to you.",
+        : "works like a desktop. you know what a desktop is. i'll shut up now.",
     },
     {
       mode: "simple",
       name: "Simple Mode",
-      detail: "Just the text, top to bottom. Quick and light.",
+      detail:
+        "if you're one of those minimalists. argh, learn to enjoy interactive stuff.",
     },
   ]);
 </script>
 
 <!-- First visit: XP-style "pick a user" screen. The mode switch itself crossfades
      (App.svelte), so this only animates its own way in and out. -->
-<div class="picker" in:fade={{ duration: 250 }}>
+<div
+  class="picker"
+  class:preview-simple={previewSimple}
+  in:fade={{ duration: 250 }}
+>
   <Wallpaper />
+  <!-- Simple Mode's plain background, faded in over the wallpaper while previewing -->
+  <div class="simple-wash" aria-hidden="true"></div>
 
   <!-- XP's welcome-screen bands: they slide in once the loader is done, and back out
        when a user is picked -->
@@ -94,6 +122,15 @@
       >
         <circle cx="1" cy="1" r="0.6" style="fill: var(--color-ink)" />
       </pattern>
+      <pattern
+        id="picker-halftone-sparkle"
+        width="24"
+        height="24"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(45)"
+      >
+        {@html iconSparkle}
+      </pattern>
     </defs>
   </svg>
 
@@ -127,11 +164,23 @@
             class="user"
             disabled={leaving}
             onclick={() => select(user.mode)}
+            onpointerenter={() => setPreview(user.mode === "simple")}
+            onpointerleave={() => setPreview(false)}
+            onfocus={() => setPreview(user.mode === "simple")}
+            onblur={() => setPreview(false)}
           >
             <span class="avatar">
               {#if user.mode === "full"}
-                <!-- Monitor with a halftone-shaded screen -->
+                <!-- Monitor: halftone dots over a paper-white screen -->
                 <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect
+                    x="2.5"
+                    y="3.5"
+                    width="19"
+                    height="13"
+                    rx="2"
+                    class="paper"
+                  />
                   <rect
                     x="2.5"
                     y="3.5"
@@ -181,6 +230,37 @@
     color: var(--color-ink);
   }
 
+  /* --- Simple Mode preview --- */
+  .simple-wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-moss-100);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .preview-simple .simple-wash {
+    opacity: 1;
+  }
+
+  /* All the green drains out: bars go beige, icon tiles go paper-white */
+  .preview-simple .bar {
+    --bar-highlight: transparent;
+    background-color: var(--color-moss-100);
+  }
+
+  .preview-simple .avatar {
+    background-color: var(--color-paper);
+  }
+
+  .preview-simple {
+    font-family:
+      "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas,
+      monospace;
+  }
+
   .svg-defs {
     position: absolute;
     width: 0;
@@ -195,10 +275,14 @@
     z-index: 1;
     height: var(--bar-height);
     overflow: hidden;
-    background: var(--color-moss-600);
+    --bar-highlight: var(--color-moss-300);
+    background-color: var(--color-moss-600);
     pointer-events: none;
     /* Leaving: accelerate away, like the bars being pulled off-screen */
-    transition: transform 0.45s cubic-bezier(0.7, 0, 0.84, 0);
+    transition:
+      transform 0.45s cubic-bezier(0.7, 0, 0.84, 0),
+      background-color 0.4s ease,
+      box-shadow 0.4s ease;
   }
 
   /* Halftone texture, fading out toward one end */
@@ -216,13 +300,13 @@
   .bar.top {
     top: 0;
     border-bottom: var(--ink-border);
-    box-shadow: inset 0 -4px 0 var(--color-moss-300);
+    box-shadow: inset 0 -4px 0 var(--bar-highlight);
   }
 
   .bar.bottom {
     bottom: 0;
     border-top: var(--ink-border);
-    box-shadow: inset 0 4px 0 var(--color-moss-300);
+    box-shadow: inset 0 4px 0 var(--bar-highlight);
   }
 
   .bar.top.leaving {
@@ -308,6 +392,13 @@
       box-shadow 0.15s ease;
   }
 
+  /* Icon halftone sparkles on hover, like the desktop icons */
+  @media (prefers-reduced-motion: no-preference) {
+    .user:hover .avatar :global([fill="url(#picker-halftone)"]) {
+      fill: url(#picker-halftone-sparkle);
+    }
+  }
+
   .user:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--color-ink);
@@ -328,7 +419,8 @@
     height: 56px;
     border: var(--ink-border);
     border-radius: 12px;
-    background: var(--color-accent);
+    background-color: var(--color-accent);
+    transition: background-color 0.4s ease;
   }
 
   .avatar svg {

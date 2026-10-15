@@ -17,11 +17,11 @@
 
   /**
    * @typedef {Object} Props
-   * @property {() => void} onSwitchMode
+   * @property {() => void} onSwitchUser Back to the login screen to pick a style
    */
 
   /** @type {Props} */
-  let { onSwitchMode } = $props();
+  let { onSwitchUser } = $props();
 
   const sections = [
     { id: "about", title: "About" },
@@ -118,7 +118,7 @@
       <ul>
         {#each liveWork as live}
           <li>
-            <strong>{live.name}</strong>
+            <strong>{live.name}</strong><br />
             {@render link(live.url, live.domain)}
           </li>
         {/each}
@@ -132,13 +132,13 @@
           <li>
             <strong>{project.name}</strong>: {project.description}
             {#if project.stars}
-              <span class="muted"
-                >(★ {starLabel(
+              <br /><span class="muted"
+                >★ {starLabel(
                   liveStars[project.stars.repo] ?? project.stars.fallback,
-                )})</span
+                )}</span
               >
             {/if}
-            {@render link(project.link, "View on GitHub")}
+            <br />{@render link(project.link, "View on GitHub")}
           </li>
         {/each}
       </ul>
@@ -174,7 +174,7 @@
 {#snippet switchButton()}<span class="link"
     ><span class="bracket" aria-hidden="true">{"[ "}</span><button
       type="button"
-      onclick={onSwitchMode}>Switch to Full Desktop Experience</button
+      onclick={onSwitchUser}>Switch website styles</button
     ><span class="bracket" aria-hidden="true">{" ]"}</span></span
   >{/snippet}
 

@@ -17,7 +17,7 @@
    * @property {(icon: any) => void} [onOpenWindow]
    * @property {boolean} [showReset] Only offered once the icons have been moved
    * @property {() => void} [onResetLayout]
-   * @property {() => void} [onSwitchMode] Switches the site to Simple Mode
+   * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
    */
 
   /** @type {Props} */
@@ -31,7 +31,7 @@
     onOpenWindow,
     showReset = false,
     onResetLayout,
-    onSwitchMode,
+    onSwitchUser,
   } = $props();
 
   let isStartMenuOpen = $state(false);
@@ -92,10 +92,10 @@
     }
   }
 
-  function switchToSimple() {
+  function switchUser() {
     isStartMenuOpen = false;
     playSound("close");
-    onSwitchMode?.();
+    onSwitchUser?.();
   }
 
   function openWindow(iconData) {
@@ -167,11 +167,7 @@
           </div>
 
           <div class="start-menu-footer">
-            <button
-              type="button"
-              class="start-menu-item"
-              onclick={switchToSimple}
-            >
+            <button type="button" class="start-menu-item" onclick={switchUser}>
               <div class="start-menu-item-icon">
                 <svg
                   viewBox="0 0 24 24"
@@ -181,15 +177,20 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  ><path
-                    d="M14 2.5H6.5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8z"
+                  ><circle cx="16.5" cy="7" r="3" /><path
+                    d="M14.5 13.5h3.5a4 4 0 0 1 4 4V20"
+                  /><path
+                    d="M2.5 21v-1.5a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4V21z"
+                    fill="url(#halftone)"
+                  /><circle
+                    cx="9"
+                    cy="8.5"
+                    r="3.5"
                     style="fill: var(--color-paper)"
-                  /><path d="M14 2.5V8h5.5z" fill="url(#halftone)" /><path
-                    d="M8 11.5h8M8 15h5.5M8 18.5h7"
                   /></svg
                 >
               </div>
-              <div class="start-menu-item-text">Switch to Simple Mode</div>
+              <div class="start-menu-item-text">Switch User</div>
             </button>
           </div>
         </div>

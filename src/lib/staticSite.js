@@ -12,7 +12,6 @@ import {
   githubProfile,
   projects,
   bookmarks,
-  credits,
   plain,
   starLabel,
   schoolName,
@@ -45,14 +44,6 @@ function linkHtml(url, label) {
   const external = /^https?:/.test(url);
   const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : "";
   return `[ <a href="${esc(url)}"${attrs}>${esc(label)}</a> ]`;
-}
-
-function soundLineText(line) {
-  return line
-    .map((part) =>
-      typeof part === "string" ? part : `[${part.text}](${part.url})`,
-    )
-    .join(" ");
 }
 
 // --------------------------------------------------------------------------- <head>
@@ -166,13 +157,15 @@ export function renderStaticPage() {
     `<section><h2>Work</h2>`,
     `<h3>Live Work</h3><ul>`,
     ...liveWork.map((w) =>
-      li(`<strong>${esc(w.name)}</strong> ${linkHtml(w.url, w.domain)}`),
+      li(`<strong>${esc(w.name)}</strong><br />${linkHtml(w.url, w.domain)}`),
     ),
     `</ul><h3>Personal Projects</h3><ul>`,
     ...projects.map((p) => {
-      const stars = p.stars ? ` (★ ${esc(starLabel(p.stars.fallback))})` : "";
+      const stars = p.stars
+        ? `<br />★ ${esc(starLabel(p.stars.fallback))}`
+        : "";
       return li(
-        `<strong>${esc(p.name)}</strong>: ${esc(p.description)}${stars} ${linkHtml(p.link, "View on GitHub")}`,
+        `<strong>${esc(p.name)}</strong>: ${esc(p.description)}${stars}<br />${linkHtml(p.link, "View on GitHub")}`,
       );
     }),
     `</ul><p>More on ${linkHtml(githubProfile, "GitHub")}</p>`,
@@ -255,9 +248,6 @@ export function renderLlmsTxt() {
     "## Optional",
     "",
     `- [Plain-text version of the site](${simpleModeUrl}): the same content without the desktop interface`,
-    `- Inspiration: ${credits.inspiration.lead} ${credits.inspiration.name} (${credits.inspiration.links.map((l) => `[${l.label}](${l.url})`).join(", ")})`,
-    `- Profile picture and favicon: ${credits.avatar.character} from ${credits.avatar.source}. ${credits.avatar.note}`,
-    ...credits.sounds.map((line) => `- ${soundLineText(line)}`),
     "",
   ];
   return lines.join("\n");
