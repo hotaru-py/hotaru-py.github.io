@@ -53,7 +53,3 @@ This site (https://hotaru-py.github.io/) is an interactive, desktop-style portfo
 ## Optional
 
 - [Plain-text version of the site](https://hotaru-py.github.io/?mode=simple): the same content without the desktop interface
-- Inspiration: Website inspired by shar ([sharyap.com](https://sharyap.com), [YouTube](https://www.youtube.com/c/sharyap))
-- Profile picture and favicon: Firefly from Honkai: Star Rail. Character and artwork © HoYoverse. Non-commercial usage.
-- Xylophone sounds by [freesound_community](https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818) from [Pixabay](https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818)
-- Mouse click sounds by [JustSomeSounds](https://pixabay.com/users/justsomesounds-53130806/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501) and [u_u4pf5h7zip](https://pixabay.com/users/u_u4pf5h7zip-50459877/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=345983) from [Pixabay](https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501)
