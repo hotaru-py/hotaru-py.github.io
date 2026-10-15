@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Plain-text summary of this site for AI agents and LLMs (https://llmstxt.org):
+# https://hotaru-py.github.io/llms.txt
+
+Sitemap: https://hotaru-py.github.io/sitemap.xml

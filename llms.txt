@@ -1,0 +1,59 @@
+# Prajesh Raam (hotaru)
+
+> Portfolio of Prajesh Raam (hotaru): full-stack developer, designer and artist. Live websites, personal projects, skills and links, presented as a playful desktop or a simple text page.
+
+I'm an engineer by day, designer by night, artist throughout. Currently an undergrad engineering student and a full-stack developer.
+
+This site (https://hotaru-py.github.io/) is an interactive, desktop-style portfolio that needs JavaScript. A plain-text version of the same content is at https://hotaru-py.github.io/?mode=simple, and everything is summarised below.
+
+## About
+
+- software development across platforms and stacks
+- designing visually appealing, usable, and accessible experiences
+- graphic & UI/UX design
+- product and interaction design in the long run
+- Education: Shiv Nadar University Chennai, B.Tech Artificial Intelligence and Data Science (2023-2027)
+- Education: Mahatma Global Gateway - CBSE, Class XII · Computer Science & Mathematics (2023); Class X (2021)
+- Pronouns: he/him
+
+## Experience
+
+- [Miniture](https://miniture.in): Software Development Engineering Intern, March 2025 - February 2026
+
+## Skills
+
+- Full-Stack Development: React, Next.js, JavaScript / TypeScript, Shopify Liquid, Svelte, Python, FastAPI, Flask, Node.js, SQL
+- Design & Creative: Figma, Inkscape, Krita, Canva, Premiere Pro, Blender, Pen & Paper
+
+## Live Work
+
+- [Miniture](https://www.miniture.in): live website
+- [SSN-SNUC INVENTE '26](https://invente-2026.vercel.app/): live website
+- [SSN-SNUC INSTINCTS '26](https://www.ssnsnucinstincts.com/): live website
+- [The Curation Company](https://www.thecurationcompany.in/): live website
+
+## Personal Projects
+
+- [My Personal Website (this one!)](https://github.com/hotaru-hspr/hotaru-hspr.github.io): My personal website, with a desktop/mobile-like interface and a simpler-to-read page
+- [Eunoia](https://github.com/Try3D/Eunoia): AI-powered DIY learning platform that turns objects at hand into hands-on projects using computer vision & RAG
+- [Minimalist ROG Grub Theme](https://github.com/hotaru-py/rog-grub): Minimalist theme for the Grub Bootloader (27 stars on GitHub)
+- [Starboard](https://github.com/hotaru-hspr/Starboard): A fast, versatile, extensible and highly flexible platform for optimal ship routing
+- [SNUGPA](https://github.com/EditaCTF/SNUC_Grade_Calculator): CGPA/SGPA Calculator for SNU Chennai
+- [CacheSim](https://github.com/hotaru-py/CacheSim): Animated Cache Simulation using Svelte & FastAPI
+- [More on GitHub](https://github.com/hotaru-py)
+
+## Contact and profiles
+
+- [LinkedIn](https://linkedin.com/in/prajesh-raam)
+- [Email](mailto:prajeshraam@gmail.com)
+- [GitHub](https://github.com/hotaru-py)
+- [Behance](https://www.behance.net/prajeshraam)
+- [YouTube (random stuff)](https://www.youtube.com/@hotaruuuh)
+
+## Optional
+
+- [Plain-text version of the site](https://hotaru-py.github.io/?mode=simple): the same content without the desktop interface
+- Inspiration: Website inspired by shar ([sharyap.com](https://sharyap.com), [YouTube](https://www.youtube.com/c/sharyap))
+- Profile picture and favicon: Firefly from Honkai: Star Rail. Character and artwork © HoYoverse. Non-commercial usage.
+- Xylophone sounds by [freesound_community](https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818) from [Pixabay](https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818)
+- Mouse click sounds by [JustSomeSounds](https://pixabay.com/users/justsomesounds-53130806/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501) and [u_u4pf5h7zip](https://pixabay.com/users/u_u4pf5h7zip-50459877/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=345983) from [Pixabay](https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501)
