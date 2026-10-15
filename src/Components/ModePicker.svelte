@@ -61,9 +61,9 @@
   const users = $derived([
     {
       mode: "full",
-      name: "Full Desktop Experience",
+      name: isPhone ? "Phone Mode" : "PC Mode",
       detail: isPhone
-        ? "Apps, a dock and a wallpaper that reacts to your touch."
+        ? "works like a phone. you know what a phone is. i'll shut up now."
         : "works like a desktop. you know what a desktop is. i'll shut up now.",
     },
     {
