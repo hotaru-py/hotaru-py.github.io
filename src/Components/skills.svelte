@@ -39,6 +39,7 @@
           {#each category.items as skill}
             <span
               class="skill-pill"
+              role="button"
               tabindex="0"
               use:xylophone={{ keys: true }}
             >

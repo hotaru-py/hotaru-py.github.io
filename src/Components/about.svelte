@@ -112,12 +112,6 @@
     font-weight: 700;
   }
 
-  .highlight_smol {
-    font-size: 16px;
-    color: var(--color-ink-muted);
-    font-weight: 600;
-  }
-
   .about-list {
     margin-bottom: 20px;
     padding-left: 20px;

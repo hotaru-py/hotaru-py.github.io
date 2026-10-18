@@ -114,15 +114,33 @@
     }
   }
 
-  function handleResizeMouseDown(e) {
+  const MIN_WIDTH = 400;
+  const MIN_HEIGHT = 300;
+
+  // Which way the grabbed corner grows the window: +1 right/down, -1 left/up
+  let resizeDirX = 1;
+  let resizeDirY = 1;
+
+  const corners = [
+    { name: "nw", dirX: -1, dirY: -1 },
+    { name: "ne", dirX: 1, dirY: -1 },
+    { name: "sw", dirX: -1, dirY: 1 },
+    { name: "se", dirX: 1, dirY: 1 },
+  ];
+
+  function handleResizeMouseDown(e, dirX, dirY) {
     if (isMobileView) return;
 
     activate();
     isResizing = true;
+    resizeDirX = dirX;
+    resizeDirY = dirY;
     startX = e.clientX;
     startY = e.clientY;
     startWidth = currentWidth;
     startHeight = currentHeight;
+    offsetX = currentX;
+    offsetY = currentY;
 
     document.addEventListener("mousemove", handleResizeMouseMove);
     document.addEventListener("mouseup", handleResizeMouseUp);
@@ -132,11 +150,21 @@
 
   function handleResizeMouseMove(e) {
     if (isResizing) {
-      const newWidth = Math.max(400, startWidth + (e.clientX - startX));
-      const newHeight = Math.max(300, startHeight + (e.clientY - startY));
+      const newWidth = Math.max(
+        MIN_WIDTH,
+        startWidth + resizeDirX * (e.clientX - startX),
+      );
+      const newHeight = Math.max(
+        MIN_HEIGHT,
+        startHeight + resizeDirY * (e.clientY - startY),
+      );
 
       currentWidth = newWidth;
       currentHeight = newHeight;
+
+      // Left/top corners move the window's origin so the opposite edge stays put
+      if (resizeDirX < 0) currentX = offsetX + (startWidth - newWidth);
+      if (resizeDirY < 0) currentY = offsetY + (startHeight - newHeight);
     }
   }
 
@@ -151,6 +179,9 @@
         width: currentWidth,
         height: currentHeight,
       });
+      if (resizeDirX < 0 || resizeDirY < 0) {
+        onMove?.({ id: window.id, x: currentX, y: currentY });
+      }
     }
   }
 
@@ -172,6 +203,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="window-container"
   class:active={isActive}
@@ -255,11 +287,15 @@
     </div>
 
     {#if !isMobileView && !maximized}
-      <div
-        class="resize-handle"
-        onmousedown={handleResizeMouseDown}
-        aria-label="Resize window"
-      ></div>
+      {#each corners as corner (corner.name)}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+          class="resize-handle {corner.name}"
+          onmousedown={(e) =>
+            handleResizeMouseDown(e, corner.dirX, corner.dirY)}
+          aria-hidden="true"
+        ></div>
+      {/each}
     {/if}
   </div>
 </div>
@@ -525,17 +561,42 @@
     color: var(--color-ink);
   }
 
+  /* Corner grips; only the bottom-right one is drawn. The top ones stay small enough
+     to clear the traffic lights. */
   .resize-handle {
     position: absolute;
+    width: 12px;
+    height: 12px;
+    z-index: 10;
+  }
+
+  .resize-handle.nw {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+  }
+
+  .resize-handle.ne {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+  }
+
+  .resize-handle.sw {
+    bottom: 0;
+    left: 0;
+    cursor: nesw-resize;
+  }
+
+  .resize-handle.se {
     bottom: 0;
     right: 0;
     width: 16px;
     height: 16px;
     cursor: nwse-resize;
-    z-index: 10;
   }
 
-  .resize-handle::after {
+  .resize-handle.se::after {
     content: "";
     position: absolute;
     right: 4px;

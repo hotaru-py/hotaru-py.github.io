@@ -170,7 +170,28 @@
             onblur={() => setPreview(false)}
           >
             <span class="avatar">
-              {#if user.mode === "full"}
+              {#if user.mode === "full" && isPhone}
+                <!-- Phone: halftone dots over a paper-white screen -->
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect
+                    x="6"
+                    y="2.5"
+                    width="12"
+                    height="19"
+                    rx="2.5"
+                    class="paper"
+                  />
+                  <rect
+                    x="6"
+                    y="2.5"
+                    width="12"
+                    height="19"
+                    rx="2.5"
+                    fill="url(#picker-halftone)"
+                  />
+                  <path d="M10.5 18.5h3" />
+                </svg>
+              {:else if user.mode === "full"}
                 <!-- Monitor: halftone dots over a paper-white screen -->
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <rect
