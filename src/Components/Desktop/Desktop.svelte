@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, setContext, untrack } from "svelte";
   import Taskbar from "./Taskbar.svelte";
   import DesktopIcon from "./DesktopIcon.svelte";
   import IconGrid from "./IconGrid.svelte";
@@ -8,6 +8,7 @@
   import MobileClock from "./MobileClock.svelte";
   import MobileSettings from "./MobileSettings.svelte";
   import WelcomeNotice from "./WelcomeNotice.svelte";
+  import AboutTip from "./AboutTip.svelte";
   import { sparkleDots } from "../../lib/halftone.js";
   import { playSound } from "../../lib/sounds.js";
   import About from "../about.svelte";
@@ -81,6 +82,61 @@
   // Mobile dock labels, toggled from the settings menu
   let showDockLabels = $state(true);
 
+  // Lets window contents open windows of their own (e.g. a file from the Work folder)
+  setContext("desktop", { openWindow });
+
+  // --- First thing on screen ---------------------------------------------------
+  // Desktops open About Me just right of the first icon column, its top in line with
+  // the first icon; phones get a bubble pointing at
+  // its dock icon instead (once per visit, until it's tapped or About is opened).
+  const INTRO_MARGIN = 24;
+  // The icon grid's margin (24) + icon width (88) + a gap
+  const INTRO_LEFT = 24 + 88 + 24;
+  const TIP_SEEN_KEY = "about-tip-seen";
+  let introDone = false;
+  let showAboutTip = $state(false);
+  /** @type {HTMLElement | undefined} */
+  let dockElement = $state();
+
+  $effect(() => {
+    if (!booted || introDone || !desktopWidth || !desktopHeight) return;
+    introDone = true;
+    untrack(() => {
+      if (isMobileView) {
+        try {
+          showAboutTip = !sessionStorage.getItem(TIP_SEEN_KEY);
+        } catch {
+          showAboutTip = true;
+        }
+        return;
+      }
+      // Room is left for the window's border and drop shadow
+      const width = Math.min(700, desktopWidth - INTRO_LEFT - INTRO_MARGIN - 7);
+      const height = Math.min(500, desktopHeight - INTRO_MARGIN * 2 - 78);
+      const about = desktopIcons.find((icon) => icon.id === "about");
+      openWindow(
+        {
+          ...about,
+          position: {
+            x: INTRO_LEFT,
+            y: INTRO_MARGIN,
+          },
+          size: { width, height },
+        },
+        { quiet: true },
+      );
+    });
+  });
+
+  function dismissAboutTip() {
+    showAboutTip = false;
+    try {
+      sessionStorage.setItem(TIP_SEEN_KEY, "1");
+    } catch {
+      // Storage unavailable; it may show again on reload
+    }
+  }
+
   onMount(() => {
     const timer = setInterval(() => {
       currentTime = new Date();
@@ -105,7 +161,14 @@
     openWindow(iconData);
   }
 
-  function openWindow(iconData) {
+  /**
+   * Opens a window, or brings it forward if it's already open. Beyond a desktop icon's
+   * fields, `position`, `size`, `props` (passed to the component) and `icon` (for the
+   * taskbar) are optional.
+   */
+  function openWindow(iconData, { quiet = false } = {}) {
+    if (iconData.id === "about" && showAboutTip) dismissAboutTip();
+
     const existingWindow = windows.find((w) => w.id === iconData.id);
 
     if (existingWindow) {
@@ -115,25 +178,30 @@
         id: iconData.id,
         title: iconData.title,
         component: iconData.component,
+        props: iconData.props,
+        icon: iconData.icon,
         position: isMobileView
           ? { x: 0, y: 0 }
-          : { x: 150 + windows.length * 30, y: 50 + windows.length * 20 },
+          : (iconData.position ?? {
+              x: 150 + windows.length * 30,
+              y: 50 + windows.length * 20,
+            }),
         size: isMobileView
           ? { width: desktopWidth, height: desktopHeight - 60 }
-          : { width: 700, height: 500 },
+          : (iconData.size ?? { width: 700, height: 500 }),
         minimized: false,
       };
       windows = [...windows, newWindow];
       activateWindow(newWindow.id);
-      playSound("open");
+      if (!quiet) playSound("open");
     }
   }
 
-  function closeWindow(id) {
+  function closeWindow(id, { quiet = false } = {}) {
     // Already on its way out (e.g. a double-click on close)
     if (closingWindowId === id) return;
     closingWindowId = id;
-    playSound("close");
+    if (!quiet) playSound("close");
 
     setTimeout(() => {
       windows = windows.filter((w) => w.id !== id);
@@ -175,6 +243,13 @@
       windows.filter((w) => !w.minimized).map((w) => w.id),
     );
     return stackOrder.findLast((id) => visible.has(id)) ?? null;
+  }
+
+  // Clicking empty desktop (or an icon) takes focus away from the windows, like on
+  // Windows; the taskbar then shows none of them as active
+  function handleDesktopPointerDown(e) {
+    if (isMobileView || e.target.closest(".window-container")) return;
+    activeWindowId = null;
   }
 
   function updateWindowPosition({ id, x, y }) {
@@ -233,11 +308,13 @@
     <WelcomeNotice isMobile={isMobileView} />
   {/if}
 
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="desktop-background"
     class:mobile-view={isMobileView}
     bind:clientWidth={desktopWidth}
     bind:clientHeight={desktopHeight}
+    onpointerdown={handleDesktopPointerDown}
   >
     {#each windows as window, i (window.id)}
       <div
@@ -253,7 +330,7 @@
           {isMobileView}
           isActive={activeWindowId === window.id}
           minimized={window.minimized}
-          onClose={() => closeWindow(window.id)}
+          onClose={(options) => closeWindow(window.id, options)}
           onMinimize={() => minimizeWindow(window.id)}
           onActivate={() => activateWindow(window.id)}
           onMove={updateWindowPosition}
@@ -283,12 +360,14 @@
       <div
         class="mobile-icons-additional"
         class:mobile-icons-hidden={activeWindowId}
+        bind:this={dockElement}
         in:fade={{ duration: 300, delay: 100 }}
       >
         {#each desktopIcons as icon, i (icon.id)}
           <div
             in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}
             class="mobile-icon-wrapper"
+            data-icon={icon.id}
           >
             <DesktopIcon
               {icon}
@@ -300,10 +379,20 @@
         {/each}
       </div>
     {/if}
+
+    {#if isMobileView && showAboutTip && !activeWindowId}
+      <AboutTip
+        anchor={dockElement?.querySelector('[data-icon="about"]')}
+        onDismiss={dismissAboutTip}
+      />
+    {/if}
   </div>
 
   {#if !isMobileView}
-    <Taskbar
+    <!-- Floats over the bottom of the desktop, so windows slide under it instead of
+         being cut off at its edge -->
+    <div class="taskbar-dock">
+      <Taskbar
       {windows}
       {activeWindowId}
       {desktopIcons}
@@ -314,7 +403,8 @@
       {onSwitchUser}
       showReset={layoutCustomized}
       onResetLayout={() => iconGrid?.reset()}
-    />
+      />
+    </div>
   {/if}
 </div>
 
@@ -345,6 +435,27 @@
     flex: 1;
     position: relative;
     overflow: hidden;
+  }
+
+  /* Height the taskbar covers (12px gap + 50px bar + 16px below it). Icons and
+     maximized windows keep clear of it; windows read it to keep their title bar out
+     from under it. */
+  .desktop-background:not(.mobile-view) {
+    --taskbar-space: 78px;
+  }
+
+  .taskbar-dock {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    /* Only the bar itself catches clicks; the gap around it lets them through */
+    pointer-events: none;
+  }
+
+  .taskbar-dock :global(.taskbar) {
+    pointer-events: auto;
   }
 
   .desktop-background.mobile-view {

@@ -1,5 +1,6 @@
 <script>
   import { tapToOpen } from "../lib/tapToOpen.js";
+  import { tactile } from "../lib/tactile.js";
   import { bookmarks } from "../lib/siteContent.js";
 
   // Icon for each bookmark, by its id in siteContent.js
@@ -17,7 +18,11 @@
   <h2 class="browser-title">Bookmarks</h2>
   <div class="browser-grid">
     {#each bookmarks as method}
-      <div class="browser-card" use:tapToOpen={method.url}>
+      <div
+        class="browser-card"
+        use:tapToOpen={method.url}
+        use:tactile
+      >
         <div class="browser-row">
           <div class="browser-icon">
             {@html ICONS[method.id]}

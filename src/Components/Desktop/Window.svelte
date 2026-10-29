@@ -3,6 +3,8 @@
   import { scale, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { playSound } from "../../lib/sounds.js";
+  import { CRASH_EVENT } from "../../lib/xylophone.js";
+  import { tactile } from "../../lib/tactile.js";
 
   /**
    * @typedef {Object} Props
@@ -10,7 +12,7 @@
    * @property {boolean} [isActive]
    * @property {boolean} [isMobileView]
    * @property {boolean} [minimized]
-   * @property {() => void} [onClose]
+   * @property {(options?: { quiet?: boolean }) => void} [onClose]
    * @property {() => void} [onMinimize]
    * @property {() => void} [onActivate]
    * @property {(pos: { id: any, x: number, y: number }) => void} [onMove]
@@ -63,6 +65,20 @@
     onClose?.();
   }
 
+  // --- Crashing ----------------------------------------------------------------
+  // Mash the musical pills for too long (see xylophone.js) and the window gives up:
+  // the piano slams, the content is replaced by a dead face, and it closes a beat later.
+  const CRASH_CLOSE_MS = 3000;
+  let crashed = $state(false);
+
+  function handleCrash() {
+    if (crashed) return;
+    crashed = true;
+    activate();
+    playSound("slam");
+    setTimeout(() => onClose?.({ quiet: true }), CRASH_CLOSE_MS);
+  }
+
   function activate() {
     onActivate?.();
   }
@@ -89,6 +105,9 @@
     currentY = window.position.y;
     currentWidth = window.size.width || 800;
     currentHeight = window.size.height || 600;
+
+    windowElement.addEventListener(CRASH_EVENT, handleCrash);
+    return () => windowElement.removeEventListener(CRASH_EVENT, handleCrash);
   });
 
   function handleMouseDown(e) {
@@ -185,10 +204,22 @@
     }
   }
 
+  // Dragged windows may hang off the sides or slip under the taskbar, but the title
+  // bar always stays where it can be grabbed again
+  const TITLE_BAR_H = 40;
+  const MIN_VISIBLE_X = 80;
+
   function handleMouseMove(e) {
     if (isDragging) {
-      currentX = offsetX + (e.clientX - startX);
-      currentY = offsetY + (e.clientY - startY);
+      const desktop = windowElement.offsetParent;
+      const taskbarSpace =
+        parseFloat(getComputedStyle(desktop).getPropertyValue("--taskbar-space")) ||
+        0;
+      const maxY = desktop.clientHeight - taskbarSpace - TITLE_BAR_H;
+      const minX = MIN_VISIBLE_X - currentWidth;
+      const maxX = desktop.clientWidth - MIN_VISIBLE_X;
+      currentX = Math.min(maxX, Math.max(minX, offsetX + (e.clientX - startX)));
+      currentY = Math.min(maxY, Math.max(0, offsetY + (e.clientY - startY)));
     }
   }
 
@@ -210,6 +241,7 @@
   class:maximized
   class:minimized
   class:animating-frame={animatingFrame}
+  class:crashed
   class:mobile-window-container={isMobileView}
   style={frameStyle}
   onmousedown={handleMouseDown}
@@ -225,7 +257,12 @@
       >
         <!-- Mac-style traffic lights; glyphs appear while the group is hovered -->
         <div class="window-controls">
-          <button class="light close" onclick={close} aria-label="Close">
+          <button
+            class="light close"
+            onclick={close}
+            aria-label="Close"
+            use:tactile
+          >
             <svg viewBox="0 0 8 8" aria-hidden="true">
               <path d="M2 2l4 4M6 2L2 6" />
             </svg>
@@ -233,6 +270,7 @@
           <button
             class="light minimize"
             onclick={minimize}
+            use:tactile
             aria-label="Minimize"
           >
             <svg viewBox="0 0 8 8" aria-hidden="true">
@@ -242,6 +280,7 @@
           <button
             class="light maximize"
             onclick={toggleMaximize}
+            use:tactile
             aria-label={maximized ? "Restore" : "Maximize"}
           >
             <svg viewBox="0 0 8 8" aria-hidden="true">
@@ -252,7 +291,9 @@
             </svg>
           </button>
         </div>
-        <div class="title-text">{window.title}</div>
+        <div class="title-text">
+          {window.title}{crashed ? " (Not Responding)" : ""}
+        </div>
       </div>
     {/if}
 
@@ -279,11 +320,23 @@
                 <path d="M12 19l-7-7 7-7"></path>
               </svg>
             </button>
-            <div class="mobile-title">{window.title}</div>
+            <div class="mobile-title">
+              {window.title}{crashed ? " (Not Responding)" : ""}
+            </div>
           </div>
         </div>
       {/if}
-      <window.component isMobile={isMobileView} />
+      {#if crashed}
+        <div class="crash-screen" class:mobile={isMobileView}>
+          <!-- Dead face: X eyes over a frown, drawn straight on the dots -->
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M12 14l12 12M24 14L12 26M40 14l12 12M52 14L40 26" />
+            <path d="M18 52c8-11 20-11 28 0" />
+          </svg>
+        </div>
+      {:else}
+        <window.component isMobile={isMobileView} {...window.props ?? {}} />
+      {/if}
     </div>
 
     {#if !isMobileView && !maximized}
@@ -321,7 +374,7 @@
     left: 8px;
     top: 8px;
     width: calc(100% - 22px);
-    height: calc(100% - 22px);
+    height: calc(100% - 22px - var(--taskbar-space, 0px));
   }
 
   .window-container.animating-frame {
@@ -343,6 +396,47 @@
       transform 0.25s var(--ease),
       opacity 0.2s ease,
       visibility 0s linear 0.25s;
+  }
+
+  /* --- Crash: the content turns to halftone dots with a dead face on top --- */
+  .window-container.crashed {
+    pointer-events: none;
+  }
+
+  .crash-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Fills the window edge to edge, cancelling the content padding */
+    height: calc(100% + 32px);
+    margin: -16px;
+    background-color: var(--color-paper);
+    background-image: var(--halftone);
+    background-size: var(--halftone-size);
+    animation: crash-in 0.12s ease-out;
+  }
+
+  .crash-screen.mobile {
+    height: auto;
+    min-height: 70vh;
+    margin: 0;
+  }
+
+  .crash-screen svg {
+    width: 96px;
+    height: 96px;
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @keyframes crash-in {
+    from {
+      opacity: 0;
+    }
   }
 
   .mobile-window-container {

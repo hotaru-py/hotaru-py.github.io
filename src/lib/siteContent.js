@@ -95,24 +95,32 @@ export const liveWork = [
     name: "Miniture",
     url: "https://www.miniture.in",
     domain: "miniture.in",
+    description:
+      "Shopify theme built end-to-end as the sole developer, from the designer's handoff through iterations with the team and designer. Continuously improved and extended using customer session data, competitor analysis and brand fit.",
   },
   {
     id: "invente",
     name: "SSN-SNUC INVENTE '26",
     url: "https://invente-2026.vercel.app/",
     domain: "invente-2026.vercel.app",
+    description:
+      "Website lead for INVENTE, my university's annual technical festival. Led the website team, set the site's initial look and drove its implementation, while also working hands-on as a frontend developer.",
   },
   {
     id: "instincts",
     name: "SSN-SNUC INSTINCTS '26",
     url: "https://www.ssnsnucinstincts.com/",
     domain: "ssnsnucinstincts.com",
+    description:
+      "Web designer and developer for INSTINCTS, my university's annual cultural festival. Led the design language and page mockups (mainly the home page), then built the site and maintained it and its content.",
   },
   {
     id: "tcc",
     name: "The Curation Company",
     url: "https://www.thecurationcompany.in/",
     domain: "thecurationcompany.in",
+    description:
+      "Website for a gift curation client. Ideated and developed the site layout, the interactive gifting flow and the card-scroll transitions between pages.",
   },
 ];
 
@@ -122,8 +130,14 @@ export const projects = [
   {
     name: "My Personal Website (this one!)",
     description:
-      "My personal website, with a desktop/mobile-like interface and a simpler-to-read page",
+      "My personal website, with a choice of a desktop/phone-like interface or a markdown-style page, and agent-crawlable text",
     link: "https://github.com/hotaru-hspr/hotaru-hspr.github.io",
+  },
+  {
+    name: "LookAtDisPatch",
+    description:
+      "Agentic operations optimization for last-mile delivery, with a versatile command-center dashboard. Entry for Google DevFest '26 Agent Wars",
+    link: "https://github.com/hotaru-py/LookAtDisPatch",
   },
   {
     name: "Eunoia",
@@ -132,8 +146,15 @@ export const projects = [
     link: "https://github.com/Try3D/Eunoia",
   },
   {
+    name: "ClothSense",
+    description:
+      "Interactive 3D virtual clothing try-on from a single 2D image, as a semester 7 course project for Modern 3D Vision Techniques",
+    link: "https://github.com/hotaru-py/ClothSense",
+  },
+  {
     name: "Minimalist ROG Grub Theme",
-    description: "Minimalist theme for the Grub Bootloader",
+    description:
+      "Minimalist theme for the GRUB bootloader, built around ASUS ROG branding",
     link: "https://github.com/hotaru-py/rog-grub",
     // Shown until (or if) the live count can't be fetched
     stars: { repo: "hotaru-py/rog-grub", fallback: 27 },
@@ -141,17 +162,19 @@ export const projects = [
   {
     name: "Starboard",
     description:
-      "A fast, versatile, extensible and highly flexible platform for optimal ship routing",
+      "A fast, versatile and highly extensible platform for optimal ship routing. Smart India Hackathon (SIH) 2024 nominee from Shiv Nadar University Chennai",
     link: "https://github.com/hotaru-hspr/Starboard",
   },
   {
     name: "SNUGPA",
-    description: "CGPA/SGPA Calculator for SNU Chennai",
+    description:
+      "CGPA/SGPA calculator with saved records for Shiv Nadar University Chennai, used by 750+ unique users",
     link: "https://github.com/EditaCTF/SNUC_Grade_Calculator",
   },
   {
     name: "CacheSim",
-    description: "Animated Cache Simulation using Svelte & FastAPI",
+    description:
+      "Animated cache simulation built with Svelte & FastAPI, as a semester 2 course project for Computer Organization and Architecture (COA)",
     link: "https://github.com/hotaru-py/CacheSim",
   },
 ];
@@ -177,11 +200,9 @@ export const bookmarks = [
   },
 ];
 
-// Attribution links exactly as Pixabay asks for them
-const PIXABAY_XYLOPHONE =
-  "https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818";
-const PIXABAY_CLICKS =
-  "https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501";
+// Pixabay's attribution links (the utm_content number is one of that creator's sounds)
+const PIXABAY_ATTRIBUTION =
+  "?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=";
 
 export const credits = {
   heading: "What made this website?",
@@ -204,32 +225,36 @@ export const credits = {
     source: "Honkai: Star Rail",
     note: "Character and artwork © HoYoverse. Non-commercial usage.",
   },
-  // Each line mixes plain text with { text, url } links
-  sounds: [
-    [
-      "Xylophone sounds by",
+  // Every sound on the site comes from Pixabay; each creator is listed once
+  sounds: {
+    source: {
+      text: "Pixabay",
+      url: "https://pixabay.com/sound-effects/" + PIXABAY_ATTRIBUTION + "44936",
+    },
+    creators: [
       {
         text: "freesound_community",
-        url: "https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45818",
+        url:
+          "https://pixabay.com/users/freesound_community-46691455/" +
+          PIXABAY_ATTRIBUTION +
+          "44936",
       },
-      "from",
-      { text: "Pixabay", url: PIXABAY_XYLOPHONE },
-    ],
-    [
-      "Mouse click sounds by",
       {
         text: "JustSomeSounds",
-        url: "https://pixabay.com/users/justsomesounds-53130806/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=432501",
+        url:
+          "https://pixabay.com/users/justsomesounds-53130806/" +
+          PIXABAY_ATTRIBUTION +
+          "432501",
       },
-      "and",
       {
         text: "u_u4pf5h7zip",
-        url: "https://pixabay.com/users/u_u4pf5h7zip-50459877/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=345983",
+        url:
+          "https://pixabay.com/users/u_u4pf5h7zip-50459877/" +
+          PIXABAY_ATTRIBUTION +
+          "345983",
       },
-      "from",
-      { text: "Pixabay", url: PIXABAY_CLICKS },
     ],
-  ],
+  },
 };
 
 /**

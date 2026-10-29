@@ -3,8 +3,34 @@ import { playXylophone } from "./sounds.js";
 // Touches are followed by emulated mouse/focus events; ignore those for this long
 const TOUCH_ECHO_MS = 500;
 
+// Mashing the keys: notes no more than GAP_MS apart, kept up for MASH_MS, "crash" the
+// window they're in (Window.svelte listens for CRASH_EVENT)
+export const CRASH_EVENT = "keys-mashed";
+const GAP_MS = 200;
+const MASH_MS = 3000;
+let mashStart = 0;
+let lastNoteAt = 0;
+
 /**
- * Svelte action: plays the next xylophone note when the element is hovered, touched or
+ * Plays a note, unless this one is the last straw.
+ * @param {HTMLElement} node
+ * @param {{ touch?: boolean }} [options]
+ */
+function playNote(node, options) {
+  const now = Date.now();
+  if (now - lastNoteAt > GAP_MS) mashStart = now;
+  lastNoteAt = now;
+
+  if (now - mashStart >= MASH_MS) {
+    mashStart = now;
+    node.dispatchEvent(new CustomEvent(CRASH_EVENT, { bubbles: true }));
+    return;
+  }
+  playXylophone(options);
+}
+
+/**
+ * Svelte action: plays the next note of the tune when the element is hovered, touched or
  * focused from the keyboard.
  * Pass `{ keys: true }` to also play on Enter/Space (for elements that aren't links).
  * @param {HTMLElement} node
@@ -15,7 +41,7 @@ export function xylophone(node, { keys = false } = {}) {
 
   function handleEnter() {
     if (Date.now() - lastTouchAt < TOUCH_ECHO_MS) return;
-    playXylophone();
+    playNote(node);
   }
 
   function handleFocus() {
@@ -25,13 +51,13 @@ export function xylophone(node, { keys = false } = {}) {
 
   function handleTouch() {
     lastTouchAt = Date.now();
-    playXylophone({ touch: true });
+    playNote(node, { touch: true });
   }
 
   function handleKey(e) {
     if (keys && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
-      playXylophone();
+      playNote(node);
     }
   }
 

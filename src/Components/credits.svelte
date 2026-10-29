@@ -46,15 +46,23 @@
 
     <section class="credit-card">
       <h3 class="credit-heading">Sounds</h3>
+      <p class="credit-text">
+        All from <a
+          class="credit-link"
+          href={credits.sounds.source.url}
+          target="_blank"
+          rel="noopener noreferrer">{credits.sounds.source.text}</a
+        >, by:
+      </p>
       <ul class="credit-list">
-        {#each credits.sounds as line}
+        {#each credits.sounds.creators as creator}
           <li>
-            {#each line as part, i}{#if i > 0}{" "}{/if}{#if typeof part === "string"}{part}{:else}<a
-                  class="credit-link"
-                  href={part.url}
-                  target="_blank"
-                  rel="noopener noreferrer">{part.text}</a
-                >{/if}{/each}
+            <a
+              class="credit-link"
+              href={creator.url}
+              target="_blank"
+              rel="noopener noreferrer">{creator.text}</a
+            >
           </li>
         {/each}
       </ul>

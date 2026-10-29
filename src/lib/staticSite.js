@@ -157,7 +157,9 @@ export function renderStaticPage() {
     `<section><h2>Work</h2>`,
     `<h3>Live Work</h3><ul>`,
     ...liveWork.map((w) =>
-      li(`<strong>${esc(w.name)}</strong><br />${linkHtml(w.url, w.domain)}`),
+      li(
+        `<strong>${esc(w.name)}</strong>: ${esc(w.description)}<br />${linkHtml(w.url, w.domain)}`,
+      ),
     ),
     `</ul><h3>Personal Projects</h3><ul>`,
     ...projects.map((p) => {
@@ -231,7 +233,7 @@ export function renderLlmsTxt() {
     "",
     "## Live Work",
     "",
-    ...liveWork.map((w) => `- [${w.name}](${w.url}): live website`),
+    ...liveWork.map((w) => `- [${w.name}](${w.url}): ${w.description}`),
     "",
     "## Personal Projects",
     "",

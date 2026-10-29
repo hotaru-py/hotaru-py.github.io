@@ -1,5 +1,6 @@
 <script>
   import { slide } from "svelte/transition";
+  import { tactile } from "../../lib/tactile.js";
 
   /**
    * @typedef {Object} Props
@@ -33,6 +34,7 @@
   tabindex="0"
   aria-label={`Open ${icon.title}`}
   onkeydown={(e) => e.key === "Enter" && handleClick()}
+  use:tactile
 >
   <div class="icon-container" class:mobile-icon-container={isMobile}>
     <div class="icon">

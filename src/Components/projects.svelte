@@ -1,275 +1,350 @@
 <script module>
   import { preloadImages } from "../lib/preload.js";
-  import minitureShot from "../assets/work-miniture.webp";
-  import tccShot from "../assets/work-tcc.webp";
-  import inventeShot from "../assets/work-invente.webp";
-  import instinctsShot from "../assets/work-instincts.webp";
+  import { workShots } from "../lib/workFiles.js";
 
-  preloadImages([minitureShot, tccShot, inventeShot, instinctsShot]);
+  preloadImages(workShots);
 </script>
 
 <script>
-  import { onMount } from "svelte";
-  import { tapToOpen } from "../lib/tapToOpen.js";
-  import { fetchStars } from "../lib/githubStars.js";
-  import {
-    liveWork,
-    projects,
-    githubProfile,
-    starLabel,
-  } from "../lib/siteContent.js";
+  import { getContext } from "svelte";
+  import FileViewer from "./FileViewer.svelte";
+  import { tactile } from "../lib/tactile.js";
+  import { playSound } from "../lib/sounds.js";
+  import { githubProfile } from "../lib/siteContent.js";
+  import { liveFiles, projectFiles, FILE_ICONS } from "../lib/workFiles.js";
 
-  // Screenshot for each live site, by its id in siteContent.js
-  const shots = {
-    miniture: minitureShot,
-    invente: inventeShot,
-    instincts: instinctsShot,
-    tcc: tccShot,
-  };
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isMobile]
+   */
 
-  /** @type {Record<string, number>} */
-  let liveStars = $state({});
+  /** @type {Props} */
+  let { isMobile = false } = $props();
 
-  onMount(() => {
-    for (const { stars } of projects) {
-      if (!stars) continue;
-      fetchStars(stars.repo).then((count) => {
-        if (count !== null) liveStars[stars.repo] = count;
-      });
-    }
-  });
+  // Provided by Desktop.svelte, so a file can open in a window of its own
+  const desktop = getContext("desktop");
 
-  function starText({ repo, fallback }) {
-    return starLabel(liveStars[repo] ?? fallback);
+  const folders = [
+    { id: "live", name: "Live Work", files: liveFiles },
+    { id: "projects", name: "Personal Projects", files: projectFiles },
+  ];
+
+  let current = $state("live");
+  const folder = $derived(folders.find((f) => f.id === current));
+
+  // Switching folders ticks, like the hover sound elsewhere (tabs have no hover sound)
+  function switchTo(id) {
+    if (id === current) return;
+    current = id;
+    playSound("tactile", 0.1);
+  }
+
+  function openFile(file) {
+    desktop?.openWindow({
+      id: file.key,
+      title: file.name,
+      icon: FILE_ICONS[file.kind],
+      component: FileViewer,
+      props: { file },
+      size: { width: 820, height: 500 },
+    });
+  }
+
+  // Arrow keys move between the two tabs, like a native tab strip
+  function handleTabKey(e) {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    const i = folders.findIndex((f) => f.id === current);
+    const next = folders[(i + (e.key === "ArrowRight" ? 1 : -1) + 2) % 2];
+    switchTo(next.id);
+    e.currentTarget.parentElement
+      .querySelector(`[data-tab="${next.id}"]`)
+      ?.focus();
   }
 </script>
 
-<div class="projects-container">
-  <h2 class="projects-title">Live Work</h2>
-
-  <div class="projects-grid">
-    {#each liveWork as site}
-      <div class="project-card live-card" use:tapToOpen={site.url}>
-        <div class="live-shot">
-          <img
-            src={shots[site.id]}
-            alt="Screenshot of the {site.name} website"
+<div class="explorer" class:mobile={isMobile}>
+  <div class="tabs" role="tablist" aria-label="Work folders">
+    {#each folders as f (f.id)}
+      <button
+        type="button"
+        class="tab"
+        role="tab"
+        id="work-tab-{f.id}"
+        data-tab={f.id}
+        aria-selected={current === f.id}
+        aria-controls="work-panel"
+        tabindex={current === f.id ? 0 : -1}
+        onclick={() => switchTo(f.id)}
+        onkeydown={handleTabKey}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+            fill={current === f.id ? "url(#halftone)" : "none"}
           />
-        </div>
-        <div class="live-body">
-          <h3 class="project-name">{site.name}</h3>
-          <a
-            href={site.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="project-link"
-          >
-            {site.domain} →
-          </a>
-        </div>
-      </div>
+          <path d="M2 10h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" class="paper" />
+        </svg>
+        {f.name}
+      </button>
     {/each}
   </div>
 
-  <h2 class="projects-title">
-    Featured Personal Projects
-    <a
-      href={githubProfile}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="github-icon-link"
-      aria-label="View GitHub profile"
-    >
-      <span class="github-icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          ><path
+  <div class="address-bar">
+    <span class="path">
+      Work <span class="sep" aria-hidden="true">›</span>
+      {folder.name}
+    </span>
+    {#if current === "projects"}
+      <a
+        href={githubProfile}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="github-link"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
             d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-          /></svg
-        >
-      </span>
-    </a>
-  </h2>
+          />
+        </svg>
+        All on GitHub
+      </a>
+    {/if}
+  </div>
 
-  <div class="projects-grid">
-    {#each projects as project}
-      <div class="project-card" use:tapToOpen={project.link}>
-        <div class="project-header">
-          <h3 class="project-name">
-            {project.name}
-          </h3>
-        </div>
-        <p class="project-description">{project.description}</p>
-        {#if project.stars}
-          <span class="star-pill">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95z"
-              />
-            </svg>
-            {starText(project.stars)}
-          </span>
-        {/if}
-        <a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="project-link"
-        >
-          View Project →
-        </a>
-      </div>
+  <div
+    class="files"
+    id="work-panel"
+    role="tabpanel"
+    aria-labelledby="work-tab-{current}"
+  >
+    {#each folder.files as file (file.key)}
+      <button
+        type="button"
+        class="file"
+        onclick={() => openFile(file)}
+        title={file.name}
+        use:tactile
+      >
+        <span class="thumb" class:image={file.image}>
+          {#if file.image}
+            <img src={file.image} alt="" loading="lazy" />
+          {:else}
+            {@html FILE_ICONS.project}
+          {/if}
+        </span>
+        <span class="file-name">{file.name}</span>
+      </button>
     {/each}
+  </div>
+
+  <div class="status-bar">
+    {folder.files.length} items · {isMobile ? "tap" : "click"} a file to open it
   </div>
 </div>
 
 <style>
-  .projects-container {
+  /* Fills the window edge to edge, cancelling the content padding */
+  .explorer {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    width: calc(100% + 16px);
-    margin-left: -8px;
-    margin-right: -8px;
-    box-sizing: border-box;
-    padding: 0 16px 0 16px;
-    overflow-y: auto;
-  }
-
-  @media (max-width: 768px) {
-    .projects-container {
-      width: 100%;
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  .projects-title {
-    font-size: 20px;
-    font-weight: 700;
+    height: calc(100% + 32px);
+    margin: -16px;
     color: var(--color-ink);
-    margin: 0 0 16px 0;
-    padding-bottom: 12px;
-    border-bottom: var(--ink-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
   }
 
-  .github-icon-link {
-    color: var(--color-ink);
-    text-decoration: none;
-    transition: transform 0.2s ease;
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-  }
-
-  .github-icon-link:hover {
-    transform: translateY(-2px);
-  }
-
-  .github-icon {
-    font-size: 20px;
-  }
-
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
-    margin-bottom: 24px;
-    padding: 0 8px 8px 0;
-    isolation: isolate;
-  }
-
-  .project-card {
-    position: relative;
-    background-color: var(--color-paper);
-    border-radius: 12px;
-    padding: 16px;
-    border: var(--ink-border);
-    top: 0;
-    left: 0;
-    /* Offsets, not transform: a transform would lift the halftone shadow above the card */
-    transition:
-      top 0.15s ease,
-      left 0.15s ease;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Halftone drop shadow; the grid isolates it so it stays behind the card */
-  .project-card::after {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background-image: var(--halftone);
-    background-size: var(--halftone-shadow-size);
-    transform: translate(6px, 6px);
-    transition: transform 0.15s ease;
-    z-index: -1;
-  }
-
-  .project-card:hover {
-    top: -2px;
-    left: -2px;
-  }
-
-  .project-card:hover::after {
-    transform: translate(8px, 8px);
-    background-image: var(--halftone-sparkle, var(--halftone));
-    background-size: var(--halftone-sparkle-size, var(--halftone-shadow-size));
-  }
-
-  .project-header {
-    margin-bottom: 12px;
-  }
-
-  .project-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--color-ink);
+  /* On phones the window is the scroller and keeps its own padding */
+  .explorer.mobile {
+    height: auto;
     margin: 0;
+  }
+
+  /* --- Folder tabs --- */
+  .tabs {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .project-description {
-    font-size: 14px;
-    color: var(--color-ink-soft);
-    margin-bottom: 16px;
-    flex-grow: 1;
-  }
-
-  .project-link {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--color-ink);
-    text-decoration: none;
-    padding: 4px 0;
-    align-self: flex-start;
-  }
-
-  /* Live work: the screenshot fills the top, name and link sit underneath */
-  .live-card {
-    padding: 0;
-  }
-
-  .live-shot {
-    aspect-ratio: 3 / 2;
-    overflow: hidden;
+    gap: 6px;
+    padding: 10px 12px 0;
     border-bottom: var(--ink-border);
-    border-radius: 10px 10px 0 0;
     background-color: var(--color-moss-100);
   }
 
-  .live-shot img {
+  .mobile .tabs {
+    padding: 0;
+    background: none;
+  }
+
+  .tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: -2px;
+    padding: 8px 14px;
+    border: var(--ink-border);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    background-color: var(--color-moss-200);
+    color: var(--color-ink-muted);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .tab:hover {
+    color: var(--color-ink);
+  }
+
+  /* The open tab joins the folder below it */
+  .tab[aria-selected="true"] {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    padding-bottom: 10px;
+  }
+
+  .mobile .tab {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+
+  .tab svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .tab .paper {
+    fill: var(--color-paper);
+  }
+
+  /* --- Address bar --- */
+  .address-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 32px;
+    padding: 6px 16px;
+    border-bottom: var(--ink-border);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .mobile .address-bar {
+    padding: 8px 2px;
+  }
+
+  .path {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-ink-soft);
+  }
+
+  .sep {
+    margin: 0 4px;
+    color: var(--color-ink-muted);
+  }
+
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 999px;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+
+  .github-link:hover {
+    background-color: var(--color-moss-100);
+  }
+
+  .github-link svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  /* --- Files: large-icon view --- */
+  .files {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+    align-content: start;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .mobile .files {
+    overflow: visible;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    padding: 16px 0;
+  }
+
+  .file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 6px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .file:hover {
+    background-color: var(--color-moss-100);
+    border-color: var(--color-ink);
+  }
+
+  .file:active {
+    background-color: var(--color-moss-200);
+  }
+
+  .thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 112px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .thumb :global(svg) {
+    width: 60%;
+    height: 80%;
+  }
+
+  /* Screenshots get a little paper print look, offset on a halftone shadow */
+  .thumb.image {
+    position: relative;
+    border: var(--ink-border);
+    border-radius: 6px;
+    background-color: var(--color-moss-100);
+    box-shadow: 3px 3px 0 var(--color-ink);
+    overflow: hidden;
+  }
+
+  .thumb img {
     display: block;
     width: 100%;
     height: 100%;
@@ -277,39 +352,32 @@
     object-position: top;
   }
 
-  .live-body {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 14px 16px 12px;
-  }
-
-  /* Outlined like the skill pills, with a halftone-shaded star */
-  .star-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    align-self: flex-start;
-    margin: -4px 0 14px;
-    padding: 3px 10px 3px 8px;
-    border: 1.5px solid var(--color-ink);
-    border-radius: 999px;
+  .file-name {
     font-size: 13px;
     font-weight: 600;
-    color: var(--color-ink);
+    line-height: 1.3;
+    text-align: center;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
   }
 
-  .star-pill svg {
-    width: 15px;
-    height: 15px;
-    fill: url(#halftone);
-    stroke: var(--color-ink);
-    stroke-width: 2;
-    stroke-linejoin: round;
-  }
-
-  /* First tap on a touch screen (see tapToOpen) */
-  .project-card:global(.tap-armed) {
+  /* --- Status bar --- */
+  .status-bar {
+    padding: 6px 16px;
+    border-top: var(--ink-border);
     background-color: var(--color-moss-100);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+  }
+
+  .mobile .status-bar {
+    border: none;
+    background: none;
+    padding: 0 2px;
   }
 </style>

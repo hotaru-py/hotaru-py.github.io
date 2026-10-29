@@ -309,7 +309,7 @@
 <style>
   .icon-grid {
     position: absolute;
-    inset: 0;
+    inset: 0 0 var(--taskbar-space, 0px);
   }
 
   .grid-item {

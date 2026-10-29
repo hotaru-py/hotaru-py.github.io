@@ -118,7 +118,7 @@
       <ul>
         {#each liveWork as live}
           <li>
-            <strong>{live.name}</strong><br />
+            <strong>{live.name}</strong>: {live.description}<br />
             {@render link(live.url, live.domain)}
           </li>
         {/each}

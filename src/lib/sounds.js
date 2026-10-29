@@ -1,45 +1,49 @@
 // UI sounds through the Web Audio API. Every file is fetched and decoded once at page
 // load, so playback is instant; an <audio> element has to load and decode again on its
-// first play, which made the first hover of each xylophone note lag.
+// first play, which made the first hover of each piano note lag.
 
 const FILES = {
   open: "/click2.mp3",
   close: "/click1.mp3",
-  "xylo:A4": "/xylo/xylo_A4.mp3",
-  "xylo:A#4": "/xylo/xylo_Asharp4.mp3",
-  "xylo:C5": "/xylo/xylo_C5.mp3",
-  "xylo:D4": "/xylo/xylo_D4.mp3",
-  "xylo:D#4": "/xylo/xylo_Dsharp4.mp3",
-  "xylo:F4": "/xylo/xylo_F4.mp3",
-  "xylo:F5": "/xylo/xylo_F5.mp3",
+  slam: "/slam.mp3",
+  tactile: "/tactile.mp3",
+  // Resampled from one recorded B5 (public/b5.mp3)
+  "piano:D5": "/piano/piano_D5.mp3",
+  "piano:D#5": "/piano/piano_Dsharp5.mp3",
+  "piano:F5": "/piano/piano_F5.mp3",
+  "piano:A5": "/piano/piano_A5.mp3",
+  "piano:A#5": "/piano/piano_Asharp5.mp3",
+  "piano:C6": "/piano/piano_C6.mp3",
+  "piano:F6": "/piano/piano_F6.mp3",
 };
 
-// The tune the xylophone pills play, one note per hover or tap
-const XYLO_MELODY = [
-  "A#4",
+// The tune the musical pills play, one note per hover or tap (an octave up from the
+// original, around the B5 recording)
+const MELODY = [
+  "A#5",
+  "F6",
+  "A#5",
+  "A5",
+  "A#5",
   "F5",
-  "A#4",
-  "A4",
-  "A#4",
-  "F4",
-  "A#4",
+  "A#5",
+  "F6",
+  "A#5",
+  "A5",
+  "A#5",
   "F5",
-  "A#4",
-  "A4",
-  "A#4",
-  "F4",
-  "A#4",
+  "A#5",
+  "F6",
+  "A#5",
+  "A5",
+  "A#5",
   "F5",
-  "A#4",
-  "A4",
-  "A#4",
-  "F4",
-  "D#4",
-  "D4",
-  "D#4",
-  "F4",
-  "C5",
-  "A#4",
+  "D#5",
+  "D5",
+  "D#5",
+  "F5",
+  "C6",
+  "A#5",
 ];
 
 /** @type {Map<string, AudioBuffer>} */
@@ -104,6 +108,12 @@ export function setMuted(value) {
   }
 }
 
+// Silence at the start of a file, skipped so the sound lands right on the hover
+const LEAD_IN = { tactile: 0.03 };
+
+// Per-file loudness trims, applied wherever the sound is played from
+const LEVEL = { close: 0.35, slam: 0.5 };
+
 function play(name, volume) {
   const buffer = buffers.get(name);
   if (muted || !context || !buffer) return null;
@@ -111,15 +121,15 @@ function play(name, volume) {
   const source = context.createBufferSource();
   source.buffer = buffer;
   const gain = context.createGain();
-  gain.gain.value = volume;
+  gain.gain.value = volume * (LEVEL[name] ?? 1);
   source.connect(gain).connect(context.destination);
-  source.start();
+  source.start(0, LEAD_IN[name] ?? 0);
   return source;
 }
 
 /**
  * Plays a UI sound; overlapping plays are fine.
- * @param {"open" | "close"} name
+ * @param {"open" | "close" | "slam" | "tactile"} name
  */
 export function playSound(name, volume = 0.8) {
   play(name, volume);
@@ -130,14 +140,14 @@ let melodyStep = 0;
 let lastTouchNote = null;
 
 /**
- * Plays the next note of the xylophone tune. Notes from hovering may overlap; a touch
- * cuts off the previous touched note so quick taps stay crisp.
+ * Plays the next note of the tune. Notes from hovering may overlap; a touch cuts off
+ * the previous touched note so quick taps stay crisp.
  */
 export function playXylophone({ touch = false } = {}) {
-  const note = XYLO_MELODY[melodyStep];
-  melodyStep = (melodyStep + 1) % XYLO_MELODY.length;
+  const note = MELODY[melodyStep];
+  melodyStep = (melodyStep + 1) % MELODY.length;
 
   if (touch) lastTouchNote?.stop();
-  const source = play(`xylo:${note}`, 0.8);
+  const source = play(`piano:${note}`, 0.1);
   if (touch) lastTouchNote = source;
 }

@@ -5,6 +5,7 @@
   import { isMuted, setMuted, playSound } from "../../lib/sounds.js";
   import { fade, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
+  import { tactile } from "../../lib/tactile.js";
 
   /**
    * @typedef {Object} Props
@@ -152,6 +153,7 @@
                 type="button"
                 class="start-menu-item"
                 onclick={() => openWindow(icon)}
+                use:tactile
                 in:slide={{
                   delay: 100 + i * 50,
                   duration: 150,
@@ -167,7 +169,12 @@
           </div>
 
           <div class="start-menu-footer">
-            <button type="button" class="start-menu-item" onclick={switchUser}>
+            <button
+              type="button"
+              class="start-menu-item"
+              onclick={switchUser}
+              use:tactile
+            >
               <div class="start-menu-item-icon">
                 <svg
                   viewBox="0 0 24 24"
@@ -204,11 +211,14 @@
           class:active={activeWindowId === window.id}
           class:minimized={window.minimized}
           onclick={() => handleTaskbarButtonClick(window.id)}
+          use:tactile
           in:slide={{ duration: 200, easing: cubicOut }}
           out:slide={{ duration: 200, easing: cubicOut }}
         >
           <span class="window-icon">
-            {@html desktopIcons.find((i) => i.id === window.id)?.icon || "📄"}
+            {@html window.icon ??
+              desktopIcons.find((i) => i.id === window.id)?.icon ??
+              "📄"}
           </span>
           <span class="window-title">{window.title}</span>
         </button>
@@ -220,6 +230,7 @@
         <button
           type="button"
           class="tray-button reset-button"
+          use:tactile
           class:hidden={!showReset}
           onclick={resetLayout}
           aria-label="Reset desktop icons"
@@ -243,6 +254,7 @@
           type="button"
           class="tray-button"
           onclick={toggleMute}
+          use:tactile
           aria-pressed={muted}
           aria-label="Mute sounds"
           title={muted ? "Unmute sounds" : "Mute sounds"}
