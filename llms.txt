@@ -27,19 +27,21 @@ This site (https://hotaru-py.github.io/) is an interactive, desktop-style portfo
 
 ## Live Work
 
-- [Miniture](https://www.miniture.in): live website
-- [SSN-SNUC INVENTE '26](https://invente-2026.vercel.app/): live website
-- [SSN-SNUC INSTINCTS '26](https://www.ssnsnucinstincts.com/): live website
-- [The Curation Company](https://www.thecurationcompany.in/): live website
+- [Miniture](https://www.miniture.in): Shopify theme built end-to-end as the sole developer, from the designer's handoff through iterations with the team and designer. Continuously improved and extended using customer session data, competitor analysis and brand fit.
+- [SSN-SNUC INVENTE '26](https://invente-2026.vercel.app/): Website lead for INVENTE, my university's annual technical festival. Led the website team, set the site's initial look and drove its implementation, while also working hands-on as a frontend developer.
+- [SSN-SNUC INSTINCTS '26](https://www.ssnsnucinstincts.com/): Web designer and developer for INSTINCTS, my university's annual cultural festival. Led the design language and page mockups (mainly the home page), then built the site and maintained it and its content.
+- [The Curation Company](https://www.thecurationcompany.in/): Website for a gift curation client. Ideated and developed the site layout, the interactive gifting flow and the card-scroll transitions between pages.
 
 ## Personal Projects
 
-- [My Personal Website (this one!)](https://github.com/hotaru-hspr/hotaru-hspr.github.io): My personal website, with a desktop/mobile-like interface and a simpler-to-read page
+- [My Personal Website (this one!)](https://github.com/hotaru-hspr/hotaru-hspr.github.io): My personal website, with a choice of a desktop/phone-like interface or a markdown-style page, and agent-crawlable text
+- [LookAtDisPatch](https://github.com/hotaru-py/LookAtDisPatch): Agentic operations optimization for last-mile delivery, with a versatile command-center dashboard. Entry for Google DevFest '26 Agent Wars
 - [Eunoia](https://github.com/Try3D/Eunoia): AI-powered DIY learning platform that turns objects at hand into hands-on projects using computer vision & RAG
-- [Minimalist ROG Grub Theme](https://github.com/hotaru-py/rog-grub): Minimalist theme for the Grub Bootloader (27 stars on GitHub)
-- [Starboard](https://github.com/hotaru-hspr/Starboard): A fast, versatile, extensible and highly flexible platform for optimal ship routing
-- [SNUGPA](https://github.com/EditaCTF/SNUC_Grade_Calculator): CGPA/SGPA Calculator for SNU Chennai
-- [CacheSim](https://github.com/hotaru-py/CacheSim): Animated Cache Simulation using Svelte & FastAPI
+- [ClothSense](https://github.com/hotaru-py/ClothSense): Interactive 3D virtual clothing try-on from a single 2D image, as a semester 7 course project for Modern 3D Vision Techniques
+- [Minimalist ROG Grub Theme](https://github.com/hotaru-py/rog-grub): Minimalist theme for the GRUB bootloader, built around ASUS ROG branding (27 stars on GitHub)
+- [Starboard](https://github.com/hotaru-hspr/Starboard): A fast, versatile and highly extensible platform for optimal ship routing. Smart India Hackathon (SIH) 2024 nominee from Shiv Nadar University Chennai
+- [SNUGPA](https://github.com/EditaCTF/SNUC_Grade_Calculator): CGPA/SGPA calculator with saved records for Shiv Nadar University Chennai, used by 750+ unique users
+- [CacheSim](https://github.com/hotaru-py/CacheSim): Animated cache simulation built with Svelte & FastAPI, as a semester 2 course project for Computer Organization and Architecture (COA)
 - [More on GitHub](https://github.com/hotaru-py)
 
 ## Contact and profiles
