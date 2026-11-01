@@ -1,6 +1,6 @@
-# Prajesh Raam (hotaru)
+# hotaru (Prajesh Raam)
 
-> Portfolio of Prajesh Raam (hotaru): full-stack developer, designer and artist. Live websites, personal projects, skills and links, presented as a playful desktop or a simple text page.
+> Portfolio of hotaru: full-stack developer, designer and artist. Live websites, personal projects, skills and links, presented as a playful desktop or a simple text page.
 
 I'm an engineer by day, designer by night, artist throughout. Currently an undergrad engineering student and a full-stack developer.
 
@@ -46,11 +46,13 @@ This site (https://hotaru-py.github.io/) is an interactive, desktop-style portfo
 
 ## Contact and profiles
 
-- [LinkedIn](https://linkedin.com/in/prajesh-raam)
-- [Email](mailto:prajeshraam@gmail.com)
+- [YouTube Channel (this stuff)](https://www.youtube.com/@hotarumakes)
+- [Instagram](https://www.instagram.com/hotarumakes)
+- [LinkedIn](https://linkedin.com/in/prajeshraam)
 - [GitHub](https://github.com/hotaru-py)
 - [Behance](https://www.behance.net/prajeshraam)
-- [YouTube (random stuff)](https://www.youtube.com/@hotaruuuh)
+- [Email](mailto:hotarumakes@gmail.com)
+- [YouTube Channel (random stuff)](https://www.youtube.com/@hotaruuuh)
 
 ## Optional
 
