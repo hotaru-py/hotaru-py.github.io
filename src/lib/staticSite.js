@@ -86,7 +86,7 @@ function structuredData() {
 
 export function renderHeadTags() {
   const image = absolute(OG_IMAGE);
-  const imageAlt = `${site.name} (${site.handle}), ${site.jobTitle}`;
+  const imageAlt = `${site.name}: developer-designer portfolio`;
   // "<" escaped so the JSON can never close the script tag early
   const jsonLd = JSON.stringify(structuredData()).replaceAll("<", "\\u003c");
   return [
@@ -121,12 +121,12 @@ export function renderStaticPage() {
   const li = (html) => `<li>${html}</li>`;
   const html = [
     `<header>`,
-    `<h1>${esc(site.name)} (${esc(site.handle)})</h1>`,
+    `<h1>${esc(site.name)} (${esc(about.realName)})</h1>`,
     `<p>${esc(site.jobTitle)}</p>`,
     `</header>`,
 
     `<section><h2>About</h2>`,
-    `<p>${esc(about.greeting)} (${esc(about.pronouns)})</p>`,
+    `<p>${esc(about.greeting)} (${esc(about.pronouns)})<br />${esc(about.realName)}</p>`,
     ...about.intro.map((p) => `<p>${esc(p)}</p>`),
     `<ul>${about.interests.map((item) => li(richHtml(item))).join("")}</ul>`,
     `<p>${esc(about.outro)}</p>`,
@@ -205,7 +205,7 @@ ${html}
 
 export function renderLlmsTxt() {
   const lines = [
-    `# ${site.name} (${site.handle})`,
+    `# ${site.name} (${about.realName})`,
     "",
     `> ${site.description}`,
     "",

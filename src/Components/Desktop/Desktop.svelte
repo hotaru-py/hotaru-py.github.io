@@ -87,8 +87,8 @@
 
   // --- First thing on screen ---------------------------------------------------
   // Desktops open About Me just right of the first icon column, its top in line with
-  // the first icon; phones get a bubble pointing at
-  // its dock icon instead (once per visit, until it's tapped or About is opened).
+  // the first icon. Phones never open it: the first time the phone desktop is shown in a
+  // visit, a bubble points at its dock icon instead (not again after Switch User).
   const INTRO_MARGIN = 24;
   // The icon grid's margin (24) + icon width (88) + a gap
   const INTRO_LEFT = 24 + 88 + 24;
@@ -102,9 +102,12 @@
     if (!booted || introDone || !desktopWidth || !desktopHeight) return;
     introDone = true;
     untrack(() => {
-      if (isMobileView) {
+      // Read straight from the viewport, so a remount (e.g. back from Switch User)
+      // can't catch isMobileView before it's been set
+      if (window.matchMedia("(max-width: 768px)").matches) {
         try {
           showAboutTip = !sessionStorage.getItem(TIP_SEEN_KEY);
+          sessionStorage.setItem(TIP_SEEN_KEY, "1");
         } catch {
           showAboutTip = true;
         }

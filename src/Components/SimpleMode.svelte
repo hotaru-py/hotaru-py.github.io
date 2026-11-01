@@ -49,7 +49,7 @@
   <main class="page">
     <header>
       <h1>
-        <span class="mark" aria-hidden="true">{"# "}</span>{site.name} ({site.handle})
+        <span class="mark" aria-hidden="true">{"# "}</span>{site.name} ({about.realName})
       </h1>
       <p class="tagline">{site.jobTitle}</p>
       <nav aria-label="Sections">
@@ -64,7 +64,8 @@
     <section id="about">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>About</h2>
       <p>
-        {about.greeting} <span class="muted">({about.pronouns})</span>
+        {about.greeting} <span class="muted">({about.pronouns})</span><br />
+        <span class="muted">{about.realName}</span>
       </p>
       {#each about.intro as paragraph}
         <p>{paragraph}</p>

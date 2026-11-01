@@ -6,16 +6,18 @@
 
 export const site = {
   url: "https://hotaru-py.github.io/",
-  name: "Prajesh Raam",
-  handle: "hotaru",
-  title: "Prajesh Raam, full-stack developer & designer",
+  name: "hotaru",
+  handle: "hotarumakes",
+  title: "hotaru | i make stuff that looks good (to me)",
   description:
-    "Portfolio of Prajesh Raam (hotaru): full-stack developer, designer and artist. Live websites, personal projects, skills and links, presented as a playful desktop or a simple text page.",
+    "Portfolio of hotaru: full-stack developer, designer and artist. Live websites, personal projects, skills and links, presented as a playful desktop or a simple text page.",
   jobTitle: "Full-stack developer & designer",
 };
 
 export const about = {
-  greeting: "Hello, I'm Prajesh (^_^)/",
+  greeting: "Hello, I'm hotaru (^_^)/",
+  // Shown under the greeting
+  realName: "Prajesh Raam",
   pronouns: "he/him",
   intro: [
     "I'm an engineer by day, designer by night, artist throughout. Currently an undergrad engineering student and a full-stack developer.",
@@ -179,23 +181,34 @@ export const projects = [
   },
 ];
 
-// `id` picks the icon in the Browser window
+// `id` picks the icon in the Browser window (or `icon`, when two share one)
 export const bookmarks = [
+  {
+    id: "youtube",
+    name: "YouTube Channel (this stuff)",
+    url: "https://www.youtube.com/@hotarumakes",
+  },
+  {
+    id: "instagram",
+    name: "Instagram",
+    url: "https://www.instagram.com/hotarumakes",
+  },
   {
     id: "linkedin",
     name: "LinkedIn",
-    url: "https://linkedin.com/in/prajesh-raam",
+    url: "https://linkedin.com/in/prajeshraam",
   },
-  { id: "email", name: "Email", url: "mailto:prajeshraam@gmail.com" },
   { id: "github", name: "GitHub", url: "https://github.com/hotaru-py" },
   {
     id: "behance",
     name: "Behance",
     url: "https://www.behance.net/prajeshraam",
   },
+  { id: "email", name: "Email", url: "mailto:hotarumakes@gmail.com" },
   {
-    id: "youtube",
-    name: "YouTube (random stuff)",
+    id: "youtube-random",
+    icon: "youtube",
+    name: "YouTube Channel (random stuff)",
     url: "https://www.youtube.com/@hotaruuuh",
   },
 ];

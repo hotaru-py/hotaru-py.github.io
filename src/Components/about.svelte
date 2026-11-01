@@ -13,9 +13,12 @@
 <div class="about-container">
   <div class="about-header">
     <img src={avatar} alt="Hotaru" class="about-avatar" />
-    <h1 class="about-title">
-      {about.greeting} <span class="pronouns">({about.pronouns})</span>
-    </h1>
+    <div>
+      <h1 class="about-title">
+        {about.greeting} <span class="pronouns">({about.pronouns})</span>
+      </h1>
+      <p class="about-name">{about.realName}</p>
+    </div>
   </div>
 
   <div class="about-content">
@@ -105,6 +108,13 @@
     font-size: 14px;
     color: var(--color-ink-muted);
     margin-top: 4px;
+  }
+
+  .about-name {
+    margin: 2px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-ink-muted);
   }
 
   .highlight {

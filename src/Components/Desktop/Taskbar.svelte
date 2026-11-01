@@ -15,7 +15,7 @@
    * @property {any} [currentTime]
    * @property {(windowId: any) => void} [onActivateWindow]
    * @property {(windowId: any) => void} [onMinimizeWindow]
-   * @property {(icon: any) => void} [onOpenWindow]
+   * @property {(icon: any, options?: { quiet?: boolean }) => void} [onOpenWindow]
    * @property {boolean} [showReset] Only offered once the icons have been moved
    * @property {() => void} [onResetLayout]
    * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
@@ -99,8 +99,10 @@
     onSwitchUser?.();
   }
 
+  // Start menu picks tick instead of playing the window-open click
   function openWindow(iconData) {
-    onOpenWindow?.(iconData);
+    playSound("tactile", 0.1);
+    onOpenWindow?.(iconData, { quiet: true });
     isStartMenuOpen = false;
   }
 
