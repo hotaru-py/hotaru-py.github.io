@@ -15,9 +15,11 @@
     <img src={avatar} alt="Hotaru" class="about-avatar" />
     <div>
       <h1 class="about-title">
-        {about.greeting} <span class="pronouns">({about.pronouns})</span>
+        {about.greeting}
       </h1>
-      <p class="about-name">{about.realName}</p>
+      <p class="about-name">
+        {about.realName} <span class="pronouns">({about.pronouns})</span>
+      </p>
     </div>
   </div>
 

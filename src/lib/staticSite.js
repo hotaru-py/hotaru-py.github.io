@@ -126,7 +126,7 @@ export function renderStaticPage() {
     `</header>`,
 
     `<section><h2>About</h2>`,
-    `<p>${esc(about.greeting)} (${esc(about.pronouns)})<br />${esc(about.realName)}</p>`,
+    `<p>${esc(about.greeting)} (${esc(about.pronouns)})</p>`,
     ...about.intro.map((p) => `<p>${esc(p)}</p>`),
     `<ul>${about.interests.map((item) => li(richHtml(item))).join("")}</ul>`,
     `<p>${esc(about.outro)}</p>`,
@@ -143,7 +143,7 @@ export function renderStaticPage() {
     `<section><h2>Experience</h2><ul>`,
     ...experience.map((job) =>
       li(
-        `<strong>${esc(job.role)}</strong><br />${linkHtml(job.url, job.company)} (${esc(job.period)})`,
+        `<strong>${esc(job.role)}</strong><br />${job.url ? linkHtml(job.url, job.company) : esc(job.company)} (${esc(job.period)})`,
       ),
     ),
     `</ul></section>`,
@@ -224,7 +224,8 @@ export function renderLlmsTxt() {
     "## Experience",
     "",
     ...experience.map(
-      (job) => `- [${job.company}](${job.url}): ${job.role}, ${job.period}`,
+      (job) =>
+        `- ${job.url ? `[${job.company}](${job.url})` : job.company}: ${job.role}, ${job.period}`,
     ),
     "",
     "## Skills",

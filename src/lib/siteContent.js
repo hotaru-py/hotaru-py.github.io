@@ -8,7 +8,7 @@ export const site = {
   url: "https://hotaru-py.github.io/",
   name: "hotaru",
   handle: "hotarumakes",
-  title: "hotaru | i make stuff that looks good (to me)",
+  title: "hotaru | i make stuff that looks good to me",
   description:
     "Portfolio of hotaru: full-stack developer, designer and artist. Live websites, personal projects, skills and links, presented as a playful desktop or a simple text page.",
   jobTitle: "Full-stack developer & designer",
@@ -43,15 +43,18 @@ export const about = {
       school: "Mahatma Global Gateway",
       board: "CBSE",
       type: "HighSchool",
-      lines: [
-        "Class XII · Computer Science & Mathematics (2023)",
-        "Class X (2021)",
-      ],
+      lines: ["Computer Science & Mathematics (2023)"],
     },
   ],
 };
 
+// Most recent first; `url` is optional (freelancing has no company page)
 export const experience = [
+  {
+    role: "Web Development, UI/UX & Graphic Design",
+    company: "Freelance",
+    period: "2021 - Present",
+  },
   {
     role: "Software Development Engineering Intern",
     company: "Miniture",

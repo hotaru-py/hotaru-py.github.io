@@ -10,12 +10,12 @@
       <p class="about-paragraph">
         {job.role}
         <span class="about-subtitle">
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="company-link">{job.company}</a
-          >
+          {#if job.url}<a
+              href={job.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="company-link">{job.company}</a
+            >{:else}{job.company}{/if}
           ({job.period})
         </span>
       </p>

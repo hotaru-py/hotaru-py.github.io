@@ -64,8 +64,7 @@
     <section id="about">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>About</h2>
       <p>
-        {about.greeting} <span class="muted">({about.pronouns})</span><br />
-        <span class="muted">{about.realName}</span>
+        {about.greeting} <span class="muted">({about.pronouns})</span>
       </p>
       {#each about.intro as paragraph}
         <p>{paragraph}</p>
@@ -95,7 +94,7 @@
         {#each experience as job}
           <li>
             <strong>{job.role}</strong><br />
-            {@render link(job.url, job.company)}
+            {#if job.url}{@render link(job.url, job.company)}{:else}{job.company}{/if}
             <span class="muted">({job.period})</span>
           </li>
         {/each}
