@@ -13,11 +13,12 @@ This site (https://hotaru-py.github.io/) is an interactive, desktop-style portfo
 - graphic & UI/UX design
 - product and interaction design in the long run
 - Education: Shiv Nadar University Chennai, B.Tech Artificial Intelligence and Data Science (2023-2027)
-- Education: Mahatma Global Gateway - CBSE, Class XII · Computer Science & Mathematics (2023); Class X (2021)
+- Education: Mahatma Global Gateway - CBSE, Computer Science & Mathematics (2023)
 - Pronouns: he/him
 
 ## Experience
 
+- Freelance: Web Development, UI/UX & Graphic Design, 2021 - Present
 - [Miniture](https://miniture.in): Software Development Engineering Intern, March 2025 - February 2026
 
 ## Skills
