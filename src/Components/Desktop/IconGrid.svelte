@@ -106,7 +106,8 @@
 
   // Give every icon a unique in-bounds cell, honouring preferences where possible.
   // Icons without a preference fill columns top to bottom, like a fresh desktop,
-  // except ones that ask for `corner: "bottom-right"`, which start in the last cell.
+  // except ones that ask for `corner: "bottom-right"`, which start in the last cell
+  // (or `cornerRowOffset` cells above it).
   function resolve(prefs, cols, rows) {
     const taken = new Set();
     /** @type {Record<string, Cell>} */
@@ -115,7 +116,10 @@
     icons.forEach((icon) => {
       let fallback;
       if (icon.corner === "bottom-right") {
-        fallback = { col: cols - 1, row: rows - 1 };
+        fallback = {
+          col: cols - 1,
+          row: Math.max(0, rows - 1 - (icon.cornerRowOffset ?? 0)),
+        };
       } else {
         fallback = { col: Math.floor(flow / rows), row: flow % rows };
         flow++;

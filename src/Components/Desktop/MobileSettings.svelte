@@ -3,6 +3,11 @@
   import { scale } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { isMuted, setMuted, playSound } from "../../lib/sounds.js";
+  import {
+    WALLPAPERS,
+    wallpaper,
+    setWallpaper,
+  } from "../../lib/wallpaper.svelte.js";
 
   /**
    * @typedef {Object} Props
@@ -52,6 +57,12 @@
     if (muted) playSound("close");
     setMuted(muted);
     if (!muted) playSound("open");
+  }
+
+  function chooseWallpaper(id) {
+    if (wallpaper.current === id) return;
+    playSound("tactile", 0.1);
+    setWallpaper(id);
   }
 
   function switchUser() {
@@ -118,6 +129,21 @@
           ><span class="knob"></span></span
         >
       </button>
+      <div class="row wallpaper-row">
+        <span id="wallpaper-label">Wallpaper</span>
+        <div class="seg" role="radiogroup" aria-labelledby="wallpaper-label">
+          {#each WALLPAPERS as option (option.id)}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={wallpaper.current === option.id}
+              onclick={() => chooseWallpaper(option.id)}
+            >
+              {option.name}
+            </button>
+          {/each}
+        </div>
+      </div>
       <button type="button" class="row switch-mode" onclick={switchUser}>
         <span>Switch User</span>
         <span class="arrow" aria-hidden="true">→</span>
@@ -172,7 +198,7 @@
     position: absolute;
     top: calc(100% + 10px);
     right: 0;
-    width: 220px;
+    width: 240px;
     padding: 6px;
     background: var(--color-paper);
     border: var(--ink-border);
@@ -197,6 +223,51 @@
     color: var(--color-ink);
     text-align: left;
     cursor: pointer;
+  }
+
+  /* Label on top, the two choices side by side under it */
+  .wallpaper-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px 10px 10px;
+    cursor: default;
+  }
+
+  .wallpaper-row:active {
+    background: none;
+  }
+
+  .seg {
+    display: flex;
+    border: var(--ink-border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .seg button {
+    flex: 1;
+    min-height: 36px;
+    padding: 0 6px;
+    border: none;
+    background: var(--color-paper);
+    color: var(--color-ink-muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .seg button + button {
+    border-left: var(--ink-border);
+  }
+
+  .seg button[aria-checked="true"] {
+    background: var(--color-accent);
+    color: var(--color-ink);
   }
 
   .switch-mode {

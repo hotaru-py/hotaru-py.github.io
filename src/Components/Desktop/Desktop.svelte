@@ -5,6 +5,7 @@
   import IconGrid from "./IconGrid.svelte";
   import Window from "./Window.svelte";
   import Wallpaper from "./Wallpaper.svelte";
+  import RainWallpaper from "./RainWallpaper.svelte";
   import MobileClock from "./MobileClock.svelte";
   import MobileSettings from "./MobileSettings.svelte";
   import WelcomeNotice from "./WelcomeNotice.svelte";
@@ -16,6 +17,10 @@
   import Projects from "../projects.svelte";
   import Reach from "../reach.svelte";
   import Credits from "../credits.svelte";
+  import WallpaperPicker from "../WallpaperPicker.svelte";
+  import { wallpaper } from "../../lib/wallpaper.svelte.js";
+  import { credits } from "../../lib/siteContent.js";
+  import { projectFiles, fileWindow } from "../../lib/workFiles.js";
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
@@ -49,6 +54,8 @@
     work: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     browser: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" style="fill: var(--color-paper)"/><path d="M12 2a10 10 0 0 0 0 20a4 10 0 0 1 0-20z" fill="url(#halftone)"/><path d="M12 2a10 10 0 0 1 0 20a4 10 0 0 0 0-20z" fill="url(#halftone)"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1.5"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.5"/></svg>`,
     credits: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11v6" style="stroke: var(--color-paper)" stroke-width="5" stroke-linecap="round"/><circle cx="12" cy="7.5" r="2.4" style="fill: var(--color-paper)"/><path d="M12 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7.5" r="1.25" fill="currentColor"/></svg>`,
+    // Framed picture on a stand: a halftone hill under a sun
+    wallpaper: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="3.5" width="19" height="14" rx="2" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/><path d="M3.5 14.5c2.5-3 5-4 8-2s5.5 1 9-2.5v5.5a1.5 1.5 0 0 1-1.5 1.5h-14a1.5 1.5 0 0 1-1.5-1.5z" fill="url(#halftone)"/><path d="M2.5 14c3-3.5 6-4.5 9-2.5s6 1.5 10-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8.5" r="1.75" fill="currentColor"/><path d="M12 17.5v3M8.5 21h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
   };
 
   const desktopIcons = [
@@ -68,7 +75,33 @@
       component: Credits,
       corner: "bottom-right", // default desktop spot; the mobile dock ignores it
     },
+    // Desktop only: phones switch wallpapers from the settings menu instead
+    {
+      id: "wallpaper",
+      title: "Wallpaper",
+      icon: ICONS.wallpaper,
+      component: WallpaperPicker,
+      size: { width: 520, height: 340 },
+      corner: "bottom-right",
+      cornerRowOffset: 1, // just above Credits
+      desktopOnly: true,
+    },
+    // The p5.rain demo, the same window its file in Work opens. On phones it sits on
+    // the home screen above the dock instead of in it.
+    {
+      ...fileWindow(projectFiles.find((file) => file.demo === "p5rain")),
+      title: "p5.rain",
+      homeScreen: true,
+    },
   ];
+  const dockIcons = desktopIcons.filter(
+    (icon) => !icon.homeScreen && !icon.desktopOnly,
+  );
+  const homeScreenIcons = desktopIcons.filter((icon) => icon.homeScreen);
+
+  // Home-screen icons line up with the dock's right end, just above it
+  let dockWidth = $state(0);
+  let dockHeight = $state(0);
 
   // One 24-unit tile covers a whole icon, so every dot twinkles independently
   const iconSparkle = sparkleDots({
@@ -81,6 +114,15 @@
 
   // Mobile dock labels, toggled from the settings menu
   let showDockLabels = $state(true);
+
+  // Set once the p5.rain wallpaper has faded in; reset when switching away from it
+  let rainWallpaperReady = $state(false);
+  $effect(() => {
+    if (wallpaper.current !== "rain") rainWallpaperReady = false;
+  });
+  const showRainCredit = $derived(
+    wallpaper.current === "rain" && rainWallpaperReady,
+  );
 
   // Lets window contents open windows of their own (e.g. a file from the Work folder)
   setContext("desktop", { openWindow });
@@ -281,7 +323,21 @@
 </script>
 
 <div class="desktop-container">
-  <Wallpaper />
+  <!-- The Motion Blob stays up while the p5.rain wallpaper loads its data, so there's
+       never a blank screen; the rain then fades in over it -->
+  {#if wallpaper.current === "blob" || !rainWallpaperReady}
+    <Wallpaper />
+  {/if}
+  {#if wallpaper.current === "rain"}
+    <RainWallpaper onReady={() => (rainWallpaperReady = true)} />
+  {/if}
+  <!-- NASA asks for credit wherever its data is shown (full wording in Credits). It fades
+       in once the rain wallpaper has, and out with it; phones show it under the clock. -->
+  {#if showRainCredit && !isMobileView}
+    <p class="rain-attribution" transition:fade={{ duration: 300 }}>
+      {credits.rainData.short}
+    </p>
+  {/if}
 
   <!-- Shared halftone fill for the icons -->
   <svg class="svg-defs" aria-hidden="true">
@@ -352,7 +408,10 @@
     {/if}
 
     {#if isMobileView}
-      <MobileClock {currentTime} />
+      <MobileClock
+        {currentTime}
+        note={showRainCredit ? credits.rainData.short : null}
+      />
     {/if}
 
     {#if isMobileView && booted}
@@ -364,9 +423,11 @@
         class="mobile-icons-additional"
         class:mobile-icons-hidden={activeWindowId}
         bind:this={dockElement}
+        bind:offsetWidth={dockWidth}
+        bind:offsetHeight={dockHeight}
         in:fade={{ duration: 300, delay: 100 }}
       >
-        {#each desktopIcons as icon, i (icon.id)}
+        {#each dockIcons as icon, i (icon.id)}
           <div
             in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}
             class="mobile-icon-wrapper"
@@ -377,6 +438,24 @@
               onclick={() => handleIconClick(icon)}
               isMobile={true}
               showLabel={showDockLabels}
+            />
+          </div>
+        {/each}
+      </div>
+
+      <div
+        class="home-screen-icons"
+        class:mobile-icons-hidden={activeWindowId}
+        style:right="{Math.max(12, (desktopWidth - dockWidth) / 2 + 12)}px"
+        style:bottom="{20 + dockHeight + 18}px"
+      >
+        {#each homeScreenIcons as icon, i (icon.id)}
+          <div in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}>
+            <DesktopIcon
+              {icon}
+              onclick={() => handleIconClick(icon)}
+              isMobile={true}
+              showLabel={true}
             />
           </div>
         {/each}
@@ -447,6 +526,25 @@
     --taskbar-space: 78px;
   }
 
+  /* Small print in the bottom-right corner, above the taskbar. Under the windows and
+     icons, and never in the way of a click. */
+  .rain-attribution {
+    position: absolute;
+    right: 24px;
+    bottom: calc(var(--taskbar-space, 78px) + 4px);
+    z-index: 1;
+    margin: 0;
+    padding: 1px 6px;
+    border-radius: 4px;
+    /* A soft paper backing keeps it readable over the rain cells */
+    background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+    pointer-events: none;
+  }
+
+
   .taskbar-dock {
     position: absolute;
     left: 0;
@@ -502,6 +600,21 @@
     transition:
       opacity 0.3s ease,
       transform 0.3s ease;
+  }
+
+  /* Home-screen icons: bare on the wallpaper, no dock panel behind them */
+  .home-screen-icons {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    gap: 16px;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .home-screen-icons.mobile-icons-hidden {
+    transform: translateY(50px);
   }
 
   .mobile-icon-wrapper {

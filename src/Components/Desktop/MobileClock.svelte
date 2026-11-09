@@ -1,11 +1,14 @@
 <script>
+  import { fade } from "svelte/transition";
+
   /**
    * @typedef {Object} Props
    * @property {Date} currentTime
+   * @property {string | null} [note] Small print under the time (the wallpaper's data credit)
    */
 
   /** @type {Props} */
-  let { currentTime } = $props();
+  let { currentTime, note = null } = $props();
 
   // "Tue, 13 Oct"
   const date = $derived.by(() => {
@@ -45,6 +48,9 @@
     {time.text}{#if time.period}<span class="clock-period">{time.period}</span
       >{/if}
   </span>
+  {#if note}
+    <span class="clock-note" transition:fade={{ duration: 300 }}>{note}</span>
+  {/if}
 </time>
 
 <style>
@@ -79,6 +85,18 @@
     line-height: 1;
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Paper backing keeps it readable over a busy wallpaper */
+  .clock-note {
+    margin-top: 4px;
+    padding: 1px 8px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--color-ink-muted);
   }
 
   .clock-period {

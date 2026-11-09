@@ -7,11 +7,15 @@
 
 <script>
   import { getContext } from "svelte";
-  import FileViewer from "./FileViewer.svelte";
   import { tactile } from "../lib/tactile.js";
   import { playSound } from "../lib/sounds.js";
   import { githubProfile } from "../lib/siteContent.js";
-  import { liveFiles, projectFiles, FILE_ICONS } from "../lib/workFiles.js";
+  import {
+    liveFiles,
+    projectFiles,
+    fileWindow,
+    FILE_ICONS,
+  } from "../lib/workFiles.js";
 
   /**
    * @typedef {Object} Props
@@ -40,14 +44,7 @@
   }
 
   function openFile(file) {
-    desktop?.openWindow({
-      id: file.key,
-      title: file.name,
-      icon: FILE_ICONS[file.kind],
-      component: FileViewer,
-      props: { file },
-      size: { width: 820, height: 500 },
-    });
+    desktop?.openWindow(fileWindow(file));
   }
 
   // Arrow keys move between the two tabs, like a native tab strip
@@ -129,7 +126,7 @@
           {#if file.image}
             <img src={file.image} alt="" loading="lazy" />
           {:else}
-            {@html FILE_ICONS.project}
+            {@html file.icon ?? FILE_ICONS.project}
           {/if}
         </span>
         <span class="file-name">{file.name}</span>

@@ -139,6 +139,14 @@ export const projects = [
     link: "https://github.com/hotaru-hspr/hotaru-hspr.github.io",
   },
   {
+    name: "p5.rain",
+    description:
+      "NASA's IMERG global precipitation data as a live, interactive pixel field for p5.js.",
+    link: "https://github.com/hotaru-py/p5-rain",
+    // Opens with a live demo in the Work window, and gets its own desktop icon
+    demo: "p5rain",
+  },
+  {
     name: "LookAtDisPatch",
     description:
       "Agentic operations optimization for last-mile delivery, with a versatile command-center dashboard. Entry for Google DevFest '26 Agent Wars",
@@ -240,6 +248,19 @@ export const credits = {
     character: "Firefly",
     source: "Honkai: Star Rail",
     note: "Character and artwork © HoYoverse. Non-commercial usage.",
+  },
+  // NASA's terms for the p5.rain data (window and wallpaper), as the p5.rain README
+  // asks: credit "NASA GPM IMERG via GIBS", GIBS's acknowledgement, no implied endorsement
+  rainData: {
+    short: "Rain data: NASA GPM IMERG via GIBS",
+    sources: [
+      { text: "NASA GPM IMERG", url: "https://gpm.nasa.gov/data/imerg" },
+      { text: "NASA GIBS", url: "https://www.earthdata.nasa.gov/gibs" },
+    ],
+    acknowledgement:
+      "We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).",
+    disclaimer:
+      "This website and p5.rain are not affiliated with or endorsed by NASA.",
   },
   // Every sound on the site comes from Pixabay; each creator is listed once
   sounds: {

@@ -6,6 +6,7 @@ import tccShot from "../assets/work-tcc.webp";
 import inventeShot from "../assets/work-invente.webp";
 import instinctsShot from "../assets/work-instincts.webp";
 import { liveWork, projects } from "./siteContent.js";
+import FileViewer from "../Components/FileViewer.svelte";
 
 // Screenshot for each live site, by its id in siteContent.js
 const shots = {
@@ -20,6 +21,8 @@ export const workShots = Object.values(shots);
 // Ink line icons in the desktop's style; shaded areas use the #halftone pattern that
 // Desktop.svelte defines. Used for the taskbar buttons and the repo file thumbnails.
 export const FILE_ICONS = {
+  // p5.rain: a canvas of rain cells at different sizes, like its Breathe style
+  rain: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="3" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/><rect x="6" y="6" width="3" height="3" fill="currentColor"/><rect x="11" y="6.5" width="2" height="2" fill="currentColor"/><rect x="14.5" y="5.5" width="4" height="4" fill="url(#halftone)" stroke="currentColor" stroke-width="1"/><rect x="6.5" y="11" width="2" height="2" fill="currentColor"/><rect x="10" y="10" width="4" height="4" fill="currentColor"/><rect x="15.5" y="11" width="2" height="2" fill="currentColor"/><rect x="5.5" y="14.5" width="4" height="4" fill="url(#halftone)" stroke="currentColor" stroke-width="1"/><rect x="11" y="15.5" width="2" height="2" fill="currentColor"/><rect x="15" y="15" width="3" height="3" fill="currentColor"/></svg>`,
   live: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="4" width="19" height="16" rx="2" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/><path d="M2.5 16.5l5-5 4 4 3-3 7 7" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="8.5" r="1.5" fill="currentColor"/></svg>`,
   project: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2.5H6.5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 2.5V8h5.5z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 12.5l-2.5 2.5 2.5 2.5M14 12.5l2.5 2.5-2.5 2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 };
@@ -42,6 +45,8 @@ function slug(name) {
  * @property {string} linkLabel
  * @property {string} [image]
  * @property {{ repo: string, fallback: number }} [stars]
+ * @property {"p5rain"} [demo] Shown live in the viewer instead of a picture
+ * @property {string} [icon] Overrides the kind's icon (explorer and taskbar)
  */
 
 /** @type {WorkFile[]} */
@@ -66,4 +71,23 @@ export const projectFiles = projects.map((project) => ({
   url: project.link,
   linkLabel: project.link.replace(/^https:\/\/(www\.)?/, ""),
   stars: project.stars,
+  demo: project.demo,
+  icon: project.demo ? FILE_ICONS.rain : undefined,
 }));
+
+/**
+ * What Desktop.svelte's openWindow needs to show a file. The Work explorer and the
+ * p5.rain desktop icon both use it, so they open (and bring forward) the same window.
+ * @param {WorkFile} file
+ */
+export function fileWindow(file) {
+  return {
+    id: file.key,
+    title: file.name,
+    icon: file.icon ?? FILE_ICONS[file.kind],
+    component: FileViewer,
+    props: { file },
+    // Demos get more room for the artwork next to the details panel
+    size: file.demo ? { width: 980, height: 600 } : { width: 820, height: 500 },
+  };
+}

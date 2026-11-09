@@ -3,6 +3,7 @@
   import { fetchStars } from "../lib/githubStars.js";
   import { starLabel } from "../lib/siteContent.js";
   import { FILE_ICONS } from "../lib/workFiles.js";
+  import P5Rain from "./P5Rain.svelte";
 
   /**
    * @typedef {Object} Props
@@ -29,8 +30,13 @@
 <!-- Photos-app style: the picture on the left, its details in a side panel -->
 <div class="shell" class:mobile={isMobile}>
   <div class="viewer" class:mobile={isMobile}>
-    <div class="stage">
-      {#if file.image}
+    <div class="stage" class:demo={file.demo}>
+      {#if file.demo === "p5rain"}
+        <!-- Projects with a demo run it live where the picture would be -->
+        <div class="demo-frame">
+          <P5Rain {isMobile} />
+        </div>
+      {:else if file.image}
         <img src={file.image} alt="Screenshot of the {file.name} website" />
       {:else}
         <!-- Repos have no screenshot: a big file icon on a halftone card instead -->
@@ -127,6 +133,29 @@
   .mobile .stage {
     padding: 0;
     background: none;
+  }
+
+  /* A live demo fills the stage, framed like the screenshots */
+  .stage.demo {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 16px;
+  }
+
+  .demo-frame {
+    flex: 1;
+    min-width: 0;
+    border: var(--ink-border);
+    border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--color-ink);
+    overflow: hidden;
+  }
+
+  /* On phones the window scrolls, so the demo gets a height of its own */
+  .mobile .stage.demo {
+    padding: 0 4px 4px 0;
+    height: min(68vh, 560px);
+    min-height: 360px;
   }
 
   .stage img {
