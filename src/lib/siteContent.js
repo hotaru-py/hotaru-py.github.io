@@ -194,16 +194,16 @@ export const projects = [
 
 // `id` picks the icon in the Browser window (or `icon`, when two share one)
 export const bookmarks = [
-  {
-    id: "youtube",
-    name: "YouTube Channel (this stuff)",
-    url: "https://www.youtube.com/@hotarumakes",
-  },
-  {
-    id: "instagram",
-    name: "Instagram",
-    url: "https://www.instagram.com/hotarumakes",
-  },
+  // {
+  //   id: "youtube",
+  //   name: "YouTube Channel (this stuff)",
+  //   url: "https://www.youtube.com/@hotarumakes",
+  // },
+  // {
+  //   id: "instagram",
+  //   name: "Instagram",
+  //   url: "https://www.instagram.com/hotarumakes",
+  // },
   {
     id: "linkedin",
     name: "LinkedIn",
