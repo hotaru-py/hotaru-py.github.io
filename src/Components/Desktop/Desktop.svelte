@@ -16,11 +16,8 @@
   import Skills from "../skills.svelte";
   import Projects from "../projects.svelte";
   import Reach from "../reach.svelte";
-  import Credits from "../credits.svelte";
-  import WallpaperPicker from "../WallpaperPicker.svelte";
   import { wallpaper } from "../../lib/wallpaper.svelte.js";
   import { credits } from "../../lib/siteContent.js";
-  import { projectFiles, fileWindow } from "../../lib/workFiles.js";
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
@@ -68,31 +65,6 @@
       component: Projects,
     },
     { id: "browser", title: "Browser", icon: ICONS.browser, component: Reach },
-    {
-      id: "credits",
-      title: "Credits",
-      icon: ICONS.credits,
-      component: Credits,
-      corner: "bottom-right", // default desktop spot; the mobile dock ignores it
-    },
-    // Desktop only: phones switch wallpapers from the settings menu instead
-    {
-      id: "wallpaper",
-      title: "Wallpaper",
-      icon: ICONS.wallpaper,
-      component: WallpaperPicker,
-      size: { width: 520, height: 340 },
-      corner: "bottom-right",
-      cornerRowOffset: 1, // just above Credits
-      desktopOnly: true,
-    },
-    // The p5.rain demo, the same window its file in Work opens. On phones it sits on
-    // the home screen above the dock instead of in it.
-    {
-      ...fileWindow(projectFiles.find((file) => file.demo === "p5rain")),
-      title: "p5.rain",
-      homeScreen: true,
-    },
   ];
   const dockIcons = desktopIcons.filter(
     (icon) => !icon.homeScreen && !icon.desktopOnly,
