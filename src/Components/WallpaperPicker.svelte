@@ -11,6 +11,9 @@
   /** @type {Props} */
   let { isMobile = false } = $props();
 
+  // p5.rain is picked but its data hasn't arrived yet (the Motion Blob is still up)
+  const loading = $derived(wallpaper.current === "rain" && !wallpaper.rainReady);
+
   function choose(id) {
     if (wallpaper.current === id) return;
     playSound("tactile", 0.1);
@@ -74,6 +77,15 @@
                 />
               {/each}
             </svg>
+            {#if loading}
+              <!-- Three rain cells lighting up in turn while the data loads -->
+              <span class="loading" role="status">
+                <span class="cells" aria-hidden="true"
+                  ><span></span><span></span><span></span></span
+                >
+                Loading…
+              </span>
+            {/if}
           {/if}
         </span>
         <span class="label">
@@ -162,6 +174,58 @@
       transparent 64%
     );
     filter: blur(2px);
+  }
+
+  .loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: color-mix(in srgb, var(--color-moss-50) 78%, transparent);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  .cells {
+    display: flex;
+    gap: 5px;
+  }
+
+  .cells span {
+    width: 10px;
+    height: 10px;
+    background: var(--color-moss-700);
+    animation: cell 0.9s ease-in-out infinite;
+  }
+
+  .cells span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .cells span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes cell {
+    0%,
+    100% {
+      transform: scale(0.45);
+      opacity: 0.4;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cells span {
+      animation: none;
+    }
   }
 
   .label {

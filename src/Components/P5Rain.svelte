@@ -167,6 +167,7 @@
   class:mobile={isMobile}
   data-theme={theme}
   data-palette={look.palette}
+  data-p5rain-demo
   bind:this={root}
   onpointermove={handlePointerMove}
   onpointerleave={() => (pointer = null)}

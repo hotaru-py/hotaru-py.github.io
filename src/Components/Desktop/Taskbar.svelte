@@ -150,7 +150,7 @@
           </div>
 
           <div class="start-menu-items">
-            {#each desktopIcons as icon, i}
+            {#each desktopIcons.filter((icon) => icon.startMenu !== false) as icon, i}
               <button
                 type="button"
                 class="start-menu-item"

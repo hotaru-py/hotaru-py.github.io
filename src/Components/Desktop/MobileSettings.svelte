@@ -140,6 +140,9 @@
               onclick={() => chooseWallpaper(option.id)}
             >
               {option.name}
+              {#if option.id === "rain" && wallpaper.current === "rain" && !wallpaper.rainReady}
+                <span class="loading-dot" aria-label="loading"></span>
+              {/if}
             </button>
           {/each}
         </div>
@@ -259,6 +262,30 @@
     transition:
       background-color 0.15s ease,
       color 0.15s ease;
+  }
+
+  /* A rain cell pulsing next to "p5.rain" while it loads */
+  .loading-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-left: 6px;
+    vertical-align: 1px;
+    background: var(--color-ink);
+    animation: pulse 0.9s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    50% {
+      transform: scale(0.4);
+      opacity: 0.4;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loading-dot {
+      animation: none;
+    }
   }
 
   .seg button + button {

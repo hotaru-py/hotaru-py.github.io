@@ -16,6 +16,8 @@
   import Skills from "../skills.svelte";
   import Projects from "../projects.svelte";
   import Reach from "../reach.svelte";
+  import Credits from "../credits.svelte";
+  import WallpaperPicker from "../WallpaperPicker.svelte";
   import { wallpaper } from "../../lib/wallpaper.svelte.js";
   import { credits } from "../../lib/siteContent.js";
   import { fade, fly } from "svelte/transition";
@@ -65,15 +67,30 @@
       component: Projects,
     },
     { id: "browser", title: "Browser", icon: ICONS.browser, component: Reach },
+    // The rest stay on the desktop (and phone) but out of the Start menu, which keeps
+    // to the main apps
+    {
+      id: "credits",
+      title: "Credits",
+      icon: ICONS.credits,
+      component: Credits,
+      corner: "bottom-right", // default desktop spot; the mobile dock ignores it
+      startMenu: false,
+    },
+    // Desktop only: phones switch wallpapers from the settings menu instead
+    {
+      id: "wallpaper",
+      title: "Wallpaper",
+      icon: ICONS.wallpaper,
+      component: WallpaperPicker,
+      size: { width: 520, height: 340 },
+      corner: "bottom-right",
+      cornerRowOffset: 1, // just above Credits
+      desktopOnly: true,
+      startMenu: false,
+    },
   ];
-  const dockIcons = desktopIcons.filter(
-    (icon) => !icon.homeScreen && !icon.desktopOnly,
-  );
-  const homeScreenIcons = desktopIcons.filter((icon) => icon.homeScreen);
-
-  // Home-screen icons line up with the dock's right end, just above it
-  let dockWidth = $state(0);
-  let dockHeight = $state(0);
+  const dockIcons = desktopIcons.filter((icon) => !icon.desktopOnly);
 
   // One 24-unit tile covers a whole icon, so every dot twinkles independently
   const iconSparkle = sparkleDots({
@@ -87,13 +104,8 @@
   // Mobile dock labels, toggled from the settings menu
   let showDockLabels = $state(true);
 
-  // Set once the p5.rain wallpaper has faded in; reset when switching away from it
-  let rainWallpaperReady = $state(false);
-  $effect(() => {
-    if (wallpaper.current !== "rain") rainWallpaperReady = false;
-  });
   const showRainCredit = $derived(
-    wallpaper.current === "rain" && rainWallpaperReady,
+    wallpaper.current === "rain" && wallpaper.rainReady,
   );
 
   // Lets window contents open windows of their own (e.g. a file from the Work folder)
@@ -155,6 +167,8 @@
   }
 
   onMount(() => {
+    // A fresh desktop (e.g. back from Switch User) starts a fresh rain wallpaper
+    wallpaper.rainReady = false;
     const timer = setInterval(() => {
       currentTime = new Date();
     }, 1000);
@@ -297,11 +311,11 @@
 <div class="desktop-container">
   <!-- The Motion Blob stays up while the p5.rain wallpaper loads its data, so there's
        never a blank screen; the rain then fades in over it -->
-  {#if wallpaper.current === "blob" || !rainWallpaperReady}
+  {#if wallpaper.current === "blob" || !wallpaper.rainReady}
     <Wallpaper />
   {/if}
   {#if wallpaper.current === "rain"}
-    <RainWallpaper onReady={() => (rainWallpaperReady = true)} />
+    <RainWallpaper onReady={() => (wallpaper.rainReady = true)} />
   {/if}
   <!-- NASA asks for credit wherever its data is shown (full wording in Credits). It fades
        in once the rain wallpaper has, and out with it; phones show it under the clock. -->
@@ -395,8 +409,6 @@
         class="mobile-icons-additional"
         class:mobile-icons-hidden={activeWindowId}
         bind:this={dockElement}
-        bind:offsetWidth={dockWidth}
-        bind:offsetHeight={dockHeight}
         in:fade={{ duration: 300, delay: 100 }}
       >
         {#each dockIcons as icon, i (icon.id)}
@@ -410,24 +422,6 @@
               onclick={() => handleIconClick(icon)}
               isMobile={true}
               showLabel={showDockLabels}
-            />
-          </div>
-        {/each}
-      </div>
-
-      <div
-        class="home-screen-icons"
-        class:mobile-icons-hidden={activeWindowId}
-        style:right="{Math.max(12, (desktopWidth - dockWidth) / 2 + 12)}px"
-        style:bottom="{20 + dockHeight + 18}px"
-      >
-        {#each homeScreenIcons as icon, i (icon.id)}
-          <div in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}>
-            <DesktopIcon
-              {icon}
-              onclick={() => handleIconClick(icon)}
-              isMobile={true}
-              showLabel={true}
             />
           </div>
         {/each}
@@ -572,21 +566,6 @@
     transition:
       opacity 0.3s ease,
       transform 0.3s ease;
-  }
-
-  /* Home-screen icons: bare on the wallpaper, no dock panel behind them */
-  .home-screen-icons {
-    position: fixed;
-    z-index: 1000;
-    display: flex;
-    gap: 16px;
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
-  }
-
-  .home-screen-icons.mobile-icons-hidden {
-    transform: translateY(50px);
   }
 
   .mobile-icon-wrapper {

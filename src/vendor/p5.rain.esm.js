@@ -1,5 +1,6 @@
-// Copied from github.com/hotaru-py/p5-rain at 3046446 (dist/p5.rain.esm.js, built
-// from src/ with `npm run build`). Update by copying a fresh build over this file.
+// Copied from github.com/hotaru-py/p5-rain at 3046446 plus batched drawing (src/batch.js),
+// built with `npm run build` (dist/p5.rain.esm.js). Update by copying a fresh build over
+// this file.
 /*! p5.rain v0.1.0 | MIT | NASA IMERG precipitation for p5.js | data: NASA GPM IMERG via GIBS */
 
 // src/util.js
@@ -687,7 +688,82 @@ function paletteLUT(mode, from, to, pm, stainAmt, rainAmt) {
   return T;
 }
 
+// src/batch.js
+var RectBatch = class {
+  /** @param {number} keys how many buckets; they are filled in order 0, 1, 2… */
+  constructor(keys) {
+    this.keys = keys;
+    this.count = new Int32Array(keys);
+    this.start = new Int32Array(keys + 1);
+    this.n = 0;
+    this._grow(4096);
+  }
+  _grow(cap) {
+    const keep = (Arr, old) => {
+      const a = new Arr(cap);
+      if (old) a.set(old.subarray(0, this.n));
+      return a;
+    };
+    this.k = keep(Int32Array, this.k);
+    this.x = keep(Float32Array, this.x);
+    this.y = keep(Float32Array, this.y);
+    this.s = keep(Float32Array, this.s);
+    this.order = new Int32Array(cap);
+    this.cap = cap;
+  }
+  clear() {
+    this.n = 0;
+    this.count.fill(0);
+    return this;
+  }
+  /** Queue a size × size square at (x, y) in bucket `key`. */
+  add(key, x, y, size) {
+    if (this.n === this.cap) this._grow(this.cap * 2);
+    const i = this.n++;
+    this.k[i] = key;
+    this.x[i] = x;
+    this.y[i] = y;
+    this.s[i] = size;
+    this.count[key]++;
+  }
+  /**
+   * Fill every queued square, bucket by bucket (counting sort, so the order inside a
+   * bucket is the order they were added).
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {(key: number) => string} styleOf  fillStyle for a bucket
+   * @param {(key: number) => number} [alphaOf] globalAlpha for a bucket (default: leave as is)
+   */
+  flush(ctx, styleOf, alphaOf) {
+    const { count, start, order, k, keys, n } = this;
+    start[0] = 0;
+    for (let i = 0; i < keys; i++) start[i + 1] = start[i] + count[i];
+    const next = start.slice(0, keys);
+    for (let i = 0; i < n; i++) order[next[k[i]]++] = i;
+    let lastAlpha = NaN;
+    for (let key = 0; key < keys; key++) {
+      const a = start[key], b = start[key + 1];
+      if (a === b) continue;
+      if (alphaOf) {
+        const al = alphaOf(key);
+        if (al !== lastAlpha) {
+          ctx.globalAlpha = al;
+          lastAlpha = al;
+        }
+      }
+      ctx.fillStyle = styleOf(key);
+      for (let j = a; j < b; j++) {
+        const i = order[j], s = this.s[i];
+        ctx.fillRect(this.x[i], this.y[i], s, s);
+      }
+    }
+    return this.clear();
+  }
+};
+
 // src/field.js
+var LEVELS = 64;
+var COLOURS = LEVELS * 2;
+var ALPHAS = 21;
 var STYLES = ["breathe", "flow"];
 var GRIDS = ["snap", "free"];
 var THEMES = ["dark", "light", "auto"];
@@ -1160,6 +1236,7 @@ var RainField = class {
     const { rate, snowNow, dl, flowX, flowY, dispX, dispY, boost } = this;
     const rain = solid ? T.rain : T.rainRaw, snow = solid ? T.snow : T.snowRaw;
     const drift = this.o.grid === "snap" ? 0 : cell;
+    const batch = this._breatheBatch || (this._breatheBatch = new RectBatch(COLOURS));
     if (!solid) ctx.globalAlpha = this.o.intensity;
     for (let yy = ya; yy < yb; yy++) {
       const y = g.r0 + yy;
@@ -1171,10 +1248,10 @@ var RainField = class {
         const s = clamp(Math.round((0.3 + 0.7 * Math.sqrt(lv)) * inner * pulse * (1 + boost[c])), 1, cell + 3);
         const cx = g.ox + x * cell + Math.round(dispX[c]) + inner / 2 + flowX[c] * drift;
         const cy = g.oy + yy * cell + Math.round(dispY[c]) + inner / 2 + flowY[c] * drift;
-        ctx.fillStyle = (snowNow[c] ? snow : rain)[lv * 63 | 0];
-        ctx.fillRect(Math.round(cx - s / 2), Math.round(cy - s / 2), s, s);
+        batch.add((lv * 63 | 0) * 2 + (snowNow[c] ? 1 : 0), Math.round(cx - s / 2), Math.round(cy - s / 2), s);
       }
     }
+    batch.flush(ctx, (key) => (key & 1 ? snow : rain)[key >> 1]);
     ctx.globalAlpha = 1;
   }
   _drawFlow(ctx, T, solid) {
@@ -1182,21 +1259,23 @@ var RainField = class {
     const { px, py, pa, plv, psn, dispX, dispY, boost } = this;
     const rain = solid ? T.rain : T.rainRaw, snow = solid ? T.snow : T.snowRaw;
     const scale = solid ? 1 : this.o.intensity;
-    let lastA = -1;
+    const batch = this._flowBatch || (this._flowBatch = new RectBatch(ALPHAS * COLOURS));
     for (let k = 0; k < this.pn; k++) {
       const gx = snap ? Math.round(px[k]) % COLS : px[k], gy = snap ? Math.round(py[k]) : py[k];
       const sx = g.ox + gx * cell, sy = g.oy + (gy - g.r0) * cell;
       if (sx < -cell || sy < -cell || sx > g.w || sy > g.h) continue;
       const c = Math.round(py[k]) * COLS + Math.round(px[k]) % COLS;
       const b = c >= 0 && c < N ? boost[c] : 0;
-      const a = Math.round(pa[k] * scale * 20) / 20;
-      if (a !== lastA) {
-        ctx.globalAlpha = a;
-        lastA = a;
-      }
-      ctx.fillStyle = (psn[k] ? snow : rain)[clamp(plv[k] + b * 0.4, 0, 1) * 63 | 0];
-      ctx.fillRect(sx + (b ? dispX[c] : 0), sy + (b ? dispY[c] : 0), inner, inner);
+      const a = Math.round(pa[k] * scale * 20);
+      if (a <= 0) continue;
+      const colour = (clamp(plv[k] + b * 0.4, 0, 1) * 63 | 0) * 2 + (psn[k] ? 1 : 0);
+      batch.add(a * COLOURS + colour, sx + (b ? dispX[c] : 0), sy + (b ? dispY[c] : 0), inner);
     }
+    batch.flush(
+      ctx,
+      (key) => (key % COLOURS & 1 ? snow : rain)[key % COLOURS >> 1],
+      (key) => Math.floor(key / COLOURS) / 20
+    );
     ctx.globalAlpha = 1;
   }
   // ---------------------------------------------------------------------------

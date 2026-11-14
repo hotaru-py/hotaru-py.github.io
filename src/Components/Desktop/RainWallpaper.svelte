@@ -15,6 +15,15 @@
 
   const FADE_MS = 600;
 
+  // p5.rain redraws every cell each frame, so the wallpaper runs at a calm 30 fps (the
+  // motion is slow enough not to show it), drops to 15 while the p5.rain window is
+  // showing so the demo gets the frames, and stops while something covers the screen
+  const FPS = 30;
+  const FPS_WITH_DEMO = 15;
+  const COVERED =
+    ".window-container.maximized:not(.minimized), .mobile-window-container:not(.minimized)";
+  const DEMO = ".window-container:not(.minimized) [data-p5rain-demo]";
+
   /** @type {HTMLDivElement} */
   let layer;
   let ready = $state(false);
@@ -47,8 +56,10 @@
         ];
         sketch = new P5((p) => {
           let field;
+          let fps = FPS;
           p.setup = () => {
             p.pixelDensity(1);
+            p.frameRate(fps);
             p.createCanvas(...size());
             field = p.createRain({
               source: "weekly",
@@ -61,6 +72,12 @@
             });
           };
           p.draw = () => {
+            // Hidden behind a maximized (or phone) window: skip the work. Readiness
+            // still counts, so the fade-in isn't held up.
+            if (ready && document.querySelector(COVERED)) return;
+            const want = document.querySelector(DEMO) ? FPS_WITH_DEMO : FPS;
+            if (want !== fps) p.frameRate((fps = want));
+
             const r = layer.getBoundingClientRect();
             field.pointer(
               pointer ? pointer.x - r.left : null,

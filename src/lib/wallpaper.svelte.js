@@ -18,12 +18,15 @@ function load() {
   }
 }
 
-export const wallpaper = $state({ current: load() });
+// `rainReady`: the p5.rain wallpaper has loaded and faded in. Until then the Motion
+// Blob stays up and the pickers show p5.rain as loading.
+export const wallpaper = $state({ current: load(), rainReady: false });
 
 /** @param {"blob" | "rain"} id */
 export function setWallpaper(id) {
   if (wallpaper.current === id) return;
   wallpaper.current = id;
+  if (id !== "rain") wallpaper.rainReady = false;
   try {
     localStorage.setItem(KEY, id);
   } catch {
