@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  import { loadP5Rain } from "../../lib/p5rain.js";
+  import { loadP5Rain, applyLoopFade } from "../../lib/p5rain.js";
 
   /**
    * The p5.rain wallpaper: NASA's last week of rain as a full-screen pixel field. It
@@ -86,6 +86,9 @@
             field.update();
             p.background(paper || "#f8f7ed");
             field.draw();
+            // Fade out and back in where the week loops, instead of a hard cut (the
+            // page's own paper colour shows through, so it just goes quiet)
+            applyLoopFade(p.canvas, field);
             if (!ready && field.ready) {
               ready = true;
               readyTimer = setTimeout(() => onReady?.(), FADE_MS);
@@ -135,6 +138,13 @@
 
   .rain-wallpaper.ready {
     opacity: 1;
+  }
+
+  /* Phones: a touch see-through, so the home screen's icons and widgets stand out */
+  @media (max-width: 768px) {
+    .rain-wallpaper.ready {
+      opacity: 0.9;
+    }
   }
 
   .rain-wallpaper :global(canvas) {

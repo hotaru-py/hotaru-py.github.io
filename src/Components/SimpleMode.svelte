@@ -5,6 +5,8 @@
     site,
     about,
     experience,
+    activities,
+    gallery,
     skillCategories,
     liveWork,
     githubProfile,
@@ -14,6 +16,7 @@
     starLabel,
     schoolName,
   } from "../lib/siteContent.js";
+  import { posts, formatPostDate, NO_POSTS } from "../lib/blogPosts.js";
 
   /**
    * @typedef {Object} Props
@@ -26,46 +29,86 @@
   const sections = [
     { id: "about", title: "About" },
     { id: "experience", title: "Experience" },
+    { id: "projects", title: "Projects" },
+    // { id: "gallery", title: "Gallery" }, // hidden while the gallery is empty
+    { id: "blog", title: "Blog" },
     { id: "skills", title: "Skills" },
-    { id: "work", title: "Work" },
     { id: "links", title: "Links" },
   ];
+
+  // The section being read, highlighted in the sticky bar
+  let currentSection = $state("about");
+
+  // A section picked from the bar stays marked while the page scrolls to it (a short
+  // section near the end may never reach the top on its own)
+  let holdUntil = 0;
+  function pick(id) {
+    currentSection = id;
+    holdUntil = Date.now() + 1000;
+  }
 
   /** @type {Record<string, number>} */
   let liveStars = $state({});
 
   onMount(() => {
+    // The current section is the last one whose heading has scrolled above a line a
+    // third of the way down the screen
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      if (Date.now() < holdUntil) return;
+      const line = window.innerHeight / 3;
+      let current = sections[0].id;
+      for (const { id } of sections) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= line) current = id;
+      }
+      currentSection = current;
+    };
+    const onScroll = () => (frame ||= requestAnimationFrame(update));
+    window.addEventListener("scroll", onScroll, { passive: true });
+
     for (const { stars } of projects) {
       if (!stars) continue;
       fetchStars(stars.repo).then((count) => {
         if (count !== null) liveStars[stars.repo] = count;
       });
     }
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
+    };
   });
 </script>
 
 <!-- Plain, markdown-flavoured version of the site: text only, top to bottom -->
 <div class="simple">
-  <main class="page">
+  <main class="page" id="top">
     <header>
       <h1>
         <span class="mark" aria-hidden="true">{"# "}</span>{site.name} ({about.realName})
       </h1>
       <p class="tagline">{site.jobTitle}</p>
-      <nav aria-label="Sections">
-        {#each sections as section, i}{#if i > 0}{" "}{/if}{@render link(
-            `#${section.id}`,
-            section.title,
-            false,
-          )}{/each}
-      </nav>
     </header>
+
+    <!-- Sticks to the top while reading, with the current section marked -->
+    <nav class="toc" aria-label="Sections">
+      {#each sections as section}
+        <a
+          href="#{section.id}"
+          class:current={currentSection === section.id}
+          aria-current={currentSection === section.id ? "location" : undefined}
+          onclick={() => pick(section.id)}>{section.title}</a
+        >
+      {/each}
+    </nav>
 
     <section id="about">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>About</h2>
       <p>
         {about.greeting} <span class="muted">({about.pronouns})</span>
       </p>
+      <p><strong>{about.tldr}</strong></p>
       {#each about.intro as paragraph}
         <p>{paragraph}</p>
       {/each}
@@ -74,7 +117,6 @@
           <li>{@render rich(item)}</li>
         {/each}
       </ul>
-      <p>{about.outro}</p>
 
       <h3><span class="mark" aria-hidden="true">{"### "}</span>Education</h3>
       <!-- Same list style as Experience: school in bold, details underneath -->
@@ -99,6 +141,86 @@
           </li>
         {/each}
       </ul>
+
+      <h3>
+        <span class="mark" aria-hidden="true">{"### "}</span>Clubs &amp; Activities
+      </h3>
+      <ul>
+        {#each activities as club}
+          <li>
+            <strong>{club.org}</strong>
+            {#each club.roles as entry}<br />{entry.role}
+              <span class="muted">({entry.period})</span>{/each}
+          </li>
+        {/each}
+      </ul>
+      {@render toTop()}
+    </section>
+
+    <section id="projects">
+      <h2><span class="mark" aria-hidden="true">{"## "}</span>Projects</h2>
+
+      <details open>
+        <summary>
+          <span class="mark" aria-hidden="true">{"### "}</span>Live Work
+          <span class="muted">({liveWork.length})</span>
+        </summary>
+        <ul>
+          {#each liveWork as live}
+            <li>
+              <strong>{live.name}</strong>: {live.description}<br />
+              {@render link(live.url, live.domain)}
+            </li>
+          {/each}
+        </ul>
+      </details>
+
+      <details open>
+        <summary>
+          <span class="mark" aria-hidden="true">{"### "}</span>Personal Projects
+          <span class="muted">({projects.length})</span>
+        </summary>
+        <ul>
+          {#each projects as project}
+            <li>
+              <strong>{project.name}</strong>: {project.description}
+              {#if project.stars}
+                <br /><span class="muted"
+                  >★ {starLabel(
+                    liveStars[project.stars.repo] ?? project.stars.fallback,
+                  )}</span
+                >
+              {/if}
+              <br />{@render link(project.link, "View on GitHub")}
+            </li>
+          {/each}
+        </ul>
+        <p>{@render link(githubProfile, "More on GitHub")}</p>
+      </details>
+      {@render toTop()}
+    </section>
+
+    <!-- Gallery: hidden while it is empty (see `gallery` in siteContent.js) -->
+
+    <section id="blog">
+      <h2><span class="mark" aria-hidden="true">{"## "}</span>Blog</h2>
+      {#if posts.length === 0}
+        <p class="muted">{NO_POSTS}</p>
+      {/if}
+      <!-- Each post folds open in place to be read in full -->
+      {#each posts as post (post.id)}
+        <details class="post">
+          <summary>
+            <span class="mark" aria-hidden="true">{"### "}</span>{post.title}
+            <span class="muted">({formatPostDate(post.date)})</span>
+          </summary>
+          <p class="muted">{post.summary}</p>
+          {#each post.body as paragraph}
+            <p>{@render rich(paragraph)}</p>
+          {/each}
+        </details>
+      {/each}
+      {@render toTop()}
     </section>
 
     <section id="skills">
@@ -109,39 +231,7 @@
         </h3>
         <p>{category.items.join(" · ")}</p>
       {/each}
-    </section>
-
-    <section id="work">
-      <h2><span class="mark" aria-hidden="true">{"## "}</span>Work</h2>
-
-      <h3><span class="mark" aria-hidden="true">{"### "}</span>Live Work</h3>
-      <ul>
-        {#each liveWork as live}
-          <li>
-            <strong>{live.name}</strong>: {live.description}<br />
-            {@render link(live.url, live.domain)}
-          </li>
-        {/each}
-      </ul>
-
-      <h3>
-        <span class="mark" aria-hidden="true">{"### "}</span>Personal Projects
-      </h3>
-      <ul>
-        {#each projects as project}
-          <li>
-            <strong>{project.name}</strong>: {project.description}
-            {#if project.stars}
-              <br /><span class="muted"
-                >★ {starLabel(
-                  liveStars[project.stars.repo] ?? project.stars.fallback,
-                )}</span
-              >
-            {/if}
-            <br />{@render link(project.link, "View on GitHub")}
-          </li>
-        {/each}
-      </ul>
+      {@render toTop()}
     </section>
 
     <section id="links">
@@ -171,6 +261,8 @@
     ><span class="bracket" aria-hidden="true">{" ]"}</span></span
   >{/snippet}
 
+{#snippet toTop()}<p class="to-top">{@render link("#top", "↑ Back to top", false)}</p>{/snippet}
+
 {#snippet switchButton()}<span class="link"
     ><span class="bracket" aria-hidden="true">{"[ "}</span><button
       type="button"
@@ -183,6 +275,16 @@
       >{:else}{part.text}{/if}{/each}{/snippet}
 
 <style>
+  :global(html[data-mode="simple"]) {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html[data-mode="simple"]) {
+      scroll-behavior: auto;
+    }
+  }
+
   .simple {
     --bg: var(--color-moss-100);
     --text: var(--color-moss-950);
@@ -245,9 +347,73 @@
     color: var(--muted);
   }
 
-  nav {
-    margin-top: 16px;
-    line-height: 2;
+  /* Sticky section bar: scrolls sideways on narrow screens rather than wrapping */
+  .toc {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    gap: 2ch;
+    margin: 20px -20px 0;
+    padding: 10px 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--bg);
+    border-bottom: 1px dashed var(--muted);
+    white-space: nowrap;
+  }
+
+  .toc::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toc a {
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .toc a.current {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* Jumps land below the sticky bar, not under it */
+  section {
+    scroll-margin-top: 56px;
+  }
+
+  /* Folding "### " headings */
+  details {
+    margin-top: 20px;
+  }
+
+  summary {
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: " +";
+    color: var(--muted);
+  }
+
+  details[open] > summary::after {
+    content: " −";
+  }
+
+  .post p {
+    margin-left: 2ch;
+  }
+
+  .to-top {
+    margin-top: 20px;
+    font-size: 13px;
   }
 
   /* Markdown-style "- " bullets */

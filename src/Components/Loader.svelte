@@ -69,8 +69,9 @@
   >
     {#if ready}
       <div class="mark" style:aspect-ratio={LOGO_ASPECT}>
-        <!-- Outline fades in, then wipes away from the bottom as the fill rises -->
-        <svg class="layer outline" viewBox={LOGO_VIEWBOX} fill="none">
+        <!-- Outline fades in, then wipes away from the bottom as the fill rises. (Not
+             class "outline": that's a Tailwind utility, which drew a 1px box around it.) -->
+        <svg class="layer outline-layer" viewBox={LOGO_VIEWBOX} fill="none">
           <path
             d={LOGO_PATH}
             stroke="var(--color-moss-600)"
@@ -126,7 +127,7 @@
   }
 
   @media (max-width: 639px) {
-    .outline {
+    .outline-layer {
       display: none;
     }
   }
@@ -138,7 +139,7 @@
     height: 100%;
   }
 
-  .outline {
+  .outline-layer {
     animation:
       outline-in 0.45s var(--ease) both,
       outline-wipe 1.05s var(--ease) 0.5s both;
@@ -179,7 +180,7 @@
 
   /* Skip straight to the filled logo */
   @media (prefers-reduced-motion: reduce) {
-    .outline {
+    .outline-layer {
       display: none;
     }
 

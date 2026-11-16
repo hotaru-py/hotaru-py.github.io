@@ -5,13 +5,13 @@
 // Text may use **double asterisks** for emphasis; see emphasis() below.
 
 export const site = {
-  url: "https://hotaru-py.github.io/",
+  url: "https://www.byhotaru.com/",
   name: "hotaru",
   handle: "hotarumakes",
   title: "hotaru | i make stuff that looks good to me",
   description:
-    "Portfolio of hotaru: full-stack developer, designer and artist. Live websites, personal projects, skills and links, presented as a playful desktop or a simple text page.",
-  jobTitle: "Full-stack developer & designer",
+    "random infodump about the individual known as Prajesh (or) hotaru",
+  jobTitle: "Product engineer-designer",
 };
 
 export const about = {
@@ -19,18 +19,23 @@ export const about = {
   // Shown under the greeting
   realName: "Prajesh Raam",
   pronouns: "he/him",
+  // Shown first, on its own line
+  tldr: "tl;dr: I make stuff that looks good to me.",
   intro: [
-    "I'm an engineer by day, designer by night, artist throughout. Currently an undergrad engineering student and a full-stack developer.",
-    "Working on a few different things, including but not limited to:",
+    "Usually, I'm a frustrated consumer trying to fix things around me with my weird concoction of design, engineering and other skills, so they're usable and look good.",
+    "Professionally, I'm a designer, engineer and artist working primarily in product engineering, trying to understand how humans have interacted with technology in the past and present, and work on how we'll interact with technology in the near and far future, especially with calm and ambient interfaces.",
+    "Other than these, I sometimes do the following (and a lot more, I just can't keep track of them):",
   ],
+  // The list after the intro
   interests: [
-    "**software development** across platforms and stacks",
-    "designing **visually appealing, usable, and accessible** experiences",
-    "**graphic & UI/UX design**",
-    "**product and interaction design** in the long run",
+    "Play the piano",
+    "Random doodling",
+    "Poke into electronics",
+    "Play some tennis",
+    "Watch Movies/TV/Anime",
+    "Listen to music (playlist more diverse than a friend group in a college brochure)",
+    "Can't think of anything else at this hour, will add more later",
   ],
-  outro:
-    "If I’m not doing the above, I’m probably at the piano, doodling at my desk, on the tennis court, watching the evolution of the Intel Inside jingle for the gazillionth time, bingeing anime or TV, watching rich people race expensive cars in circles, listening to my curated Mr. Worldwide playlist with Hatsune Miku sitting between Olivia Rodrigo and Kanye West, or just kicking back and taking a nap.",
   // Most recent first. `board` is shown after the name ("School - CBSE"); `type` is the
   // schema.org kind of school, for search engines
   education: [
@@ -52,7 +57,7 @@ export const about = {
 export const experience = [
   {
     role: "Web Development, UI/UX & Graphic Design",
-    company: "Freelance",
+    company: "Freelance (on and off)",
     period: "2021 - Present",
   },
   {
@@ -61,6 +66,69 @@ export const experience = [
     url: "https://miniture.in",
     period: "March 2025 - February 2026",
   },
+];
+
+// College clubs and activities, shown after work experience. Each club lists its roles,
+// most recent first.
+export const activities = [
+  {
+    org: "SNUC Coding Club",
+    roles: [
+      { role: "Club Head", period: "Jul 2026 - Present" },
+      {
+        role: "Founding Team - Game Development & AR/VR Vertical",
+        period: "Sep 2026 - Present",
+      },
+      {
+        role: "Core Member - Software Development Vertical",
+        period: "Sep 2025 - Present",
+      },
+      { role: "Graphic Designer", period: "Oct 2023 - Aug 2025" },
+    ],
+  },
+  {
+    org: "Aura - SNUC Design Club",
+    roles: [{ role: "Senior Core Member", period: "Jul 2026 - Present" }],
+  },
+  {
+    org: "Cognition - The SNUC Quiz Club",
+    roles: [
+      { role: "Club Head", period: "May 2026 - Present" },
+      { role: "Core Member", period: "Aug 2024 - May 2026" },
+    ],
+  },
+  {
+    org: "Shiv Nadar University Chennai",
+    roles: [
+      { role: "Graphic Designer - Marketing", period: "Sep 2023 - Mar 2024" },
+    ],
+  },
+];
+
+// The phone's Featured widget: something new, or anything worth showing off. `file` is
+// the key of a file in the Projects or Gallery windows (it opens there); or give a `url`
+// instead. `image` overrides the file's own picture.
+export const featured = {
+  label: "Featured",
+  title: "p5.rain",
+  blurb: "Earth's rain as pixel art",
+  file: "project-p5-rain",
+};
+
+// The Gallery app's subfolders. Hidden for now (the app, its widget and its Simple Mode
+// section are commented out in Desktop.svelte, SimpleMode.svelte and staticSite.js);
+// bring those back once there's work to show. Each item gets an `image` URL (e.g. from
+// public/); without one a placeholder is drawn from its id.
+export const gallery = [
+  // {
+  //   id: "art",
+  //   name: "Art",
+  //   typeLabel: "Art",
+  //   items: [{ id: "…", title: "…", date: "2026-11-17", description: "…", image: "/gallery/….webp" }],
+  // },
+  // { id: "mockups", name: "UI/UX Mockups", typeLabel: "UI/UX mockup", items: [] },
+  // { id: "graphics", name: "Graphic Design", typeLabel: "Graphic design", items: [] },
+  // { id: "photos", name: "Photos", typeLabel: "Photo", items: [] },
 ];
 
 export const skillCategories = [
@@ -136,7 +204,7 @@ export const projects = [
     name: "My Personal Website (this one!)",
     description:
       "My personal website, with a choice of a desktop/phone-like interface or a markdown-style page, and agent-crawlable text",
-    link: "https://github.com/hotaru-hspr/hotaru-hspr.github.io",
+    link: "https://github.com/hotaru-py/hotaru-py.github.io",
   },
   {
     name: "p5.rain",
@@ -194,11 +262,11 @@ export const projects = [
 
 // `id` picks the icon in the Browser window (or `icon`, when two share one)
 export const bookmarks = [
-  // {
-  //   id: "youtube",
-  //   name: "YouTube Channel (this stuff)",
-  //   url: "https://www.youtube.com/@hotarumakes",
-  // },
+  {
+    id: "youtube",
+    name: "YouTube Channel (this stuff)",
+    url: "https://www.youtube.com/@hotarumakes",
+  },
   // {
   //   id: "instagram",
   //   name: "Instagram",
@@ -210,11 +278,12 @@ export const bookmarks = [
     url: "https://linkedin.com/in/prajeshraam",
   },
   { id: "github", name: "GitHub", url: "https://github.com/hotaru-py" },
-  {
-    id: "behance",
-    name: "Behance",
-    url: "https://www.behance.net/prajeshraam",
-  },
+  // Delisted for now
+  // {
+  //   id: "behance",
+  //   name: "Behance",
+  //   url: "https://www.behance.net/prajeshraam",
+  // },
   { id: "email", name: "Email", url: "mailto:hotarumakes@gmail.com" },
   {
     id: "youtube-random",

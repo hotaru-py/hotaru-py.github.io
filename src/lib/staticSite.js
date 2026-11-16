@@ -1,4 +1,5 @@
-// Build-time outputs for search engines and AI agents, all generated from siteContent.js:
+// Build-time outputs for search engines and AI agents, all generated from siteContent.js
+// (blog posts live in blogPosts.js and are deliberately left out of these):
 // the <head> tags, a plain-HTML copy of the content baked into index.html (for crawlers
 // and visitors without JavaScript), /llms.txt, /robots.txt and /sitemap.xml.
 // Used by the plugin in vite.config.js; runs in Node, so no browser APIs here.
@@ -7,6 +8,8 @@ import {
   site,
   about,
   experience,
+  activities,
+  gallery,
   skillCategories,
   liveWork,
   githubProfile,
@@ -86,7 +89,7 @@ function structuredData() {
 
 export function renderHeadTags() {
   const image = absolute(OG_IMAGE);
-  const imageAlt = `${site.name}: developer-designer portfolio`;
+  const imageAlt = `${site.name}: ${about.tldr.replace(/^tl;dr:\s*/i, "")}`;
   // "<" escaped so the JSON can never close the script tag early
   const jsonLd = JSON.stringify(structuredData()).replaceAll("<", "\\u003c");
   return [
@@ -127,9 +130,9 @@ export function renderStaticPage() {
 
     `<section><h2>About</h2>`,
     `<p>${esc(about.greeting)} (${esc(about.pronouns)})</p>`,
+    `<p><strong>${esc(about.tldr)}</strong></p>`,
     ...about.intro.map((p) => `<p>${esc(p)}</p>`),
     `<ul>${about.interests.map((item) => li(richHtml(item))).join("")}</ul>`,
-    `<p>${esc(about.outro)}</p>`,
     `<h3>Education</h3>`,
     `<ul>`,
     ...about.education.map((entry) =>
@@ -146,6 +149,12 @@ export function renderStaticPage() {
         `<strong>${esc(job.role)}</strong><br />${job.url ? linkHtml(job.url, job.company) : esc(job.company)} (${esc(job.period)})`,
       ),
     ),
+    `</ul><h3>Clubs &amp; Activities</h3><ul>`,
+    ...activities.map((club) =>
+      li(
+        `<strong>${esc(club.org)}</strong>${club.roles.map((r) => `<br />${esc(r.role)} (${esc(r.period)})`).join("")}`,
+      ),
+    ),
     `</ul></section>`,
 
     `<section><h2>Skills</h2>`,
@@ -154,7 +163,7 @@ export function renderStaticPage() {
     ),
     `</section>`,
 
-    `<section><h2>Work</h2>`,
+    `<section><h2>Projects</h2>`,
     `<h3>Live Work</h3><ul>`,
     ...liveWork.map((w) =>
       li(
@@ -172,6 +181,18 @@ export function renderStaticPage() {
     }),
     `</ul><p>More on ${linkHtml(githubProfile, "GitHub")}</p>`,
     `</section>`,
+
+    // Gallery: only once it has work in it
+    ...(gallery.length
+      ? [
+          `<section><h2>Gallery</h2>`,
+          ...gallery.map(
+            (folder) =>
+              `<h3>${esc(folder.name)}</h3><ul>${folder.items.map((item) => li(`<strong>${esc(item.title)}</strong>${item.description ? `: ${esc(item.description)}` : ""}`)).join("")}</ul>`,
+          ),
+          `</section>`,
+        ]
+      : []),
 
     `<section><h2>Links</h2><ul>`,
     ...bookmarks.map((b) => li(linkHtml(b.url, b.name))),
@@ -209,23 +230,34 @@ export function renderLlmsTxt() {
     "",
     `> ${site.description}`,
     "",
-    about.intro[0],
+    about.tldr,
     "",
     `This site (${site.url}) is an interactive, desktop-style portfolio that needs JavaScript. A plain-text version of the same content is at ${simpleModeUrl}, and everything is summarised below.`,
     "",
     "## About",
     "",
-    ...about.interests.map((item) => `- ${plain(item)}`),
+    ...about.intro.slice(0, -1).flatMap((p) => [p, ""]),
     ...about.education.map(
       (entry) => `- Education: ${schoolName(entry)}, ${entry.lines.join("; ")}`,
     ),
     `- Pronouns: ${about.pronouns}`,
+    "",
+    "Outside of work:",
+    "",
+    ...about.interests.map((item) => `- ${plain(item)}`),
     "",
     "## Experience",
     "",
     ...experience.map(
       (job) =>
         `- ${job.url ? `[${job.company}](${job.url})` : job.company}: ${job.role}, ${job.period}`,
+    ),
+    "",
+    "## Clubs and activities",
+    "",
+    ...activities.map(
+      (club) =>
+        `- ${club.org}: ${club.roles.map((r) => `${r.role} (${r.period})`).join("; ")}`,
     ),
     "",
     "## Skills",
@@ -244,6 +276,19 @@ export function renderLlmsTxt() {
     }),
     `- [More on GitHub](${githubProfile})`,
     "",
+    ...(gallery.length
+      ? [
+          "## Gallery",
+          "",
+          ...gallery.flatMap((folder) =>
+            folder.items.map(
+              (item) =>
+                `- ${folder.name}: ${item.title}${item.description ? `. ${item.description}` : ""}`,
+            ),
+          ),
+          "",
+        ]
+      : []),
     "## Contact and profiles",
     "",
     ...bookmarks.map((b) => `- [${b.name}](${b.url})`),

@@ -93,7 +93,16 @@
   :global(html[data-mode="simple"]),
   :global(html[data-mode="simple"] body) {
     height: auto;
+  }
+
+  /* Only the page itself scrolls: a scrolling body would also trap Simple Mode's sticky
+     section bar, which sticks to its nearest scroller */
+  :global(html[data-mode="simple"]) {
     overflow: auto;
+  }
+
+  :global(html[data-mode="simple"] body) {
+    overflow: visible;
   }
 
   .desktop-main {

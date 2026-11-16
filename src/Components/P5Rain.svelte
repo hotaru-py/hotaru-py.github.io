@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { playSound } from "../lib/sounds.js";
-  import { loadP5Rain } from "../lib/p5rain.js";
+  import { loadP5Rain, applyLoopFade } from "../lib/p5rain.js";
 
   /**
    * The p5.rain hero from github.com/hotaru-py/p5-rain, sized to whatever box it's in:
@@ -141,6 +141,8 @@
             field.pointer(pointer?.x ?? null, pointer?.y ?? null);
             field.update();
             field.draw();
+            // Fade out and back in where the week loops, instead of a hard cut
+            applyLoopFade(p.canvas, field);
           };
         }, layer);
         observer = new ResizeObserver(() => {

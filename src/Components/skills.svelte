@@ -1,27 +1,9 @@
 <script>
   import { xylophone } from "../lib/xylophone.js";
-  import { experience, skillCategories } from "../lib/siteContent.js";
+  import { skillCategories } from "../lib/siteContent.js";
 </script>
 
 <div class="skills-container">
-  <div class="skills-description">
-    <h2 class="skills-title">Work Experience</h2>
-    {#each experience as job}
-      <p class="about-paragraph">
-        {job.role}
-        <span class="about-subtitle">
-          {#if job.url}<a
-              href={job.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="company-link">{job.company}</a
-            >{:else}{job.company}{/if}
-          ({job.period})
-        </span>
-      </p>
-    {/each}
-  </div>
-
   <h2 class="skills-title">Skills</h2>
 
   <div class="skills-grid">
@@ -177,42 +159,9 @@
     color: var(--color-paper);
   }
 
-  .skills-description {
-    margin-bottom: 24px;
-  }
 
-  .skills-description p {
-    margin-bottom: 16px;
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--color-ink-soft);
-  }
 
-  .skills-description p:last-child {
-    margin-bottom: 0;
-  }
 
-  .about-paragraph {
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: 16px;
-    color: var(--color-ink);
-    font-weight: 600;
-  }
 
-  .about-subtitle {
-    display: block;
-    font-size: 14px;
-    color: var(--color-ink-muted);
-    margin-top: 4px;
-  }
 
-  .company-link {
-    color: var(--color-ink);
-    font-weight: 700;
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
-  }
 </style>

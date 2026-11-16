@@ -24,6 +24,7 @@
   </div>
 
   <div class="about-content">
+    <p class="about-paragraph tldr">{about.tldr}</p>
     {#each about.intro as paragraph}
       <p class="about-paragraph">{paragraph}</p>
     {/each}
@@ -37,8 +38,6 @@
         </li>
       {/each}
     </ul>
-
-    <p class="about-paragraph">{about.outro}</p>
 
     <h3 class="about-heading">Education</h3>
     {#each about.education as entry}
@@ -117,6 +116,12 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--color-ink-muted);
+  }
+
+  .tldr {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-ink);
   }
 
   .highlight {

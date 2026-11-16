@@ -101,18 +101,19 @@
   }
 
   .mobile-icon-title {
-    padding-top: 5px;
-    font-size: 10px;
+    padding-top: 6px;
+    font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
     color: var(--color-ink);
   }
 
+  /* 64px, shrinking a little on narrow phones so four still fit side by side */
   .mobile-icon-container {
-    width: 52px;
-    height: 52px;
+    width: clamp(52px, 16.5vw, 64px);
+    height: clamp(52px, 16.5vw, 64px);
     margin-bottom: 0;
-    border-radius: 14px;
+    border-radius: 16px;
   }
 
   .desktop-icon:hover .icon-container {
@@ -144,14 +145,15 @@
     height: 32px;
   }
 
-  .mobile-icon-container .icon {
-    width: 28px;
-    height: 28px;
+  .mobile-icon-container .icon,
+  .mobile-icon-container .icon :global(svg) {
+    width: 55%;
+    height: 55%;
   }
 
   .mobile-icon-container .icon :global(svg) {
-    width: 28px;
-    height: 28px;
+    width: 100%;
+    height: 100%;
   }
 
   .icon-title {

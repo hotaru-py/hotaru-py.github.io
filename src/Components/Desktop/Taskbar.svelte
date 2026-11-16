@@ -16,7 +16,7 @@
    * @property {(windowId: any) => void} [onActivateWindow]
    * @property {(windowId: any) => void} [onMinimizeWindow]
    * @property {(icon: any, options?: { quiet?: boolean }) => void} [onOpenWindow]
-   * @property {boolean} [showReset] Only offered once the icons have been moved
+   * @property {boolean} [showReset] Only offered once icons or widgets have been moved
    * @property {() => void} [onResetLayout]
    * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
    */
@@ -150,7 +150,7 @@
           </div>
 
           <div class="start-menu-items">
-            {#each desktopIcons.filter((icon) => icon.startMenu !== false) as icon, i}
+            {#each desktopIcons.filter((icon) => icon.core) as icon, i}
               <button
                 type="button"
                 class="start-menu-item"
@@ -235,8 +235,8 @@
           use:tactile
           class:hidden={!showReset}
           onclick={resetLayout}
-          aria-label="Reset desktop icons"
-          title="Reset desktop icons"
+          aria-label="Reset desktop layout"
+          title="Reset desktop layout"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <rect

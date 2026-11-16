@@ -3,6 +3,7 @@
   import { fetchStars } from "../lib/githubStars.js";
   import { starLabel } from "../lib/siteContent.js";
   import { FILE_ICONS } from "../lib/workFiles.js";
+  import { formatPostDate } from "../lib/blogPosts.js";
   import P5Rain from "./P5Rain.svelte";
 
   /**
@@ -24,7 +25,6 @@
     });
   });
 
-  const isLive = $derived(file.kind === "live");
 </script>
 
 <!-- Photos-app style: the picture on the left, its details in a side panel -->
@@ -37,7 +37,7 @@
           <P5Rain {isMobile} />
         </div>
       {:else if file.image}
-        <img src={file.image} alt="Screenshot of the {file.name} website" />
+        <img src={file.image} alt={file.alt ?? file.name} />
       {:else}
         <!-- Repos have no screenshot: a big file icon on a halftone card instead -->
         <div class="placeholder">
@@ -57,8 +57,14 @@
       <dl class="facts">
         <div>
           <dt>Type</dt>
-          <dd>{isLive ? "Live website" : "Personal project"}</dd>
+          <dd>{file.typeLabel}</dd>
         </div>
+        {#if file.date}
+          <div>
+            <dt>Date</dt>
+            <dd>{formatPostDate(file.date)}</dd>
+          </div>
+        {/if}
         <div>
           <dt>File</dt>
           <dd>{file.fileName}</dd>
@@ -76,20 +82,24 @@
             </dd>
           </div>
         {/if}
-        <div>
-          <dt>Location</dt>
-          <dd class="location">{file.linkLabel}</dd>
-        </div>
+        {#if file.linkLabel}
+          <div>
+            <dt>Location</dt>
+            <dd class="location">{file.linkLabel}</dd>
+          </div>
+        {/if}
       </dl>
 
-      <a
-        href={file.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="open-link"
-      >
-        {isLive ? "Visit website" : "View project"} →
-      </a>
+      {#if file.url}
+        <a
+          href={file.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="open-link"
+        >
+          {file.linkText} →
+        </a>
+      {/if}
     </aside>
   </div>
 </div>
