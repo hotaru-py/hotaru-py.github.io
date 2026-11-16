@@ -4,15 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Moved to byhotaru.com</title>
-    <!-- Tells search engines the site now lives at byhotaru.com -->
-    <link rel="canonical" href="https://byhotaru.com/" />
+    <!-- Tells search engines the site now lives at www.byhotaru.com (byhotaru.com
+         itself redirects there, so pointing straight at it saves a hop) -->
+    <link rel="canonical" href="https://www.byhotaru.com/" />
     <meta name="robots" content="noindex" />
     <!-- Fallback when JavaScript is off -->
-    <meta http-equiv="refresh" content="0; url=https://byhotaru.com/" />
+    <meta http-equiv="refresh" content="0; url=https://www.byhotaru.com/" />
     <script>
       // Keep the path, query and hash, so links like ?mode=simple carry over
       location.replace(
-        "https://byhotaru.com" +
+        "https://www.byhotaru.com" +
           location.pathname +
           location.search +
           location.hash,
@@ -47,6 +48,6 @@
     </style>
   </head>
   <body>
-    <p>This site has moved to <a href="https://byhotaru.com/">byhotaru.com</a>.</p>
+    <p>This site has moved to <a href="https://www.byhotaru.com/">byhotaru.com</a>.</p>
   </body>
 </html>
