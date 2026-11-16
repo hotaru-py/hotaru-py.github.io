@@ -107,7 +107,11 @@
 
   .desktop-main {
     width: 100vw;
+    /* dvh = the height you can actually see. On phones, vh is the height with the
+       browser's address bar hidden, which left the home pages reaching below the
+       visible screen (and under the fixed-position dock) while the bar was showing. */
     height: 100vh;
+    height: 100dvh;
   }
 
   /* Mode switches: a slightly slower, eased crossfade than the browser default */
