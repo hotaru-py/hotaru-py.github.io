@@ -14,6 +14,19 @@ export const site = {
   jobTitle: "Product engineer-designer",
 };
 
+// The copyright notice, shown in the About window and Simple Mode's footer. The end year
+// is always the current one.
+export const copyright = { holder: "Prajesh Raam", since: 2024 };
+
+/** "© 2024-2026 Prajesh Raam" */
+export function copyrightLine(year = new Date().getFullYear()) {
+  const years =
+    year > copyright.since
+      ? `${copyright.since}-${year}`
+      : `${copyright.since}`;
+  return ` © ${years} ${copyright.holder}`;
+}
+
 export const about = {
   greeting: "Hello, I'm hotaru (^_^)/",
   // Shown under the greeting
@@ -31,6 +44,7 @@ export const about = {
     "Play the piano",
     "Random doodling",
     "Poke into electronics",
+    "Video games (old and new)",
     "Play some tennis",
     "Watch Movies/TV/Anime",
     "Listen to music (playlist more diverse than a friend group in a college brochure)",
@@ -262,11 +276,11 @@ export const projects = [
 
 // `id` picks the icon in the Browser window (or `icon`, when two share one)
 export const bookmarks = [
-  {
-    id: "youtube",
-    name: "YouTube Channel (this stuff)",
-    url: "https://www.youtube.com/@hotarumakes",
-  },
+  // {
+  //   id: "youtube",
+  //   name: "YouTube Channel (this stuff)",
+  //   url: "https://www.youtube.com/@hotarumakes",
+  // },
   // {
   //   id: "instagram",
   //   name: "Instagram",
@@ -317,6 +331,14 @@ export const credits = {
     character: "Firefly",
     source: "Honkai: Star Rail",
     note: "Character and artwork © HoYoverse. Non-commercial usage.",
+  },
+  // The site's typeface, an open font whose licence asks to be shown with it
+  typeface: {
+    name: "Obel Mono",
+    by: "The Obel Mono Project Authors",
+    url: "https://typographic.systems",
+    site: "typographic.systems",
+    license: "SIL Open Font License 1.1",
   },
   // NASA's terms for the p5.rain data (window and wallpaper), as the p5.rain README
   // asks: credit "NASA GPM IMERG via GIBS", GIBS's acknowledgement, no implied endorsement

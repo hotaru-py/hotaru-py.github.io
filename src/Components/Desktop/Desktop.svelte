@@ -841,10 +841,14 @@
   /* Same row as the settings cog (16px down, 44px tall) */
   .corner-clock {
     position: fixed;
-    top: calc(16px + env(safe-area-inset-top, 0px));
-    left: 20px;
+    /* 36px tall, centred on the 44px cog's row */
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    left: 12px;
     z-index: 1000;
-    height: 44px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
     display: flex;
     align-items: center;
     font-size: 17px;
@@ -860,6 +864,9 @@
     z-index: 1000;
     display: flex;
     gap: 4px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
     transform: translateX(-50%);
     transition: opacity 0.3s ease;
   }

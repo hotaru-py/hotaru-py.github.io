@@ -100,8 +100,13 @@
       box-shadow 0.15s ease;
   }
 
+  /* On a paper-coloured pill, so it reads over the wallpaper (the dock's own paper
+     panel hides the pill there) */
   .mobile-icon-title {
-    padding-top: 6px;
+    margin-top: 6px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
@@ -156,12 +161,16 @@
     height: 100%;
   }
 
+  /* In a monospace font every character is 0.6em wide, so "Experience" is 84px at 12px:
+     wider than the icon's 80px, so the label may be as wide as its text (centred under
+     the icon, into the gap beside it) up to 96px, and only wraps past that */
   .icon-title {
     text-align: center;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     word-break: break-word;
-    max-width: 88px;
+    width: max-content;
+    max-width: 96px;
     background-color: var(--color-paper);
     padding: 2px 6px;
     border-radius: 4px;

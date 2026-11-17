@@ -277,9 +277,7 @@
   }
 
   .preview-simple {
-    font-family:
-      "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas,
-      monospace;
+    font-family: var(--font-terminal);
   }
 
   .svg-defs {

@@ -416,11 +416,6 @@
 
   .grid-item.dragging {
     z-index: 2;
-    cursor: grabbing;
-  }
-
-  .grid-item.dragging :global(*) {
-    cursor: grabbing;
   }
 
   /* Widgets: the content fills the block of cells and tilts up when picked up, like an

@@ -222,9 +222,7 @@
 
   .placeholder-name {
     padding: 0 16px;
-    font-family:
-      "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas,
-      monospace;
+    font-family: var(--font-terminal);
     font-size: 13px;
     color: var(--color-ink-soft);
     text-align: center;

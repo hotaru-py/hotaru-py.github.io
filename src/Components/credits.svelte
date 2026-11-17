@@ -1,6 +1,30 @@
 <script>
+  import { getContext } from "svelte";
   import { xylophone } from "../lib/xylophone.js";
   import { credits } from "../lib/siteContent.js";
+  import { FILE_ICONS } from "../lib/workFiles.js";
+  import { playSound } from "../lib/sounds.js";
+  import LicenseViewer from "./LicenseViewer.svelte";
+  // The font's full licence, exactly as shipped with it
+  import oflText from "../assets/fonts/ObelMono-OFL.txt?raw";
+
+  // Provided by Desktop.svelte, so the licence can open in a window of its own
+  const desktop = getContext("desktop");
+
+  function openLicense() {
+    playSound("tactile", 0.1);
+    desktop?.openWindow({
+      id: "license-obel-mono",
+      title: `${credits.typeface.name} licence`,
+      icon: FILE_ICONS.text,
+      component: LicenseViewer,
+      props: {
+        title: `${credits.typeface.name}: ${credits.typeface.license}`,
+        text: oflText.replace(/\r\n/g, "\n").trim(),
+      },
+      size: { width: 640, height: 520 },
+    });
+  }
 
   // Icon for each inspiration pill, by its id in siteContent.js
   const ICONS = {
@@ -42,6 +66,25 @@
         <em>{credits.avatar.source}</em>
       </p>
       <p class="credit-text credit-note">{credits.avatar.note}</p>
+    </section>
+
+    <section class="credit-card">
+      <h3 class="credit-heading">Typeface</h3>
+      <p class="credit-text">
+        Set in <strong>{credits.typeface.name}</strong> by {credits.typeface.by}
+        (<a
+          class="credit-link"
+          href={credits.typeface.url}
+          target="_blank"
+          rel="noopener noreferrer">{credits.typeface.site}</a
+        >), under the {credits.typeface.license}.
+      </p>
+      <div class="credit-links">
+        <button type="button" class="credit-pill" onclick={openLicense}>
+          <span class="credit-pill-icon">{@html FILE_ICONS.text}</span>
+          View full licence
+        </button>
+      </div>
     </section>
 
     <section class="credit-card">
@@ -199,6 +242,9 @@
 
   /* Outlined like the skill pills; inverts on hover */
   .credit-pill {
+    background: none;
+    font: inherit;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;

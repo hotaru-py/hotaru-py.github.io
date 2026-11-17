@@ -172,7 +172,8 @@
     align-items: center;
     justify-content: center;
     border: none;
-    background: none;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
     color: var(--color-ink);
     cursor: pointer;
     transition: transform 0.15s ease;

@@ -60,8 +60,29 @@ body {
   background-color: var(--color-moss-50);
 }
 
+/* Obel Mono (SIL OFL, see assets/fonts/ObelMono-OFL.txt): Latin, Latin-1/Extended-A,
+   punctuation, arrows and the few symbols the site uses. One variable file, weights 100-900. */
+@font-face {
+  font-family: "Obel Mono";
+  src: url("./assets/fonts/obel-mono.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The site's two typefaces, both Obel Mono for now (a trial). To go back, set
+   --font-ui to "Quicksand", sans-serif and --font-terminal to "JetBrains Mono",
+   ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace. Both are still loaded
+   from index.html. */
+:root {
+  --font-ui:
+    "Obel Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-terminal:
+    "Obel Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
 body {
-  font-family: "Quicksand", sans-serif;
+  font-family: var(--font-ui);
   font-weight: 500;
   color: var(--color-ink);
 }

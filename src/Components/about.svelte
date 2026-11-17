@@ -7,7 +7,12 @@
 </script>
 
 <script>
-  import { about, emphasis, schoolName } from "../lib/siteContent.js";
+  import {
+    about,
+    emphasis,
+    schoolName,
+    copyrightLine,
+  } from "../lib/siteContent.js";
 </script>
 
 <div class="about-container">
@@ -38,6 +43,8 @@
         </li>
       {/each}
     </ul>
+
+    <p class="copyright">{copyrightLine()}</p>
 
     <h3 class="about-heading">Education</h3>
     {#each about.education as entry}
@@ -114,6 +121,13 @@
   .about-name {
     margin: 2px 0 0;
     font-size: 15px;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+  }
+
+  .copyright {
+    margin: 0 0 20px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--color-ink-muted);
   }

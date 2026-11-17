@@ -15,6 +15,7 @@
     emphasis,
     starLabel,
     schoolName,
+    copyrightLine,
   } from "../lib/siteContent.js";
   import { posts, formatPostDate, NO_POSTS } from "../lib/blogPosts.js";
 
@@ -38,6 +39,18 @@
 
   // The section being read, highlighted in the sticky bar
   let currentSection = $state("about");
+  const currentTitle = $derived(
+    sections.find((section) => section.id === currentSection)?.title ?? "",
+  );
+
+  // Phones: the sticky bar shows the current section, and a button opens the full list
+  let menuOpen = $state(false);
+  /** @type {HTMLButtonElement | undefined} */
+  let menuButton = $state();
+  function closeMenu(refocus = false) {
+    menuOpen = false;
+    if (refocus) menuButton?.focus();
+  }
 
   // A section picked from the bar stays marked while the page scrolls to it (a short
   // section near the end may never reach the top on its own)
@@ -65,7 +78,11 @@
       }
       currentSection = current;
     };
-    const onScroll = () => (frame ||= requestAnimationFrame(update));
+    const onScroll = () => {
+      // Scrolling away from an open list closes it
+      if (menuOpen) menuOpen = false;
+      frame ||= requestAnimationFrame(update);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
 
     for (const { stars } of projects) {
@@ -81,17 +98,89 @@
   });
 </script>
 
+<!-- Escape closes the phone section list -->
+<svelte:window
+  onkeydown={(e) => menuOpen && e.key === "Escape" && closeMenu(true)}
+/>
+
 <!-- Plain, markdown-flavoured version of the site: text only, top to bottom -->
 <div class="simple">
   <main class="page" id="top">
     <header>
-      <h1>
-        <span class="mark" aria-hidden="true">{"# "}</span>{site.name} ({about.realName})
-      </h1>
+      <div class="title-row">
+        <h1>
+          <span class="mark" aria-hidden="true">{"# "}</span>{site.name} ({about.realName})
+        </h1>
+        <!-- Switch website styles: back to the picker, from anywhere on the page -->
+        <span class="link switch-icon"
+          ><span class="bracket" aria-hidden="true">{"[ "}</span><button
+            type="button"
+            class="icon-button"
+            onclick={onSwitchUser}
+            aria-label="Switch website style"
+            title="Switch website style"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4" />
+            </svg></button
+          ><span class="bracket" aria-hidden="true">{" ]"}</span></span
+        >
+      </div>
       <p class="tagline">{site.jobTitle}</p>
     </header>
 
-    <!-- Sticks to the top while reading, with the current section marked -->
+    <!-- Phones: one line that sticks to the top. It names the section being read, and its
+         button opens a list of every section as big tap targets (the tab strip below
+         doesn't fit a phone: its last tabs hid off the edge with nothing to show it
+         scrolls). -->
+    <div class="jump">
+      <div class="jump-bar">
+        <span class="jump-current" aria-live="polite">
+          <span class="mark" aria-hidden="true">{"## "}</span>{currentTitle}
+        </span>
+        <button
+          type="button"
+          class="jump-toggle"
+          bind:this={menuButton}
+          aria-expanded={menuOpen}
+          aria-controls="jump-menu"
+          onclick={() => (menuOpen = !menuOpen)}
+        >
+          <span class="bracket" aria-hidden="true">{"[ "}</span>sections {menuOpen
+            ? "▴"
+            : "▾"}<span class="bracket" aria-hidden="true">{" ]"}</span>
+        </button>
+      </div>
+      {#if menuOpen}
+        <!-- Tap outside the list to close it -->
+        <button
+          type="button"
+          class="jump-backdrop"
+          tabindex="-1"
+          aria-hidden="true"
+          onclick={() => closeMenu()}
+        ></button>
+        <nav id="jump-menu" class="jump-menu" aria-label="Sections">
+          {#each sections as section}
+            <a
+              href="#{section.id}"
+              class:current={currentSection === section.id}
+              aria-current={currentSection === section.id ? "location" : undefined}
+              onclick={() => {
+                pick(section.id);
+                closeMenu();
+              }}
+              ><span class="mark" aria-hidden="true"
+                >{currentSection === section.id ? "> " : "- "}</span
+              >{section.title}</a
+            >
+          {/each}
+        </nav>
+      {/if}
+    </div>
+
+    <!-- Wider screens: tabs that stick to the top while reading, with the current
+         section marked -->
     <nav class="toc" aria-label="Sections">
       {#each sections as section}
         <a
@@ -248,7 +337,7 @@
       <p aria-hidden="true">(^_^)/</p>
       <p class="rule" aria-hidden="true">---</p>
       <p>{@render switchButton()}</p>
-      <p class="muted">© {new Date().getFullYear()} {site.name}</p>
+      <p class="muted">{copyrightLine()}</p>
     </footer>
   </main>
 </div>
@@ -292,9 +381,7 @@
     min-height: 100vh;
     background: var(--bg);
     color: var(--text);
-    font-family:
-      "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas,
-      monospace;
+    font-family: var(--font-terminal);
     font-size: 15px;
     line-height: 1.7;
   }
@@ -319,6 +406,44 @@
 
   h1 {
     font-size: 22px;
+  }
+
+  /* The title with the switch icon at the right end of its row */
+  .title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .title-row h1 {
+    min-width: 0;
+  }
+
+  .switch-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    /* Lines the 44px tap target up with the title's first line */
+    margin-top: -9px;
+  }
+
+  .icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+  }
+
+  .icon-button svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   h2 {
@@ -376,6 +501,109 @@
     color: var(--text);
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  /* --- Phone bar: the current section, and a button for the full list --- */
+  .jump {
+    display: none;
+  }
+
+  @media (max-width: 540px) {
+    /* The tab strip needs about 480px; below that the bar and list replace it */
+    .toc {
+      display: none;
+    }
+
+    .jump {
+      display: block;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      margin: 20px -20px 0;
+    }
+
+    .jump-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      padding: 0 20px;
+      background: var(--bg);
+      border-bottom: 1px dashed var(--muted);
+    }
+
+    .jump-current {
+      min-width: 0;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .jump-toggle {
+      flex-shrink: 0;
+      min-height: 48px;
+      padding: 0 4px;
+      white-space: nowrap;
+    }
+
+    /* Dims the page behind the list; sits under the bar and list but over the page */
+    .jump-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      background: color-mix(in srgb, var(--text) 28%, transparent);
+      cursor: default;
+    }
+
+    /* Floats over the page under the bar rather than pushing it down: growing the bar
+       made the browser's scroll anchoring shift the page, which closed the list */
+    .jump-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      border-bottom: 1px dashed var(--muted);
+    }
+
+    .jump-menu a {
+      display: flex;
+      align-items: center;
+      gap: 1ch;
+      min-height: 52px;
+      padding: 0 20px;
+      color: var(--muted);
+    }
+
+    .jump-menu a + a {
+      border-top: 1px dashed color-mix(in srgb, var(--muted) 45%, transparent);
+    }
+
+    .jump-menu a.current {
+      color: var(--text);
+    }
+
+    .jump-menu .mark {
+      white-space: pre;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (max-width: 540px) {
+    .jump-menu {
+      animation: jump-in 0.14s ease-out;
+    }
+
+    @keyframes jump-in {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+    }
   }
 
   /* Jumps land below the sticky bar, not under it */

@@ -43,10 +43,13 @@
   datetime={currentTime.toISOString()}
   data-wallpaper-sample
 >
-  <span class="clock-date">{date}</span>
-  <span class="clock-time">
-    {time.text}{#if time.period}<span class="clock-period">{time.period}</span
-      >{/if}
+  <!-- One paper card behind the date and time, so they read over the wallpaper -->
+  <span class="clock-face">
+    <span class="clock-date">{date}</span>
+    <span class="clock-time">
+      {time.text}{#if time.period}<span class="clock-period">{time.period}</span
+        >{/if}
+    </span>
   </span>
   {#if note}
     <span class="clock-note" transition:fade={{ duration: 300 }}>{note}</span>
@@ -70,6 +73,16 @@
     user-select: none;
     color: var(--clock-ink, var(--color-ink));
     transition: color 0.5s ease;
+  }
+
+  .clock-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 24px 8px;
+    border-radius: 28px;
+    background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
   }
 
   .clock-date {

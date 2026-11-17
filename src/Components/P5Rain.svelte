@@ -222,15 +222,6 @@
 {/snippet}
 
 <style>
-  @font-face {
-    font-family: "Obel Mono";
-    /* Latin-only cut of Obel Mono (SIL OFL, see assets/fonts/ObelMono-OFL.txt) */
-    src: url("../assets/fonts/obel-mono.woff2") format("woff2");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-  }
-
   /* --- Colours, as on the p5.rain site --- */
   .rain {
     --bg: #07090e;
