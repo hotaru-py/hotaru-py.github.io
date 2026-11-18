@@ -1,5 +1,6 @@
 <script>
   import { experience, activities } from "../lib/siteContent.js";
+  import { foldable } from "../lib/foldable.js";
 </script>
 
 <div class="experience">
@@ -22,12 +23,30 @@
   <ul class="entries">
     {#each activities as club}
       <li>
-        <span class="role">{club.org}</span>
+        <span class="role">
+          {#if club.url}<a
+              class="org-link"
+              href={club.url}
+              target="_blank"
+              rel="noopener noreferrer">{club.org}</a
+            >{:else}{club.org}{/if}
+        </span>
         <ul class="roles">
           {#each club.roles as entry}
             <li>
-              <span class="role-name">{entry.role}</span>
-              <span class="sub">{entry.period}</span>
+              {#if entry.description}
+                <!-- The details fold open under the role -->
+                <details use:foldable>
+                  <summary>
+                    <span class="role-name">{entry.role}</span>
+                    {#if entry.period}<span class="sub">{entry.period}</span>{/if}
+                  </summary>
+                  <p class="desc">{entry.description}</p>
+                </details>
+              {:else}
+                <span class="role-name">{entry.role}</span>
+                {#if entry.period}<span class="sub">{entry.period}</span>{/if}
+              {/if}
             </li>
           {/each}
         </ul>
@@ -91,6 +110,46 @@
 
   .roles li + li {
     margin-top: 8px;
+  }
+
+  .org-link {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .desc {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+
+  summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    padding-right: 22px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: "+";
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-weight: 700;
+    color: var(--color-ink-muted);
+  }
+
+  details[open]:not([data-expanded="false"]) > summary::after {
+    content: "−";
   }
 
   .role-name {

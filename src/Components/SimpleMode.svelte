@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { fetchStars } from "../lib/githubStars.js";
+  import { foldable } from "../lib/foldable.js";
   import {
     site,
     about,
@@ -276,9 +277,21 @@
       <ul>
         {#each activities as club}
           <li>
-            <strong>{club.org}</strong>
-            {#each club.roles as entry}<br />{entry.role}
-              <span class="muted">({entry.period})</span>{/each}
+            {#if club.url}{@render link(club.url, club.org)}{:else}<strong>{club.org}</strong>{/if}
+            {#each club.roles as entry}
+              {#if entry.description}
+                <!-- The details fold open under the role -->
+                <details class="role-detail" use:foldable>
+                  <summary>
+                    {entry.role}
+                    {#if entry.period}<span class="muted">({entry.period})</span>{/if}
+                  </summary>
+                  <p class="muted">{entry.description}</p>
+                </details>
+              {:else}<span class="role-line"
+                  >{entry.role}
+                  {#if entry.period}<span class="muted">({entry.period})</span>{/if}</span
+                >{/if}{/each}
           </li>
         {/each}
       </ul>
@@ -676,7 +689,7 @@
     color: var(--muted);
   }
 
-  details[open] > summary::after {
+  details[open]:not([data-expanded="false"]) > summary::after {
     content: " −";
   }
 
@@ -687,6 +700,24 @@
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  /* A role's details, folding open inside its club's list item */
+  .role-detail {
+    margin-top: 0;
+  }
+
+  .role-line {
+    display: block;
+  }
+
+  .role-detail summary {
+    font-weight: 500;
+  }
+
+  .role-detail p {
+    margin-top: 4px;
+    margin-bottom: 8px;
   }
 
   .listing li + li {

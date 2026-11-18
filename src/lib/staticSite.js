@@ -152,7 +152,7 @@ export function renderStaticPage() {
     `</ul><h3>Clubs &amp; Activities</h3><ul>`,
     ...activities.map((club) =>
       li(
-        `<strong>${esc(club.org)}</strong>${club.roles.map((r) => `<br />${esc(r.role)} (${esc(r.period)})`).join("")}`,
+        `${club.url ? linkHtml(club.url, club.org) : `<strong>${esc(club.org)}</strong>`}${club.roles.map((r) => `<br />${esc(r.role)}${r.period ? ` (${esc(r.period)})` : ""}${r.description ? `<br />${esc(r.description)}` : ""}`).join("")}`,
       ),
     ),
     `</ul></section>`,
@@ -257,7 +257,7 @@ export function renderLlmsTxt() {
     "",
     ...activities.map(
       (club) =>
-        `- ${club.org}: ${club.roles.map((r) => `${r.role} (${r.period})`).join("; ")}`,
+        `- ${club.org}: ${club.roles.map((r) => `${r.role}${r.period ? ` (${r.period})` : ""}`).join("; ")}${club.url ? ` (${club.url})` : ""}`,
     ),
     "",
     "## Skills",

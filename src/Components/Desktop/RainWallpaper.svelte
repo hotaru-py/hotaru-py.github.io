@@ -24,6 +24,24 @@
     ".window-container.maximized:not(.minimized), .mobile-window-container:not(.minimized)";
   const DEMO = ".window-container:not(.minimized) [data-p5rain-demo]";
 
+  // Faint grid lines in the 1px gaps between the squares, only on this wallpaper
+  const GRID_LINE = "rgba(70, 92, 36, 0.05)";
+  const GRID_LINE_TENTH = "rgba(70, 92, 36, 0.1)";
+  function drawGridLines(ctx, g) {
+    const { cell, ox, oy, rows } = g;
+    const x1 = ox + 240 * cell;
+    const y1 = oy + rows * cell;
+    for (let i = 1, x = ox + cell - 1; x <= x1; i++, x += cell) {
+      // Every 10th line, across and down, is stronger
+      ctx.fillStyle = i % 10 === 0 ? GRID_LINE_TENTH : GRID_LINE;
+      ctx.fillRect(x, oy, 1, y1 - oy);
+    }
+    for (let i = 1, y = oy + cell - 1; y <= y1; i++, y += cell) {
+      ctx.fillStyle = i % 10 === 0 ? GRID_LINE_TENTH : GRID_LINE;
+      ctx.fillRect(ox, y, x1 - ox, 1);
+    }
+  }
+
   /** @type {HTMLDivElement} */
   let layer;
   let ready = $state(false);
@@ -65,8 +83,8 @@
               source: "weekly",
               theme: "light",
               palette: "moss",
-              style: "breathe",
-              grid: "free",
+              style: "flow",
+              grid: "snap",
               background: false,
               start: 96,
             });
@@ -85,6 +103,7 @@
             );
             field.update();
             p.background(paper || "#f8f7ed");
+            if (field._g) drawGridLines(p.drawingContext, field._g);
             field.draw();
             // Fade out and back in where the week loops, instead of a hard cut (the
             // page's own paper colour shows through, so it just goes quiet)

@@ -83,7 +83,7 @@ export const experience = [
 ];
 
 // College clubs and activities, shown after work experience. Each club lists its roles,
-// most recent first.
+// most recent first. `url` (club) and `period` and `description` (role) are optional; a description folds open under its role.
 export const activities = [
   {
     org: "SNUC Coding Club",
@@ -112,11 +112,65 @@ export const activities = [
     ],
   },
   {
-    org: "Shiv Nadar University Chennai",
+    org: "Team Edita",
+    url: "https://www.editactf.tech",
     roles: [
-      { role: "Graphic Designer - Marketing", period: "Sep 2023 - Mar 2024" },
+      {
+        role: "Founding member",
+        period: "2023 - Present",
+        description:
+          "Joined a bunch of people I met online to do CTFs, then organized them, and a few more things.",
+      },
     ],
   },
+  {
+    org: "SSN-SNUC MUN Society",
+    roles: [
+      {
+        role: "Under Secretary General - Tech",
+        period: "2025 - 2026",
+        description:
+          "Led the technical development of things the conference used, while building some of the frontend and backend myself.",
+      },
+      {
+        role: "General Administrator - Tech",
+        period: "2024 - 2025",
+        description:
+          "Worked on the design and development of the website, working on most components and pages.",
+      },
+    ],
+  },
+  {
+    org: "University Work",
+    roles: [
+      {
+        role: "Website Head, SSN-SNUC Invente '26",
+        period: "Jul - Sep 2026",
+        description:
+          "Coordinated design, frontend and backend teams for the website and other technologies used across the technical festival, while building initial identity and a few pages and components in the website myself.",
+      },
+      {
+        role: "Frontend Developer & UI/UX Designer, University Faculty and Student Capstone Portal",
+        description:
+          "Absolutely hated the UI of the portal, so volunteered to replace it with a visually better, on-brand and significant usable interface with a design system implemented for future reference and scope creep.",
+      },
+      {
+        role: "Conference Website Developer",
+        description: "NCVPRIPG '26 GLOFeagles Challenge & ICACM '27",
+      },
+      {
+        role: "Web Designer & Developer, SSN-SNUC Instincts '26",
+        period: "Jan - Mar 2026",
+        description:
+          "Designed and developed initial identity, components and pages for the university's annual cultural festival, as one of the lead designers and developers.",
+      },
+      {
+        role: "Graphic Designer - Marketing, SNUC",
+        period: "Sep 2023 - Mar 2024",
+      },
+    ],
+  },
+  // (if anyone from the team is reading this, love y'all, best team)
 ];
 
 // The phone's Featured widget: something new, or anything worth showing off. `file` is
