@@ -3,7 +3,7 @@
    * A licence (or any plain text file) in a window of its own. The words are exactly the
    * file's; only its hard line breaks are dropped, so paragraphs wrap to the window
    * instead of leaving ragged half-lines on a phone. Rules of dashes become dividers and
-   * all-caps lines headings.
+   * all-caps (or "## ") lines headings.
    * @typedef {Object} Props
    * @property {string} title
    * @property {string} text
@@ -13,7 +13,8 @@
   /** @type {Props} */
   let { title, text } = $props();
 
-  const isRule = (line) => /^-{4,}$/.test(line);
+  const isRule = (line) => /^-{3,}$/.test(line);
+  const markdownHeading = (line) => /^#{1,6}\s+(.+)$/.exec(line)?.[1];
   const isHeading = (line) =>
     line.length <= 40 &&
     /[A-Z]{3}/.test(line) &&
@@ -33,10 +34,14 @@
       else if (isRule(line)) {
         flush();
         blocks.push({ kind: "rule" });
-      } else if (isHeading(line)) {
+      } else if (markdownHeading(line) || isHeading(line)) {
         flush();
-        blocks.push({ kind: "heading", text: line });
-      } else lines.push(line);
+        blocks.push({ kind: "heading", text: markdownHeading(line) ?? line });
+      } else {
+        // Each "Copyright (c) ..." line stands alone, rather than running together
+        if (/^Copyright \(c\)/i.test(line)) flush();
+        lines.push(line);
+      }
     }
     flush();
     // A line between two rules is a title, too

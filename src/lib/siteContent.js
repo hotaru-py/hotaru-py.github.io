@@ -11,12 +11,12 @@ export const site = {
   title: "hotaru | i make stuff that looks good to me",
   description:
     "random infodump about the individual known as Prajesh (or) hotaru",
-  jobTitle: "Product engineer-designer",
+  jobTitle: "mix of a designer-developer",
 };
 
 // The copyright notice, shown in the About window and Simple Mode's footer. The end year
 // is always the current one.
-export const copyright = { holder: "Prajesh Raam", since: 2024 };
+export const copyright = { holder: "Prajesh Raam / hotaru", since: 2024 };
 
 /** "© 2024-2026 Prajesh Raam" */
 export function copyrightLine(year = new Date().getFullYear()) {
@@ -72,7 +72,7 @@ export const experience = [
   {
     role: "Web Development, UI/UX & Graphic Design",
     company: "Freelance (on and off)",
-    period: "2021 - Present",
+    period: "2020 - Present",
   },
   {
     role: "Software Development Engineering Intern",
@@ -316,7 +316,7 @@ export const credits = {
   inspiration: {
     lead: "Website inspired by",
     name: "shar",
-    aside: "wholesome content, do watch",
+    aside: "w person",
     // `id` picks the icon on the pill
     links: [
       { id: "website", label: "sharyap.com", url: "https://sharyap.com" },
@@ -334,10 +334,10 @@ export const credits = {
   },
   // The site's typeface, an open font whose licence asks to be shown with it
   typeface: {
-    name: "Obel Mono",
-    by: "The Obel Mono Project Authors",
-    url: "https://typographic.systems",
-    site: "typographic.systems",
+    name: "Ioskeley Mono",
+    by: "Ahmed Hatem, built on Iosevka by Renzhi Li",
+    url: "https://github.com/ahatem/IoskeleyMono",
+    site: "github.com/ahatem/IoskeleyMono",
     license: "SIL Open Font License 1.1",
   },
   // NASA's terms for the p5.rain data (window and wallpaper), as the p5.rain README

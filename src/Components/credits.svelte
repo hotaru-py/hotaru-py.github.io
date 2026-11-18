@@ -6,7 +6,7 @@
   import { playSound } from "../lib/sounds.js";
   import LicenseViewer from "./LicenseViewer.svelte";
   // The font's full licence, exactly as shipped with it
-  import oflText from "../assets/fonts/ObelMono-OFL.txt?raw";
+  import oflText from "../assets/fonts/IoskeleyMono-OFL.txt?raw";
 
   // Provided by Desktop.svelte, so the licence can open in a window of its own
   const desktop = getContext("desktop");
@@ -14,7 +14,7 @@
   function openLicense() {
     playSound("tactile", 0.1);
     desktop?.openWindow({
-      id: "license-obel-mono",
+      id: "license-font",
       title: `${credits.typeface.name} licence`,
       icon: FILE_ICONS.text,
       component: LicenseViewer,

@@ -164,8 +164,8 @@
       corner: "top-right",
     },
     {
-      id: "widget-soon",
-      widget: soonWidget,
+      id: "widget-featured",
+      widget: featuredWidget,
       span: { cols: 2, rows: 2 },
       square: true,
       corner: "top-right",
@@ -173,8 +173,8 @@
       cornerRowOffset: 2,
     },
     {
-      id: "widget-featured",
-      widget: featuredWidget,
+      id: "widget-soon",
+      widget: soonWidget,
       span: { cols: 2, rows: 2 },
       square: true,
       corner: "top-right",
@@ -571,8 +571,8 @@
             <BlogWidget onOpenPost={openPost} onViewAll={openAllPosts} />
           </div>
           <div class="widget-row">
-            <SoonWidget />
             <FeaturedWidget onOpenFile={(file) => openWindow(fileWindow(file))} />
+            <SoonWidget />
           </div>
         </section>
       </div>

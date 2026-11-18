@@ -1,5 +1,11 @@
 <script>
-  import { posts, formatPostDate, NO_POSTS } from "../lib/blogPosts.js";
+  import {
+    posts,
+    formatPostDate,
+    preview,
+    NO_POSTS,
+    BLOG_TITLE,
+  } from "../lib/blogPosts.js";
   import { blogNav } from "../lib/blogNav.svelte.js";
   import { emphasis } from "../lib/siteContent.js";
   import { playSound } from "../lib/sounds.js";
@@ -55,7 +61,7 @@
     </article>
   {:else}
     <div in:fly={slide(-28)}>
-      <h2 class="title">Blog</h2>
+      <h2 class="title">{BLOG_TITLE}</h2>
       {#if posts.length === 0}
         <p class="empty">{NO_POSTS}</p>
       {:else}
@@ -70,7 +76,7 @@
               >
                 <span class="entry-title">{entry.title}</span>
                 <span class="date">{formatPostDate(entry.date)}</span>
-                <span class="summary">{entry.summary}</span>
+                <span class="summary">{preview(entry)}</span>
               </button>
             </li>
           {/each}
@@ -138,6 +144,11 @@
     font-size: 14px;
     line-height: 1.5;
     color: var(--color-ink-soft);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .back {

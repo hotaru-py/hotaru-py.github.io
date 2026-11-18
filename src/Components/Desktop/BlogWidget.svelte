@@ -2,6 +2,7 @@
   import {
     latestPosts,
     formatPostDate,
+    preview,
     NO_POSTS,
   } from "../../lib/blogPosts.js";
 
@@ -32,7 +33,7 @@
           <button type="button" class="post" onclick={() => onOpenPost(post.id)}>
             <span class="title">{post.title}</span>
             <span class="date">{formatPostDate(post.date)}</span>
-            <span class="summary">{post.summary}</span>
+            <span class="summary">{preview(post)}</span>
           </button>
         </li>
       {/each}

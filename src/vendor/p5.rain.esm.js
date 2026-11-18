@@ -1,6 +1,6 @@
-// Copied from github.com/hotaru-py/p5-rain at 3046446 plus batched drawing (src/batch.js),
-// built with `npm run build` (dist/p5.rain.esm.js). Update by copying a fresh build over
-// this file.
+// Copied from github.com/hotaru-py/p5-rain at 3046446 plus batched drawing (src/batch.js)
+// and the optional world map (src/landmask.js), built with `npm run build`
+// (dist/p5.rain.esm.js). Update by copying a fresh build over this file.
 /*! p5.rain v0.1.0 | MIT | NASA IMERG precipitation for p5.js | data: NASA GPM IMERG via GIBS */
 
 // src/util.js
@@ -760,7 +760,88 @@ var RectBatch = class {
   }
 };
 
+// src/landdata.js
+var LAND_B64 = [
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAwD8/wAAAAAAAAAAAAAAAAAAAAAA",
+  "AAAAAAAAAPD///////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//8////z8AAOADgNMAAOADAAAAAAAAAAAAAAAAvPw//////wcA",
+  "gN8AAAAAAAA/AAAAAAAAAAAAAAAnAPEP/////wcAAI4AAAAAAABwAAAAAAAAAAAAAID/f/8HAP///wcAAAAAAMAPAPD/DwD4AQAA",
+  "AAAAAOATQO8HAPz//wcAAAAAAHAAAP3/BwAAAAAAAAAAAOD/8/c/APj//wEAAAAAABjA8P///z/AAQAAAYABAGD+R/P/Afj//wMA",
+  "AAAAADjg////////vwGAAPj/x//8z4f/B/D//wAAAPA/AIDn//////////d9B/7///9/59/jD/D/HwAAAPz/Z////f//////////",
+  "P/T///////+Bf/D/AwAAAP7/7///////////////PP/////////xP+A/AH4AAH9//P//////////////APD//////8+TH8AfAB4A",
+  "wP////////////////9/AP7//////wPxDIAPAAAA+M////////////////+/AP7//////wHwAwAPAAAA+M////////////////gH",
+  "APAL+P///wHwMwAAAAAA+A//////////////fxwAAIAD4P///wPwfwAAAAB4QEf///////////8/AB4AAGAAwP///z/gfwAAAABw",
+  "YMf///////////8PAA8AAAAAgP/////5/wMAAAD8wPn///////////8PAA8AAAAAgP7////7/wcAAADu+f//////////////AAMA",
+  "AAAAAPz//////wcAAADm/f//////////////AAMAAAAAAPj//////wYAAAAg//////////////+/AAAAAAAAAPD/////Hw4AAADg",
+  "//////////////+/AAAAAAAAAOD/////HxwAAADA///////////////fAAAAAAAAAOD//////wAAAACA///P/vj///////8PAAAA",
+  "AAAAAOD/////FwAAAACA//0H/vz////////HAAAAAAAAAOD/////AQAAAAD8g/sH+Pz////////hAAAAAAAAAOD/////AQAAAAD8",
+  "Q+////H//////38gAAAAAAAAAOD///9/AAAAAAD8YGz+//n//////x5gAAAAAAAAAMD///8/AAAAAAD8AMb8//H/////fzggAAAA",
+  "AAAAAMD///8fAAAAAAB4fgL8/////////zM4AAAAAAAAAID///8fAAAAAADwfwAA/////////zA/AAAAAAAAAAD+//8PAAAAAAD4",
+  "/wCA/////////4EHAAAAAAAAAAD8//8DAAAAAAD8/+OA/////////8EAAAAAAAAAAAD8//8DAAAAAAD+/////////////wEAAAAA",
+  "AAAAAADo/wkDAAAAAAD+//////z//////wEAAAAAAAAAAADQfwAGAAAAAID///////3//////wEAAAAAAAAAAACgfwAGAAAAAMD/",
+  "//9//8P//////wAAAAAAAAAAAAAgfwAAAAAAAMD//////jfw////fwEAAAAAAAAAAABAfgAGAAAAAOD//////P/A////PwEAAAAA",
+  "AAAAAAAAfiAcAAAAAOD//////f/A/+//BwAAAAAAAAABAAAA/jiwAAAAAOD//////X8A/8N/AgAAAAAAAAAAAAAA/D2AAwAAAOD/",
+  "////+T8A/8F/AwAAAAAAAAAAAAAA8B8AAAAAAOD/////8x8AfoD/AAMAAAAAAAAAAAAAgP4AAAAAAOD/////9wcAPoD+AQEAAAAA",
+  "AAAAAAAAAPwBAAAAAOD//////wEAPgD+AQEAAAAAAAAAAAAAAOAAAAAAAOD/////PwAAPAD+AQEAAAAAAAAAAAAAAMDAAwAAAMD/",
+  "////nwMAHADkAQoAAAAAAAAAAAAAAIDhfwAAAID//////wMAGABCAAQAAAAAAAAAAAAAAAD//wEAAID//////wMAKAAGABwAAAAA",
+  "AAAAAAAAAADw/wMAAAD//////wEAYAAMQAgAAAAAAAAAAAAAAADw/x8AAAD++P///wEAAIAZYAAAAAAAAAAAAAAAAADw/z8AAAAA",
+  "wP///wAAAAAbeAAAAAAAAAAAAAAAAAD4/38AAAAAwP//fwAAAAAefAAAAAAAAAAAAAAAAAD4/38AAAAAwP//HwAAAAAcfycAAAAA",
+  "AAAAAAAAAAD8//8BAAAAwP//DwAAAAA4voIBAAAAAAAAAAAAAAD8//8PAAAAwP//DwAAAAB4vgE7AAAAAAAAAAAAAAD8//9/AAAA",
+  "gP//BwAAAABwkFP/AQAAAAAAAAAAAAD8////AAAAAP//AwAAAABgAAD4MwAAAAAAAAAAAAD8////AQAAAP//AwAAAADABwDwAwAA",
+  "AAAAAAAAAAD4////AQAAAP7/AwAAAAAAfgHwBgAAAAAAAAAAAADw////AAAAAP7/BwAAAAAAAAAADAAAAAAAAAAAAADw//9/AAAA",
+  "AP7/BwAAAAAAAAABAAAAAAAAAAAAAADg//9/AAAAAP7/BwEAAAAAAIDHAAAAAAAAAAAAAADg//8/AAAAAP//BwMAAAAAANDHAQAA",
+  "AAAAAAAAAADA//8/AAAAAP//xwMAAAAAAPjPAQAAAAAAAAAAAAAA//8/AAAAAP//4wEAAAAAAP7/AwBAAAAAAAAAAAAA/v8/AAAA",
+  "AP//4AEAAAAAAP7/AwAAAAAAAAAAAAAA/v8fAAAAAP7/4AEAAAAAwP//BwAAAAAAAAAAAAAA/v8fAAAAAP7/4AAAAAAA8P//D0AA",
+  "AAAAAAAAAAAA/v8HAAAAAP7/4AAAAAAA8P//HwAAAAAAAAAAAAAA/v8BAAAAAPx/4AAAAAAA8P//PwAAAAAAAAAAAAAA/v8AAAAA",
+  "APw/AAAAAAAA8P//PwAAAAAAAAAAAAAA//8AAAAAAPw/AAAAAAAA8P//PwAAAAAAAAAAAAAA/38AAAAAAPgfAAAAAAAA8P//fwAA",
+  "AAAAAAAAAAAA/z8AAAAAAPgfAAAAAAAA4P//PwAAAAAAAAAAAAAA/x8AAAAAAPAPAAAAAAAA4D//PwAAAAAAAAAAAAAA/x8AAAAA",
+  "APADAAAAAAAA4Af8HwAAAAAAAAAAAAAA/wMAAAAAAAAAAAAAAAAAQAD4HwAIAAAAAAAAAACA/wMAAAAAAAAAAAAAAAAAAADgDwAQ",
+  "AAAAAAAAAACA/wMAAAAAAAAAAAAAAAAAAADABwBwAAAAAAAAAACAfwAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAACAPwAAAAAA",
+  "AAAAAAAAAAAAAAAABwAcAAAAAAAAAADAHwAAAAAAAAAAAAAAAAAAAAAABgAMAAAAAAAAAACAHwAAAAAAAAAAAAAAAAAAAAAAAAAH",
+  "AAAAAAAAAADABwAAAAAAAAAAAAAAAAAAAAAAAIADAAAAAAAAAADADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgDwAAAAAA",
+  "AAAAAABAAAAAAAAAAAAAAAAAAAAAAADAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAwEAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "AAAAAAAAAACABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAA",
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAAAAAAAD4AAP7/H97/AAAA",
+  "AAAAAAAAAAAAGAAAAAAAAAAA+P9/8P//////HwAAAAAAAAAAAAAAfwAAAAAAAADg//8//v///////wcAAAAAAAAAAADAfwAAAAD+",
+  "//////+///////////8DAAAAAAAA8Bkg/wAAAMD///////////////////8BAAAAAPwv8P//fwAAAPD//////////////////z8A",
+  "AADA////////HwAAwP///////////////////x8AAMD///////8/AAAA/v///////////////////x8AABj///////8PBsAH////",
+  "//////////////////8AAADw//////8/yPAH/P///////////////////wcAAAD/////////f4D5/////////////////////w8A",
+  "AMz///////////////////////////////////8D////////////////////////////////////////////////////////////",
+  "////////////////////////////////////////////////////////////////////////////////////////////////////"
+].join("");
+
+// src/landmask.js
+var INLAND = 1;
+var COAST = 2;
+var mask = null;
+function landMask() {
+  if (mask) return mask;
+  const bits = fromBase64(LAND_B64);
+  const land = new Uint8Array(N);
+  for (let c = 0; c < N; c++) land[c] = bits[c >> 3] >> (c & 7) & 1;
+  mask = new Uint8Array(N);
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const c = y * COLS + x;
+      if (!land[c]) continue;
+      const west = land[y * COLS + (x + COLS - 1) % COLS];
+      const east = land[y * COLS + (x + 1) % COLS];
+      const north = y > 0 ? land[c - COLS] : 1;
+      const south = y < ROWS - 1 ? land[c + COLS] : 1;
+      mask[c] = west && east && north && south ? INLAND : COAST;
+    }
+  }
+  return mask;
+}
+
 // src/field.js
+var MAP_STRENGTH = 0.3;
+var MAP_INLAND_SHARE = 0.5;
+var RAIN_OVER_MAP = 0.72;
+var MAP_INK_DARK = [205, 218, 238];
+var MAP_INK_LIGHT = [26, 30, 42];
 var LEVELS = 64;
 var COLOURS = LEVELS * 2;
 var ALPHAS = 21;
@@ -793,6 +874,8 @@ var DEFAULTS = Object.freeze({
   // fixed cell size in px (overrides fit)
   stain: 0.55,
   // strength of the window-total stain, 0..1
+  map: false,
+  // faint pixel world map under the rain; true | false | strength 0..1
   intensity: 1,
   // strength of the rain colours, 0..1
   lens: true,
@@ -900,6 +983,10 @@ var RainField = class {
     o.speed = Number(o.speed) || 0;
     o.stain = clamp(Number(o.stain) || 0, 0, 1);
     o.intensity = clamp(o.intensity == null ? 1 : Number(o.intensity), 0, 1);
+    if (o.map == null || o.map === false) o.map = false;
+    else if (o.map === true) o.map = MAP_STRENGTH;
+    else if (typeof o.map === "number" && !Number.isNaN(o.map)) o.map = clamp(o.map, 0, 1) || false;
+    else throw new Error("p5.rain: map must be true, false or a strength from 0 to 1");
     this.o = o;
     if (this._g) this._layout(this._g.w, this._g.h);
   }
@@ -958,6 +1045,7 @@ var RainField = class {
     if (this._off) this._off();
     this._off = null;
     this._stainCache = null;
+    this._mapCache = null;
   }
   // ---------------------------------------------------------------------------
   // simulation
@@ -1149,6 +1237,7 @@ var RainField = class {
     const ctx = this.p.drawingContext, o = this.o, st = this.st, g = this._g;
     const T = paletteLUT(st.mode, st.palFrom, st.palTo, st.pm, o.stain, o.intensity);
     const solid = o.background;
+    const opaque = solid && !o.map;
     ctx.save();
     ctx.beginPath();
     ctx.rect(x, y, w, h);
@@ -1162,12 +1251,64 @@ var RainField = class {
       const cell = g.cell;
       const xa = Math.max(0, Math.floor(-g.ox / cell)), xb = Math.min(COLS, Math.ceil((w - g.ox) / cell));
       const ya = Math.max(0, Math.floor(-g.oy / cell)), yb = Math.min(g.rows, Math.ceil((h - g.oy) / cell));
-      this._drawStain(ctx, T, solid, xa, xb, ya, yb);
-      if (o.style === "flow") this._drawFlow(ctx, T, solid);
-      else this._drawBreathe(ctx, T, solid, xa, xb, ya, yb);
+      if (o.map) this._drawMap(ctx, T, solid, xa, xb, ya, yb);
+      this._drawStain(ctx, T, opaque, xa, xb, ya, yb);
+      if (o.style === "flow") this._drawFlow(ctx, T, opaque);
+      else this._drawBreathe(ctx, T, opaque, xa, xb, ya, yb);
     }
     ctx.restore();
     return this;
+  }
+  // The world map never moves (the lens pushes rain, not geography), so it is drawn once
+  // into an offscreen canvas and copied each frame, and redrawn only when the layout, its
+  // strength or the theme change.
+  _drawMap(ctx, T, solid, xa, xb, ya, yb) {
+    const g = this._g, w = g.w, h = g.h;
+    const m = typeof ctx.getTransform === "function" ? ctx.getTransform() : null;
+    if (!m || typeof document === "undefined") {
+      this._mapCells(ctx, T, solid, xa, xb, ya, yb);
+      return;
+    }
+    const sx = Math.hypot(m.a, m.b), sy = Math.hypot(m.c, m.d);
+    const key = `${w}|${h}|${g.cell}|${g.ox}|${g.oy}|${g.r0}|${solid}|${this.o.map}|${sx}|${sy}|${Math.round(this.st.mode * 60)}`;
+    let M = this._mapCache;
+    if (!M || M.key !== key) {
+      if (!M) M = this._mapCache = { cv: document.createElement("canvas") };
+      const cw = Math.max(1, Math.ceil(w * sx)), ch = Math.max(1, Math.ceil(h * sy));
+      if (M.cv.width !== cw || M.cv.height !== ch) {
+        M.cv.width = cw;
+        M.cv.height = ch;
+      }
+      const mc = M.cv.getContext("2d", { willReadFrequently: true });
+      mc.setTransform(1, 0, 0, 1, 0, 0);
+      mc.clearRect(0, 0, cw, ch);
+      mc.setTransform(sx, 0, 0, sy, 0, 0);
+      this._mapCells(mc, T, solid, xa, xb, ya, yb);
+      M.key = key;
+    }
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(M.cv, 0, 0, w, h);
+    ctx.restore();
+  }
+  _mapCells(ctx, T, solid, xa, xb, ya, yb) {
+    const g = this._g, cell = g.cell, inner = Math.max(1, cell - 1), land = landMask();
+    const k = this.o.map;
+    const ink = mix(MAP_INK_DARK, MAP_INK_LIGHT, this.st.mode);
+    for (const [kind, share] of [[INLAND, MAP_INLAND_SHARE], [COAST, 1]]) {
+      if (solid) ctx.fillStyle = css(mix(T.bgRGB, ink, k * share));
+      else {
+        ctx.fillStyle = css(ink);
+        ctx.globalAlpha = k * share;
+      }
+      for (let yy = ya; yy < yb; yy++) {
+        const row = (g.r0 + yy) * COLS;
+        for (let x = xa; x < xb; x++) {
+          if (land[row + x] === kind) ctx.fillRect(g.ox + x * cell, g.oy + yy * cell, inner, inner);
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
   }
   // The stain (total over the window) only changes with the data, layout or colours, so it
   // is drawn once into an offscreen canvas and copied each frame: redrawing ~28 800 cells
@@ -1237,7 +1378,7 @@ var RainField = class {
     const rain = solid ? T.rain : T.rainRaw, snow = solid ? T.snow : T.snowRaw;
     const drift = this.o.grid === "snap" ? 0 : cell;
     const batch = this._breatheBatch || (this._breatheBatch = new RectBatch(COLOURS));
-    if (!solid) ctx.globalAlpha = this.o.intensity;
+    if (!solid) ctx.globalAlpha = this.o.intensity * (this.o.map ? RAIN_OVER_MAP : 1);
     for (let yy = ya; yy < yb; yy++) {
       const y = g.r0 + yy;
       for (let x = xa; x < xb; x++) {
@@ -1258,7 +1399,7 @@ var RainField = class {
     const g = this._g, cell = g.cell, inner = Math.max(1, cell - 1), snap = this.o.grid === "snap";
     const { px, py, pa, plv, psn, dispX, dispY, boost } = this;
     const rain = solid ? T.rain : T.rainRaw, snow = solid ? T.snow : T.snowRaw;
-    const scale = solid ? 1 : this.o.intensity;
+    const scale = solid ? 1 : this.o.intensity * (this.o.map ? RAIN_OVER_MAP : 1);
     const batch = this._flowBatch || (this._flowBatch = new RectBatch(ALPHAS * COLOURS));
     for (let k = 0; k < this.pn; k++) {
       const gx = snap ? Math.round(px[k]) % COLS : px[k], gy = snap ? Math.round(py[k]) : py[k];

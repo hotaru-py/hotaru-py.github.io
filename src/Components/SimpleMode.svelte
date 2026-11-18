@@ -17,7 +17,13 @@
     schoolName,
     copyrightLine,
   } from "../lib/siteContent.js";
-  import { posts, formatPostDate, NO_POSTS } from "../lib/blogPosts.js";
+  import {
+    posts,
+    formatPostDate,
+    preview,
+    NO_POSTS,
+    BLOG_TITLE,
+  } from "../lib/blogPosts.js";
 
   /**
    * @typedef {Object} Props
@@ -37,13 +43,65 @@
     { id: "links", title: "Links" },
   ];
 
-  // The section being read, highlighted in the sticky bar
-  let currentSection = $state("about");
+  // One tab at a time, with the address as a path: #about, #blog, #blog/<post id>. The
+  // tab is the top directory and anything inside it (a blog post) a subdirectory, so the
+  // browser's back button and shared links work like a file tree.
+  const tabIds = sections.map((section) => section.id);
+
+  // Every project as a page of its own, under its group's heading in the Projects list
+  const slug = (name) =>
+    name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const projectGroups = [
+    {
+      title: "Live Work",
+      entries: liveWork.map((live) => ({
+        id: slug(live.name),
+        name: live.name,
+        description: live.description,
+        url: live.url,
+        linkLabel: live.domain,
+      })),
+    },
+    {
+      title: "Personal Projects",
+      entries: projects.map((project) => ({
+        id: slug(project.name),
+        name: project.name,
+        description: project.description,
+        url: project.link,
+        linkLabel: "View on GitHub",
+        stars: project.stars,
+      })),
+    },
+  ];
+  const allProjects = projectGroups.flatMap((group) => group.entries);
+  function parseHash() {
+    const [tab, sub] = location.hash.replace(/^#\/?/, "").split("/");
+    const id = tabIds.includes(tab) ? tab : "about";
+    return {
+      tab: id,
+      sub:
+        (id === "blog" && posts.some((post) => post.id === sub)) ||
+        (id === "projects" && allProjects.some((entry) => entry.id === sub))
+          ? sub
+          : null,
+    };
+  }
+  let route = $state(parseHash());
+  const currentSection = $derived(route.tab);
   const currentTitle = $derived(
-    sections.find((section) => section.id === currentSection)?.title ?? "",
+    sections.find((section) => section.id === route.tab)?.title ?? "",
+  );
+  const openPost = $derived(
+    route.tab === "blog" ? (posts.find((post) => post.id === route.sub) ?? null) : null,
+  );
+  const openProject = $derived(
+    route.tab === "projects"
+      ? (allProjects.find((entry) => entry.id === route.sub) ?? null)
+      : null,
   );
 
-  // Phones: the sticky bar shows the current section, and a button opens the full list
+  // Phones: the sticky bar shows the current tab, and a button opens the full list
   let menuOpen = $state(false);
   /** @type {HTMLButtonElement | undefined} */
   let menuButton = $state();
@@ -52,37 +110,19 @@
     if (refocus) menuButton?.focus();
   }
 
-  // A section picked from the bar stays marked while the page scrolls to it (a short
-  // section near the end may never reach the top on its own)
-  let holdUntil = 0;
-  function pick(id) {
-    currentSection = id;
-    holdUntil = Date.now() + 1000;
-  }
-
   /** @type {Record<string, number>} */
   let liveStars = $state({});
 
   onMount(() => {
-    // The current section is the last one whose heading has scrolled above a line a
-    // third of the way down the screen
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      if (Date.now() < holdUntil) return;
-      const line = window.innerHeight / 3;
-      let current = sections[0].id;
-      for (const { id } of sections) {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= line) current = id;
-      }
-      currentSection = current;
+    // A new page starts at the top, under the bar
+    const onHash = () => {
+      route = parseHash();
+      menuOpen = false;
+      window.scrollTo({ top: 0, behavior: "instant" });
     };
-    const onScroll = () => {
-      // Scrolling away from an open list closes it
-      if (menuOpen) menuOpen = false;
-      frame ||= requestAnimationFrame(update);
-    };
+    window.addEventListener("hashchange", onHash);
+    // Scrolling away from an open list closes it
+    const onScroll = () => menuOpen && (menuOpen = false);
     window.addEventListener("scroll", onScroll, { passive: true });
 
     for (const { stars } of projects) {
@@ -92,8 +132,8 @@
       });
     }
     return () => {
+      window.removeEventListener("hashchange", onHash);
       window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(frame);
     };
   });
 </script>
@@ -105,11 +145,11 @@
 
 <!-- Plain, markdown-flavoured version of the site: text only, top to bottom -->
 <div class="simple">
-  <main class="page" id="top">
+  <main class="page">
     <header>
       <div class="title-row">
         <h1>
-          <span class="mark" aria-hidden="true">{"# "}</span>{site.name} ({about.realName})
+          <span class="mark" aria-hidden="true">{"# "}</span>{site.name} <span class="real-name">({about.realName})</span>
         </h1>
         <!-- Switch website styles: back to the picker, from anywhere on the page -->
         <span class="link switch-icon"
@@ -166,10 +206,7 @@
               href="#{section.id}"
               class:current={currentSection === section.id}
               aria-current={currentSection === section.id ? "location" : undefined}
-              onclick={() => {
-                pick(section.id);
-                closeMenu();
-              }}
+              onclick={() => closeMenu()}
               ><span class="mark" aria-hidden="true"
                 >{currentSection === section.id ? "> " : "- "}</span
               >{section.title}</a
@@ -187,11 +224,12 @@
           href="#{section.id}"
           class:current={currentSection === section.id}
           aria-current={currentSection === section.id ? "location" : undefined}
-          onclick={() => pick(section.id)}>{section.title}</a
+          >{section.title}</a
         >
       {/each}
     </nav>
 
+    {#if route.tab === "about"}
     <section id="about">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>About</h2>
       <p>
@@ -218,6 +256,7 @@
         {/each}
       </ul>
     </section>
+    {:else if route.tab === "experience"}
 
     <section id="experience">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>Experience</h2>
@@ -243,74 +282,76 @@
           </li>
         {/each}
       </ul>
-      {@render toTop()}
     </section>
+    {:else if route.tab === "projects"}
 
     <section id="projects">
-      <h2><span class="mark" aria-hidden="true">{"## "}</span>Projects</h2>
-
-      <details open>
-        <summary>
-          <span class="mark" aria-hidden="true">{"### "}</span>Live Work
-          <span class="muted">({liveWork.length})</span>
-        </summary>
-        <ul>
-          {#each liveWork as live}
-            <li>
-              <strong>{live.name}</strong>: {live.description}<br />
-              {@render link(live.url, live.domain)}
-            </li>
-          {/each}
-        </ul>
-      </details>
-
-      <details open>
-        <summary>
-          <span class="mark" aria-hidden="true">{"### "}</span>Personal Projects
-          <span class="muted">({projects.length})</span>
-        </summary>
-        <ul>
-          {#each projects as project}
-            <li>
-              <strong>{project.name}</strong>: {project.description}
-              {#if project.stars}
-                <br /><span class="muted"
-                  >★ {starLabel(
-                    liveStars[project.stars.repo] ?? project.stars.fallback,
-                  )}</span
-                >
-              {/if}
-              <br />{@render link(project.link, "View on GitHub")}
-            </li>
-          {/each}
-        </ul>
+      {#if openProject}
+        <p>{@render link("#projects", "← ../", false)}</p>
+        <h2>
+          <span class="mark" aria-hidden="true">{"## "}</span>{openProject.name}
+        </h2>
+        <p>{openProject.description}</p>
+        {#if openProject.stars}
+          <p class="muted">
+            ★ {starLabel(
+              liveStars[openProject.stars.repo] ?? openProject.stars.fallback,
+            )}
+          </p>
+        {/if}
+        <p>{@render link(openProject.url, openProject.linkLabel)}</p>
+      {:else}
+        <h2><span class="mark" aria-hidden="true">{"## "}</span>Projects</h2>
+        <!-- A directory listing: each project opens as its own page -->
+        {#each projectGroups as group}
+          <h3>
+            <span class="mark" aria-hidden="true">{"### "}</span>{group.title}
+            <span class="muted">({group.entries.length})</span>
+          </h3>
+          <ul class="listing">
+            {#each group.entries as entry (entry.id)}
+              <li>
+                <a href="#projects/{entry.id}">{entry.name}</a>
+                <span class="excerpt muted">{entry.description}</span>
+              </li>
+            {/each}
+          </ul>
+        {/each}
         <p>{@render link(githubProfile, "More on GitHub")}</p>
-      </details>
-      {@render toTop()}
+      {/if}
     </section>
+    {:else if route.tab === "blog"}
 
     <!-- Gallery: hidden while it is empty (see `gallery` in siteContent.js) -->
 
     <section id="blog">
-      <h2><span class="mark" aria-hidden="true">{"## "}</span>Blog</h2>
-      {#if posts.length === 0}
-        <p class="muted">{NO_POSTS}</p>
-      {/if}
-      <!-- Each post folds open in place to be read in full -->
-      {#each posts as post (post.id)}
-        <details class="post">
-          <summary>
-            <span class="mark" aria-hidden="true">{"### "}</span>{post.title}
-            <span class="muted">({formatPostDate(post.date)})</span>
-          </summary>
-          <p class="muted">{post.summary}</p>
-          {#each post.body as paragraph}
-            <p>{@render rich(paragraph)}</p>
+      {#if openPost}
+        <p>{@render link("#blog", "← ../", false)}</p>
+        <h2>
+          <span class="mark" aria-hidden="true">{"## "}</span>{openPost.title}
+        </h2>
+        <p class="muted">{formatPostDate(openPost.date)}</p>
+        {#each openPost.body as paragraph}
+          <p>{@render rich(paragraph)}</p>
+        {/each}
+      {:else}
+        <h2><span class="mark" aria-hidden="true">{"## "}</span>{BLOG_TITLE}</h2>
+        {#if posts.length === 0}
+          <p class="muted">{NO_POSTS}</p>
+        {/if}
+        <!-- A directory listing: each post opens as its own page -->
+        <ul class="listing">
+          {#each posts as post (post.id)}
+            <li>
+              <a href="#blog/{post.id}">{post.title}</a>
+              <span class="muted">({formatPostDate(post.date)})</span>
+              <span class="excerpt muted">{preview(post)}</span>
+            </li>
           {/each}
-        </details>
-      {/each}
-      {@render toTop()}
+        </ul>
+      {/if}
     </section>
+    {:else if route.tab === "skills"}
 
     <section id="skills">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>Skills</h2>
@@ -320,8 +361,8 @@
         </h3>
         <p>{category.items.join(" · ")}</p>
       {/each}
-      {@render toTop()}
     </section>
+    {:else if route.tab === "links"}
 
     <section id="links">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>Links</h2>
@@ -331,6 +372,7 @@
         {/each}
       </ul>
     </section>
+    {/if}
 
     <footer>
       <!-- A little wave goodbye; hidden from screen readers, which would spell it out -->
@@ -349,8 +391,6 @@
       rel={external ? "noopener noreferrer" : undefined}>{label}</a
     ><span class="bracket" aria-hidden="true">{" ]"}</span></span
   >{/snippet}
-
-{#snippet toTop()}<p class="to-top">{@render link("#top", "↑ Back to top", false)}</p>{/snippet}
 
 {#snippet switchButton()}<span class="link"
     ><span class="bracket" aria-hidden="true">{"[ "}</span><button
@@ -406,6 +446,11 @@
 
   h1 {
     font-size: 22px;
+  }
+
+  /* The real name moves as a unit, never splitting the surname onto its own line */
+  .real-name {
+    white-space: nowrap;
   }
 
   /* The title with the switch icon at the right end of its row */
@@ -635,13 +680,17 @@
     content: " −";
   }
 
-  .post p {
-    margin-left: 2ch;
+  /* The first couple of lines of a post, then an ellipsis */
+  .excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .to-top {
-    margin-top: 20px;
-    font-size: 13px;
+  .listing li + li {
+    margin-top: 14px;
   }
 
   /* Markdown-style "- " bullets */
@@ -707,6 +756,12 @@
     color: var(--muted);
   }
 
+  @media (max-width: 380px) {
+    .page h1 {
+      font-size: 16px;
+    }
+  }
+
   @media (max-width: 480px) {
     .simple {
       font-size: 14px;
@@ -714,6 +769,11 @@
 
     .page {
       padding-top: 40px;
+    }
+
+    /* Sized so "# hotaru (Prajesh Raam)" fits one line beside the switch icon */
+    h1 {
+      font-size: 18px;
     }
 
     /* Long link labels in lists may wrap on narrow screens; the short section links

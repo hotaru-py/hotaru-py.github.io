@@ -60,25 +60,49 @@ body {
   background-color: var(--color-moss-50);
 }
 
-/* Obel Mono (SIL OFL, see assets/fonts/ObelMono-OFL.txt): Latin, Latin-1/Extended-A,
-   punctuation, arrows and the few symbols the site uses. One variable file, weights 100-900. */
+/* Ioskeley Mono (SIL OFL, see assets/fonts/IoskeleyMono-OFL.txt): Latin, Latin-1/Extended-A,
+   punctuation, arrows and the few symbols the site uses, in the weights it uses (500 for
+   text, 600 and 700 for emphasis) and one italic. The font has no star (U+2605); that one
+   glyph falls back to a system font. */
 @font-face {
-  font-family: "Obel Mono";
-  src: url("./assets/fonts/obel-mono.woff2") format("woff2");
-  font-weight: 100 900;
+  font-family: "Ioskeley Mono";
+  src: url("./assets/fonts/ioskeley-mono-500.woff2") format("woff2");
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
-/* The site's two typefaces, both Obel Mono for now (a trial). To go back, set
-   --font-ui to "Quicksand", sans-serif and --font-terminal to "JetBrains Mono",
-   ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace. Both are still loaded
-   from index.html. */
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("./assets/fonts/ioskeley-mono-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("./assets/fonts/ioskeley-mono-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("./assets/fonts/ioskeley-mono-500i.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* The site's two typefaces: both Ioskeley Mono, one for the desktop and phone, one for
+   Simple Mode, so either can be changed on its own. */
 :root {
   --font-ui:
-    "Obel Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    "Ioskeley Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --font-terminal:
-    "Obel Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    "Ioskeley Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 body {

@@ -209,7 +209,7 @@ ${html}
     <noscript><style>
       html, body { height: auto !important; overflow: auto !important; background: #f1f1da; }
       #static-content { display: block !important; max-width: 72ch; margin: 0 auto; padding: 48px 20px;
-        font: 15px/1.7 "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; color: #132310; }
+        font: 15px/1.7 "Ioskeley Mono", ui-monospace, Menlo, Consolas, monospace; color: #132310; }
       #static-content h2 { margin-top: 40px; }
       #static-content h1 { font-size: 22px; font-weight: 700; }
       #static-content h2 { font-size: 18px; font-weight: 700; }

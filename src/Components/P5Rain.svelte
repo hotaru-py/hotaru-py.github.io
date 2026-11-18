@@ -27,6 +27,12 @@
     { id: "snap", label: "Snap" },
     { id: "free", label: "Free" },
   ];
+  // The pixel world map under the rain: off, or soft (as p5.rain's `map` strength)
+  const MAPS = [
+    { id: "off", label: "Off", value: false },
+    { id: "soft", label: "Soft", value: 0.18 },
+  ];
+  const mapStrength = (id) => MAPS.find((m) => m.id === id)?.value ?? false;
 
   // Choices are remembered per visitor, like on the p5.rain site
   const store = {
@@ -52,6 +58,7 @@
     palette: store.get("palette", ids(PALETTES), "ocean"),
     style: store.get("style", ids(STYLES), "breathe"),
     grid: store.get("grid", ids(GRIDS), "free"),
+    map: store.get("map", ids(MAPS), "soft"),
   });
   // Light by default, to sit with the paper desktop
   let theme = $state(store.get("theme", ["light", "dark"], "light"));
@@ -68,7 +75,7 @@
     if (look[key] === value) return;
     look[key] = value;
     store.set(key, value);
-    field?.set({ [key]: value });
+    field?.set({ [key]: key === "map" ? mapStrength(value) : value });
     playSound("tactile", 0.1);
   }
 
@@ -132,6 +139,8 @@
               source: "weekly",
               theme,
               ...look,
+              // The pixel world map under the rain, so it's clear where it falls
+              map: mapStrength(look.map),
               start: 96,
             });
           };
@@ -195,6 +204,7 @@
       {@render seg("Palette", "palette", PALETTES)}
       {@render seg("Motion", "style", STYLES)}
       {@render seg("Grid", "grid", GRIDS)}
+      {@render seg("Map", "map", MAPS)}
     </div>
     <p class="meta">
       <span class="live-dot" aria-hidden="true"></span>
@@ -268,13 +278,7 @@
     overflow: hidden;
     background: var(--bg);
     color: var(--text);
-    font-family:
-      "Obel Mono",
-      ui-monospace,
-      SFMono-Regular,
-      Menlo,
-      Consolas,
-      monospace;
+    font-family: var(--font-ui);
     transition:
       background-color 0.4s,
       color 0.4s;
