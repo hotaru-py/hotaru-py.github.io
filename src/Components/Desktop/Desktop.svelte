@@ -41,6 +41,27 @@
   /** @type {Props} */
   let { booted = true, onSwitchUser } = $props();
 
+  // The very first time the desktop is shown (remembered in this browser), its parts
+  // arrive one by one over about two seconds: the taskbar, then the icons and widgets,
+  // then the About Me window. Every later visit keeps the quick version.
+  const INTRO_SEEN_KEY = "desktop-intro-seen";
+  // Picking the mode crossfades into the desktop for ~450ms; the sequence waits that
+  // out (INTRO_LEAD), or the taskbar and first icons would already be in place
+  const INTRO_LEAD = 500;
+  const INTRO_WINDOW_DELAY = INTRO_LEAD + 1600;
+  const firstVisit = (() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    try {
+      if (localStorage.getItem(INTRO_SEEN_KEY)) return false;
+      localStorage.setItem(INTRO_SEEN_KEY, "1");
+    } catch {
+      // Storage unavailable: show the quick version rather than replaying every time
+      return false;
+    }
+    return true;
+  })();
+  let introTimer;
+
   let windows = $state([]);
   /** @type {IconGrid | undefined} */
   let iconGrid = $state();
@@ -254,14 +275,18 @@
       // can't catch isMobileView before it's been set
       if (window.matchMedia("(max-width: 768px)").matches) {
         try {
-          showAboutTip = !sessionStorage.getItem(TIP_SEEN_KEY);
+          const show = !sessionStorage.getItem(TIP_SEEN_KEY);
           sessionStorage.setItem(TIP_SEEN_KEY, "1");
+          // On a first visit the bubble waits until everything has arrived
+          if (show && firstVisit) introTimer = setTimeout(() => (showAboutTip = true), INTRO_LEAD + 1900);
+          else showAboutTip = show;
         } catch {
           showAboutTip = true;
         }
         return;
       }
-      openIntroWindow();
+      if (firstVisit) introTimer = setTimeout(openIntroWindow, INTRO_WINDOW_DELAY);
+      else openIntroWindow();
     });
   });
 
@@ -305,6 +330,7 @@
 
     return () => {
       clearInterval(timer);
+      clearTimeout(introTimer);
       window.removeEventListener("resize", updateDesktopDimensions);
     };
   });
@@ -448,12 +474,14 @@
 <div class="desktop-container">
   <!-- The Motion Blob stays up while the p5.rain wallpaper loads its data, so there's
        never a blank screen; the rain then fades in over it -->
-  {#if wallpaper.current === "blob" || !wallpaper.rainReady}
-    <Wallpaper />
-  {/if}
-  {#if wallpaper.current === "rain"}
-    <RainWallpaper onReady={() => (wallpaper.rainReady = true)} />
-  {/if}
+  <div class="wallpaper-layer">
+    {#if wallpaper.current === "blob" || !wallpaper.rainReady}
+      <Wallpaper />
+    {/if}
+    {#if wallpaper.current === "rain"}
+      <RainWallpaper onReady={() => (wallpaper.rainReady = true)} />
+    {/if}
+  </div>
   <!-- NASA asks for credit wherever its data is shown (full wording in Credits). It fades
        in once the rain wallpaper has, and out with it; phones show it under the clock. -->
   {#if showRainCredit && !isMobileView}
@@ -494,6 +522,8 @@
   <div
     class="desktop-background"
     class:mobile-view={isMobileView}
+    class:phone-intro={firstVisit && isMobileView}
+    style:--intro-lead="{INTRO_LEAD}ms"
     bind:clientWidth={desktopWidth}
     bind:clientHeight={desktopHeight}
     onpointerdown={handleDesktopPointerDown}
@@ -526,6 +556,7 @@
         bind:this={iconGrid}
         bind:customized={layoutCustomized}
         icons={gridIcons}
+        intro={firstVisit}
         onOpen={handleIconClick}
       />
     {/if}
@@ -553,7 +584,10 @@
               {#each homeRowIcons as icon, i (icon.id)}
                 <div
                   style:grid-column={icon.homeColumn}
-                  in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}
+                  class:intro-in={firstVisit}
+                  style:--intro-delay="{INTRO_LEAD + 300 + i * 120}ms"
+                  style:--intro-y="20px"
+                  in:fly={firstVisit ? { duration: 0 } : { y: 20, duration: 200, delay: 300 + i * 50 }}
                 >
                   <DesktopIcon
                     {icon}
@@ -591,6 +625,8 @@
 
       <div
         class="page-dots"
+        class:intro-in={firstVisit}
+        style:--intro-delay="{INTRO_LEAD + 1300}ms"
         class:hidden-under-app={activeWindowId}
         style:bottom="{20 + dockHeight + 10}px"
       >
@@ -613,11 +649,17 @@
         class:mobile-icons-hidden={activeWindowId}
         bind:this={dockElement}
         bind:offsetHeight={dockHeight}
-        in:fade={{ duration: 300, delay: 100 }}
+        class:intro-in={firstVisit}
+        style:--intro-delay="{INTRO_LEAD + 800}ms"
+        style:--intro-y="40px"
+        in:fade={firstVisit ? { duration: 0 } : { duration: 300, delay: 100 }}
       >
         {#each dockIcons as icon, i (icon.id)}
           <div
-            in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}
+            in:fly={firstVisit ? { duration: 0 } : { y: 20, duration: 200, delay: 300 + i * 50 }}
+            class:intro-in={firstVisit}
+            style:--intro-delay="{INTRO_LEAD + 1000 + i * 120}ms"
+            style:--intro-y="16px"
             class="mobile-icon-wrapper"
             data-icon={icon.id}
           >
@@ -640,10 +682,15 @@
     {/if}
   </div>
 
-  {#if !isMobileView}
+  {#if !isMobileView && (booted || !firstVisit)}
     <!-- Floats over the bottom of the desktop, so windows slide under it instead of
          being cut off at its edge -->
-    <div class="taskbar-dock">
+    <div
+      class="taskbar-dock"
+      class:intro-in={firstVisit}
+      style:--intro-delay="{INTRO_LEAD}ms"
+      style:--intro-y="60px"
+    >
       <Taskbar
       {windows}
       {activeWindowId}
@@ -665,6 +712,33 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+  }
+
+  /* First visit: parts fade and rise in after a delay set per element. `backwards` keeps
+     them hidden until their turn without pinning a transform afterwards. */
+  .intro-in {
+    animation: intro-in 450ms cubic-bezier(0.22, 1, 0.36, 1) var(--intro-delay, 0ms)
+      backwards;
+  }
+
+  @keyframes intro-in {
+    from {
+      opacity: 0;
+      translate: 0 var(--intro-y, 0px);
+    }
+  }
+
+  /* Phone, first visit: the clock and settings cog come first, then the sequence above */
+  .phone-intro :global(.mobile-clock),
+  .phone-intro :global(.mobile-settings) {
+    animation: intro-in 450ms cubic-bezier(0.22, 1, 0.36, 1) var(--intro-lead) backwards;
+  }
+
+  .wallpaper-layer {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
   }
 
   .svg-defs {

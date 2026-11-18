@@ -10,10 +10,17 @@
    * @property {any[]} icons Icons, then any widgets: `{ id, widget: Snippet, span: { cols, rows }, square? }`
    * @property {(icon: any) => void} onOpen
    * @property {boolean} [customized] Out: whether anything is away from its default spot
+   * @property {boolean} [intro] First visit: items arrive one at a time, more slowly
    */
 
   /** @type {Props} */
-  let { icons, onOpen, customized = $bindable(false) } = $props();
+  let { icons, onOpen, customized = $bindable(false), intro = false } = $props();
+
+  // Normal: all in within about a second. Intro: one every 110ms, after the taskbar
+  // (500 = the mode crossfade, then the taskbar); done with CSS, which keeps
+  // them hidden until their turn
+  const flyIn = (i) => ({ y: 20, duration: 200, delay: 300 + i * 50 });
+  const introDelay = (i) => 750 + i * 110;
 
   // Icon footprint (tile + label), the smallest gap between icons, and the edge margin
   const ICON_W = 88;
@@ -385,7 +392,9 @@
       style:transform="translate({offset.x}px, {offset.y}px)"
       onpointerdown={(e) => handlePointerDown(e, icon)}
       onclickcapture={icon.widget ? handleWidgetClick : undefined}
-      in:fly={{ y: 20, duration: 200, delay: 300 + i * 50 }}
+      class:intro-in={intro}
+      style:--intro-delay="{introDelay(i)}ms"
+      in:fly={intro ? { duration: 0 } : flyIn(i)}
     >
       {#if icon.widget}
         <div class="widget-body" class:lifted={dragging}>
@@ -408,6 +417,17 @@
     position: absolute;
     touch-action: none;
     user-select: none;
+  }
+
+  .grid-item.intro-in {
+    animation: intro-in 400ms cubic-bezier(0.22, 1, 0.36, 1) var(--intro-delay) backwards;
+  }
+
+  @keyframes intro-in {
+    from {
+      opacity: 0;
+      translate: 0 24px;
+    }
   }
 
   .grid-item.settling {

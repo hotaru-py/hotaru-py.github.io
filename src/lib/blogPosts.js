@@ -16,8 +16,8 @@ export const posts = [
     title: "(Not my) first post!",
     date: "2026-11-18",
     body: [
-      "This is technically not my first blog post, since I had a blog back in high school (none of the posts from which exist anymore). I do have them backed up in a text file on my PC back at home, and it had some fun outlook on things from my pov then, iirc. Might try curating some good ones from there when I get back. 99% chance you won't see it.",
-      "New content incoming though. Eventually.",
+      "This is technically not my first blog post, since I had a blog back in high school (which doesn't exist anymore). I do have the posts backed up in a text file on my PC back at home, and it had some fun outlook on things from my pov then, iirc. Might try curating some good ones from there when I get back (assuming it's still there). 99% chance you won't see it.",
+      "New content incoming though. Eventually. Toodles for now!",
     ],
   },
 ];

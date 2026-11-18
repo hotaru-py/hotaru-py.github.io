@@ -152,7 +152,7 @@ export const activities = [
       {
         role: "Frontend Developer & UI/UX Designer, University Faculty and Student Capstone Portal",
         description:
-          "Absolutely hated the UI of the portal, so volunteered to replace it with a visually better, on-brand and significant usable interface with a design system implemented for future reference and scope creep.",
+          "Absolutely hated the UI of the portal, so volunteered to replace it with a visually better, on-brand and significantly more usable interface with a design system implemented for future developers when scope creep happens.",
       },
       {
         role: "Conference Website Developer",
