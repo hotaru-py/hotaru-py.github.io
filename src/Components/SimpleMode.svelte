@@ -264,9 +264,21 @@
       <ul>
         {#each experience as job}
           <li>
-            <strong>{job.role}</strong><br />
-            {#if job.url}{@render link(job.url, job.company)}{:else}{job.company}{/if}
-            <span class="muted">({job.period})</span>
+            {#if job.description}
+              <!-- The details fold open under the role -->
+              <details class="role-detail" use:foldable>
+                <summary>
+                  <strong>{job.role}</strong><br />
+                  {#if job.url}{@render link(job.url, job.company)}{:else}{job.company}{/if}
+                  <span class="muted">({job.period})</span>
+                </summary>
+                <p class="muted">{job.description}</p>
+              </details>
+            {:else}
+              <strong>{job.role}</strong><br />
+              {#if job.url}{@render link(job.url, job.company)}{:else}{job.company}{/if}
+              <span class="muted">({job.period})</span>
+            {/if}
           </li>
         {/each}
       </ul>

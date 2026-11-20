@@ -3,18 +3,33 @@
   import { foldable } from "../lib/foldable.js";
 </script>
 
+{#snippet jobSub(job)}
+  <span class="sub">
+    {#if job.url}<a href={job.url} target="_blank" rel="noopener noreferrer"
+        >{job.company}</a
+      >{:else}{job.company}{/if}
+    ({job.period})
+  </span>
+{/snippet}
+
 <div class="experience">
   <h2 class="title">Work Experience</h2>
   <ul class="entries">
     {#each experience as job}
       <li>
-        <span class="role">{job.role}</span>
-        <span class="sub">
-          {#if job.url}<a href={job.url} target="_blank" rel="noopener noreferrer"
-              >{job.company}</a
-            >{:else}{job.company}{/if}
-          ({job.period})
-        </span>
+        {#if job.description}
+          <!-- The details fold open under the role -->
+          <details use:foldable>
+            <summary>
+              <span class="role">{job.role}</span>
+              {@render jobSub(job)}
+            </summary>
+            <p class="desc">{job.description}</p>
+          </details>
+        {:else}
+          <span class="role">{job.role}</span>
+          {@render jobSub(job)}
+        {/if}
       </li>
     {/each}
   </ul>

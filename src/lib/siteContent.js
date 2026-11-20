@@ -70,32 +70,36 @@ export const about = {
 // Most recent first; `url` is optional (freelancing has no company page)
 export const experience = [
   {
-    role: "Web Development, UI/UX & Graphic Design",
-    company: "Freelance (on and off)",
-    period: "2020 - Present",
-  },
-  {
     role: "Software Development Engineering Intern",
     company: "Miniture",
     url: "https://miniture.in",
     period: "March 2025 - February 2026",
+    description:
+      "Redesigned and built the company's storefront and mobile app, from design to code. Built the tools that let non-engineers manage pages, data and marketing themselves, then used analytics to keep improving the updated storefront after launch.",
+  },
+  {
+    role: "Web Development, UI/UX & Graphic Design",
+    company: "Freelance (on and off)",
+    period: "2020 - Present",
+    description:
+      "Take up a few projects here and there, whenever I'm free (and require a source of income).",
   },
 ];
 
 // College clubs and activities, shown after work experience. Each club lists its roles,
-// most recent first. `url` (club) and `period` and `description` (role) are optional; a description folds open under its role.
+// most recent first. `url` (club or job), `description` (job) and `period` and `description` (role) are optional; a description folds open under its role.
 export const activities = [
   {
     org: "SNUC Coding Club",
     roles: [
       { role: "Club Head", period: "Jul 2026 - Present" },
       {
-        role: "Founding Team - Game Development & AR/VR Vertical",
-        period: "Sep 2026 - Present",
-      },
-      {
         role: "Core Member - Software Development Vertical",
         period: "Sep 2025 - Present",
+      },
+      {
+        role: "Founding Team - Game Development & AR/VR Vertical",
+        period: "Sep 2026 - Present",
       },
       { role: "Graphic Designer", period: "Oct 2023 - Aug 2025" },
     ],

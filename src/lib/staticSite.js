@@ -146,7 +146,7 @@ export function renderStaticPage() {
     `<section><h2>Experience</h2><ul>`,
     ...experience.map((job) =>
       li(
-        `<strong>${esc(job.role)}</strong><br />${job.url ? linkHtml(job.url, job.company) : esc(job.company)} (${esc(job.period)})`,
+        `<strong>${esc(job.role)}</strong><br />${job.url ? linkHtml(job.url, job.company) : esc(job.company)} (${esc(job.period)})${job.description ? `<br />${esc(job.description)}` : ""}`,
       ),
     ),
     `</ul><h3>Clubs &amp; Activities</h3><ul>`,
@@ -250,7 +250,7 @@ export function renderLlmsTxt() {
     "",
     ...experience.map(
       (job) =>
-        `- ${job.url ? `[${job.company}](${job.url})` : job.company}: ${job.role}, ${job.period}`,
+        `- ${job.url ? `[${job.company}](${job.url})` : job.company}: ${job.role}, ${job.period}${job.description ? `. ${job.description}` : ""}`,
     ),
     "",
     "## Clubs and activities",

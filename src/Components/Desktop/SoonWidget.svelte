@@ -9,7 +9,7 @@
   <span class="cells" aria-hidden="true"
     ><span></span><span></span><span></span></span
   >
-  <span class="text">something will be here soon</span>
+  <span class="text">something will be here soon, hopefully</span>
 </div>
 
 <style>
