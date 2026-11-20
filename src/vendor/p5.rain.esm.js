@@ -1114,12 +1114,16 @@ var RainField = class {
     const SA = d.snow[i], SB = d.snow[i + 1], dl = this.dl, lm = this.lm;
     const k = Math.min(1, dt * 1.5), dir = this.o.speed < 0 ? -1 : 1;
     const y0 = Math.max(0, g.r0 - 1), y1 = Math.min(ROWS, g.r0 + g.rows + 1);
+    // flowX/flowY only steer "breathe" cells; "flow" moves particles along the motion
+    // field instead, so it skips them (they were most of this loop's cost)
+    const steer = this.o.style !== "flow";
     for (let y = y0; y < y1; y++) {
       const row = y * COLS;
       for (let x = 0; x < COLS; x++) {
         const c = row + x;
         this.rate[c] = A[c] + (B[c] - A[c]) * fr;
         this.snowNow[c] = fr < 0.5 ? SA[c] : SB[c];
+        if (!steer) continue;
         const gx = (lm[row + (x + 1) % COLS] - lm[row + (x + COLS - 1) % COLS]) * 0.5;
         const gy = (lm[y < ROWS - 1 ? c + COLS : c] - lm[y > 0 ? c - COLS : c]) * 0.5;
         const g2 = gx * gx + gy * gy;

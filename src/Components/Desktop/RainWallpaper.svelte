@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  import { loadP5Rain } from "../../lib/p5rain.js";
+  import { cellView, cssToRGB, paintGaps } from "../../lib/rainCells.js";
 
   /**
    * The p5.rain wallpaper: NASA's last week of rain as a full-screen pixel field. It
@@ -15,9 +15,9 @@
 
   const FADE_MS = 600;
 
-  // p5.rain redraws every cell each frame, so the wallpaper runs at a calm 30 fps (the
-  // motion is slow enough not to show it), drops to 15 while the p5.rain window is
-  // showing so the demo gets the frames, and stops while something covers the screen
+  // The rain moves slowly, so the wallpaper runs at a calm 30 fps, drops to 15 while
+  // the p5.rain window is showing so the demo gets the frames, and stops while
+  // something covers the screen
   const FPS = 30;
   const FPS_WITH_DEMO = 15;
   const COVERED =
@@ -26,8 +26,7 @@
 
   // Where the week loops, the end crossfades into the start over this many data-hours: a
   // second field plays the start of the week from the moment the first has this long
-  // left, fading in over it, and then carries on as the main one. (Two fields, each
-  // drawn into its own buffer, then composited.)
+  // left, fading in over it, and then carries on as the main one
   const CROSSFADE_HOURS = 4;
 
   // Faint grid lines in the 1px gaps between the squares, only on this wallpaper
@@ -48,17 +47,32 @@
     }
   }
 
+  const look = {
+    source: "weekly",
+    theme: "light",
+    palette: "moss",
+    style: "flow",
+    grid: "snap",
+    background: false,
+    start: 96,
+  };
+
   /** @type {HTMLDivElement} */
   let layer;
+  /** @type {HTMLCanvasElement} */
+  let cellsA;
+  /** @type {HTMLCanvasElement} */
+  let cellsB;
+  /** @type {HTMLCanvasElement} */
+  let gaps;
   let ready = $state(false);
 
   onMount(() => {
     let cancelled = false;
-    let sketch = null;
-    /** @type {any[]} The two buffers the two fields draw into */
-    let surfaces = [];
+    let raf = 0;
     let observer;
     let readyTimer;
+    let worker;
 
     // The wallpaper sits under the icons and windows, so the lens follows the pointer
     // over the whole page
@@ -68,133 +82,197 @@
     window.addEventListener("pointermove", handleMove, { passive: true });
     document.documentElement.addEventListener("pointerleave", handleLeave);
 
-    // Paints the desktop's own paper colour behind the rain, so it matches the taskbar
-    const paper = getComputedStyle(document.documentElement)
-      .getPropertyValue("--color-moss-50")
-      .trim();
+    // The desktop's own paper colour sits behind the rain, so it matches the taskbar
+    const paper =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--color-moss-50")
+        .trim() || "#f8f7ed";
 
-    loadP5Rain()
-      .then((P5) => {
+    // Only p5.rain itself is needed here, not p5.js: the fields are drawn by
+    // rainCells.js, so the 1MB p5 download is left to the p5.rain window
+    import("../../vendor/p5.rain.esm.js")
+      .then((rain) => {
         if (cancelled) return;
-        const size = () => [
-          Math.max(1, layer.clientWidth),
-          Math.max(1, layer.clientHeight),
-        ];
-        sketch = new P5((p) => {
-          let fields = [];
-          let cur = 0; // the field being shown; the other one only runs while crossfading
-          let crossfading = false;
-          let fps = FPS;
-          const look = {
-            source: "weekly",
-            theme: "light",
-            palette: "moss",
-            style: "flow",
-            grid: "snap",
-            background: false,
-            start: 96,
-          };
-          p.setup = () => {
-            p.pixelDensity(1);
-            p.frameRate(fps);
-            p.createCanvas(...size());
-            surfaces = [0, 1].map(() => {
-              const g = p.createGraphics(...size());
-              g.pixelDensity(1);
-              return g;
-            });
-            const first = P5.prototype.createRain.call(surfaces[0], look);
-            // The second shares the first's data, so nothing is downloaded twice
-            const second = P5.prototype.createRain.call(surfaces[1], {
-              ...look,
-              data: first.data,
-              start: 0,
-            });
-            fields = [first, second];
-          };
-
-          // One field onto its own buffer: the desktop's paper, the faint grid, the rain
-          const paint = (field, g) => {
-            g.background(paper || "#f8f7ed");
-            if (field._g) drawGridLines(g.drawingContext, field._g);
-            field.draw();
-          };
-
-          p.draw = () => {
-            // Hidden behind a maximized (or phone) window: skip the work. Readiness
-            // still counts, so the fade-in isn't held up.
-            if (ready && document.querySelector(COVERED)) return;
-            const want = document.querySelector(DEMO) ? FPS_WITH_DEMO : FPS;
-            if (want !== fps) p.frameRate((fps = want));
-
-            const r = layer.getBoundingClientRect();
-            const px = pointer ? pointer.x - r.left : null;
-            const py = pointer ? pointer.y - r.top : null;
-            const dt = (p.deltaTime || 16.7) / 1e3;
-
-            let main = fields[cur];
-            if (!main.ready) {
-              p.background(paper || "#f8f7ed");
-              return;
-            }
-            const other = fields[1 - cur];
-            const span = main.data.frames.length - 1.001;
-            const before = main.st.f;
-            main.pointer(px, py);
-            main.update(dt);
-
-            if (!crossfading && main.st.f >= span - CROSSFADE_HOURS) {
-              crossfading = true;
-              other.seek(main.st.f - (span - CROSSFADE_HOURS));
-            }
-            if (crossfading) {
-              other.pointer(px, py);
-              other.update(dt);
-              // The main field has wrapped to the start of the week: the other one,
-              // already there and fully faded in, takes over
-              if (main.st.f < before) {
-                cur = 1 - cur;
-                crossfading = false;
-              }
-            }
-            main = fields[cur];
-
-            paint(main, surfaces[cur]);
-            const ctx = p.drawingContext;
-            ctx.drawImage(surfaces[cur].elt, 0, 0, p.width, p.height);
-            if (crossfading) {
-              const t = (main.st.f - (span - CROSSFADE_HOURS)) / CROSSFADE_HOURS;
-              paint(other, surfaces[1 - cur]);
-              ctx.globalAlpha = Math.max(0, Math.min(1, t));
-              ctx.drawImage(surfaces[1 - cur].elt, 0, 0, p.width, p.height);
-              ctx.globalAlpha = 1;
-            }
-            if (!ready) {
-              ready = true;
-              readyTimer = setTimeout(() => onReady?.(), FADE_MS);
-            }
-          };
-        }, layer);
-        observer = new ResizeObserver(() => {
-          if (layer.clientWidth && layer.clientHeight) {
-            sketch.resizeCanvas(...size());
-            for (const g of surfaces) g.resizeCanvas(...size());
-          }
-        });
-        observer.observe(layer);
+        start(rain);
       })
       .catch(() => {
-        // p5 couldn't load: never becomes ready, so the Motion Blob stays up
+        // Couldn't load: never becomes ready, so the Motion Blob stays up
       });
+
+    function start(rain) {
+      // The layer's size and place, kept up to date by the observer below rather than
+      // measured every frame (measuring can force the page to lay itself out mid-frame)
+      const box = { w: 1, h: 1, left: 0, top: 0 };
+      const measure = () => {
+        const r = layer.getBoundingClientRect();
+        box.w = Math.max(1, Math.round(r.width));
+        box.h = Math.max(1, Math.round(r.height));
+        box.left = r.left;
+        box.top = r.top;
+      };
+      measure();
+
+      // p5.rain fields expect a p5 sketch; all they use of it is a canvas, its size and
+      // the frame time, so a stand-in will do
+      const stand = document.createElement("canvas");
+      const host = {
+        canvas: stand,
+        drawingContext: stand.getContext("2d"),
+        get width() {
+          return box.w;
+        },
+        get height() {
+          return box.h;
+        },
+        deltaTime: 16.7,
+      };
+      const first = new rain.RainField(host, look);
+      // The second shares the first's data, so nothing is downloaded twice
+      const second = new rain.RainField(host, { ...look, data: first.data, start: 0 });
+      const fields = [first, second];
+      const rgb = cssToRGB(paper);
+      const views = [cellView(cellsA, rain, rgb), cellView(cellsB, rain, rgb)];
+      let cur = 0; // the field being shown; the other one only runs while crossfading
+      let crossfading = false;
+      let gapLayout = null;
+
+      const motion = motionAhead(first.data);
+
+      observer = new ResizeObserver(() => {
+        measure();
+        // Lay the fields out again for the new size on their next update
+        for (const f of fields) f._g = null;
+      });
+      observer.observe(layer);
+
+      let fps = FPS;
+      let last = 0;
+      const loop = (now) => {
+        raf = requestAnimationFrame(loop);
+        if (last && now - last < 1000 / fps - 3) return;
+        const dt = last ? Math.min(now - last, 100) / 1e3 : 1 / 60;
+        last = now;
+        frame(dt);
+      };
+      raf = requestAnimationFrame(loop);
+
+      function frame(dt) {
+        // Hidden behind a maximized (or phone) window: skip the work
+        if (ready && document.querySelector(COVERED)) return;
+        fps = document.querySelector(DEMO) ? FPS_WITH_DEMO : FPS;
+
+        let main = fields[cur];
+        if (!main.ready) return;
+        const other = fields[1 - cur];
+        const span = main.data.frames.length - 1.001;
+        const px = pointer ? pointer.x - box.left : null;
+        const py = pointer ? pointer.y - box.top : null;
+        const before = main.st.f;
+        main.pointer(px, py);
+        main.update(dt);
+
+        if (!crossfading && main.st.f >= span - CROSSFADE_HOURS) {
+          crossfading = true;
+          other.seek(main.st.f - (span - CROSSFADE_HOURS));
+        }
+        if (crossfading) {
+          other.pointer(px, py);
+          other.update(dt);
+          // The main field has wrapped to the start of the week: the other one,
+          // already there and fully faded in, takes over
+          if (main.st.f < before) {
+            cur = 1 - cur;
+            crossfading = false;
+          }
+        }
+        main = fields[cur];
+
+        views[cur].render(main);
+        if (main._g !== gapLayout) {
+          gapLayout = main._g;
+          paintGaps(gaps, gapLayout, rain.COLS, paper, drawGridLines);
+        }
+
+        // The crossfade is just the top canvas's opacity: the browser blends the two
+        const top = views[1 - cur].canvas;
+        views[cur].canvas.style.zIndex = "1";
+        views[cur].canvas.style.opacity = "1";
+        top.style.zIndex = "2";
+        if (crossfading) {
+          views[1 - cur].render(fields[1 - cur]);
+          const t = (main.st.f - (span - CROSSFADE_HOURS)) / CROSSFADE_HOURS;
+          top.style.opacity = String(Math.max(0, Math.min(1, t)));
+        } else if (top.style.opacity !== "0") {
+          top.style.opacity = "0";
+        }
+
+        // Work out the motion for hours coming up before they're needed
+        motion.prefetch(main.st.i);
+        if (main.st.f >= span - CROSSFADE_HOURS - 1) motion.prefetch(-1);
+        if (crossfading) motion.prefetch(fields[1 - cur].st.i);
+
+        if (!ready) {
+          ready = true;
+          readyTimer = setTimeout(() => onReady?.(), FADE_MS);
+        }
+      }
+    }
+
+    /**
+     * p5.rain works out each hour's motion when it first needs it, which stalled a frame
+     * every data-hour. This works out the next couple of hours in a worker ahead of time
+     * and hands them to p5.rain's own cache. If the worker can't start, p5.rain just
+     * carries on working them out itself.
+     */
+    function motionAhead(data) {
+      // p5.rain's motion for hour i compares it with the hour this many later (BASE)
+      const BASE = 3;
+      const pending = new Set();
+      try {
+        worker = new Worker(new URL("../../lib/rainMotion.worker.js", import.meta.url), {
+          type: "module",
+        });
+      } catch {
+        return { prefetch() {} };
+      }
+      worker.onmessage = ({ data: { key, vx, vy } }) => {
+        pending.delete(key);
+        const [version, i] = key.split(":").map(Number);
+        if (version !== data.version || data._motion.has(i)) return;
+        data._motion.set(i, { vx, vy });
+        // Same limit as p5.rain's cache
+        if (data._motion.size > 16) data._motion.delete(data._motion.keys().next().value);
+      };
+      worker.onerror = () => {
+        worker?.terminate();
+        worker = null;
+      };
+      const ask = (i) => {
+        const last = data.frames.length - 2;
+        if (!worker || i < 0 || i > last || data._motion.has(i)) return;
+        const key = `${data.version}:${i}`;
+        if (pending.has(key)) return;
+        pending.add(key);
+        const j = Math.min(data.frames.length - 1, i + BASE);
+        worker.postMessage({ key, a: data.frames[i], b: data.frames[j], span: Math.max(1, j - i) });
+      };
+      return {
+        /** The hours after `i` (or the start of the week, for -1) */
+        prefetch(i) {
+          if (i < 0) [0, 1, 2].forEach(ask);
+          else [i + 1, i + 2].forEach(ask);
+        },
+      };
+    }
 
     return () => {
       cancelled = true;
+      cancelAnimationFrame(raf);
       clearTimeout(readyTimer);
+      worker?.terminate();
       window.removeEventListener("pointermove", handleMove);
       document.documentElement.removeEventListener("pointerleave", handleLeave);
       observer?.disconnect();
-      for (const g of surfaces) g.remove();
-      sketch?.remove();
     };
   });
 </script>
@@ -206,7 +284,11 @@
   bind:this={layer}
   aria-hidden="true"
   out:fade={{ duration: 400 }}
-></div>
+>
+  <canvas class="cells" bind:this={cellsA}></canvas>
+  <canvas class="cells" bind:this={cellsB} style:opacity="0"></canvas>
+  <canvas class="gaps" bind:this={gaps}></canvas>
+</div>
 
 <style>
   .rain-wallpaper {
@@ -215,6 +297,7 @@
     z-index: -1;
     overflow: hidden;
     opacity: 0;
+    background: var(--color-moss-50);
     transition: opacity var(--fade) ease;
   }
 
@@ -229,8 +312,17 @@
     }
   }
 
-  .rain-wallpaper :global(canvas) {
+  /* One pixel per cell, scaled up square-edged; positioned and sized from script */
+  canvas {
+    position: absolute;
     display: block;
     image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  .gaps {
+    left: 0;
+    top: 0;
+    z-index: 3;
   }
 </style>
