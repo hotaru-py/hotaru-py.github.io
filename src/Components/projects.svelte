@@ -10,12 +10,6 @@
   import { githubProfile } from "../lib/siteContent.js";
   import { liveFiles, projectFiles } from "../lib/workFiles.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [isMobile]
-   */
-
-  /** @type {Props} */
   let { isMobile = false } = $props();
 
   const folders = [

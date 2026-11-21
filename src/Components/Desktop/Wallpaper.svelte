@@ -1,37 +1,37 @@
 <script>
   import { onMount } from "svelte";
 
-  // The field is computed at 1/SCALE resolution and upscaled by the browser
+  // the field is computed at 1/SCALE resolution and upscaled by the browser
   const SCALE = 7;
 
-  // Spring pulling particles back into the blob; low damping gives a jelly wobble
+  // spring pulling particles back into the blob; low damping gives a jelly wobble
   const SPRING = 2.4;
   const DAMPING = 1.4;
-  // The blob's center is a body too: it follows a slow drift path but can be shoved
+  // the blob's center is a body too: it follows a slow drift path but can be shoved
   const ANCHOR_SPRING = 0.5;
   const ANCHOR_DAMPING = 1.1;
   const ANCHOR_DRAG = 1.2;
 
-  // Cursor push: a little when hovering, much more when swiping fast
+  // cursor push: a little when hovering, much more when swiping fast
   const PUSH_BASE = 300;
   const PUSH_PER_SPEED = 9;
-  // Cursor drag: nearby goo gets swept along with the cursor's motion
+  // cursor drag: nearby goo gets swept along with the cursor's motion
   const DRAG = 7;
   const MAX_POINTER_SPEED = 4000;
   const POINTER_REACH = 0.3; // of the blob unit
 
-  // On narrow screens the blob is sized from the screen's area instead of its short
-  // side, which would make it small on a tall phone. Same shape and motion, just scaled up.
+  // on narrow screens the blob is sized from the screen's area instead of its short
+  // side, which would make it small on a tall phone. same shape and motion, just scaled up.
   const MOBILE_MAX_WIDTH = 768;
   const MOBILE_UNIT = 1.05; // of sqrt(width * height)
 
-  // Blob layout in blob units: many small particles, so a swipe can cut a clean gap
+  // blob layout in blob units: many small particles, so a swipe can cut a clean gap
   const ring = (count, dist, r, phase = 0) =>
     Array.from({ length: count }, (_, i) => ({
       angle: phase + (i / count) * Math.PI * 2,
       dist,
       r: r * (1 + 0.15 * Math.sin(i * 2.3)),
-      // Slightly different orbit speeds keep the outline shifting
+      // slightly different orbit speeds keep the outline shifting
       spin: 0.05 + 0.03 * Math.sin(i * 1.7 + dist * 10),
     }));
   const PARTICLES = [
@@ -41,14 +41,14 @@
     ...ring(16, 0.42, 0.1, 0.6),
   ];
 
-  // Gaussian falloff lookup; contributions beyond GAUSS_CUTOFF (in r^2 units) are dropped
+  // gaussian falloff lookup; contributions beyond GAUSS_CUTOFF (in r^2 units) are dropped
   const GAUSS_CUTOFF = 9;
   const GAUSS_STEPS = 1024;
   const GAUSS = Float32Array.from({ length: GAUSS_STEPS }, (_, i) =>
     Math.exp(-(i / GAUSS_STEPS) * GAUSS_CUTOFF),
   );
 
-  // Normalized field intensity -> moss shade; the resting peak lands near moss-400
+  // normalized field intensity -> moss shade; the resting peak lands near moss-400
   const PEAK = 0.87;
   const STOPS = [
     [0.0, "--color-moss-50"],
@@ -87,7 +87,7 @@
 
     const pointer = { x: 0, y: 0, vx: 0, vy: 0, active: false, lastTime: 0 };
 
-    // The slow path the blob's center drifts along
+    // the slow path the blob's center drifts along
     function drift(t) {
       return [
         width * (0.52 + 0.24 * Math.sin(t * 0.06)),
@@ -95,7 +95,7 @@
       ];
     }
 
-    // Where each particle wants to be, relative to the blob's center
+    // where each particle wants to be, relative to the blob's center
     function target(p, i, t) {
       const angle = p.angle + t * p.spin;
       const dist = p.dist * unit * (1 + 0.15 * Math.sin(t * 0.6 + i));
@@ -129,7 +129,7 @@
       calibrate();
     }
 
-    // Measure the resting blob's peak once per size, so colors stay put during splits
+    // measure the resting blob's peak once per size, so colors stay put during splits
     function calibrate() {
       const saved = particles.map((p) => [p.x, p.y]);
       const savedAnchor = [anchor.x, anchor.y];
@@ -150,7 +150,7 @@
       const pvx = pointer.vx * clamp;
       const pvy = pointer.vy * clamp;
 
-      // Move the blob's center: spring to its drift path, shoved by nearby swipes
+      // move the blob's center: spring to its drift path, shoved by nearby swipes
       const [driftX, driftY] = drift(t);
       let aax =
         ANCHOR_SPRING * (driftX - anchor.x) - ANCHOR_DAMPING * anchor.vx;
@@ -193,13 +193,13 @@
         p.y += p.vy * dt;
       });
 
-      // Pointer velocity fades out once the cursor stops moving
+      // pointer velocity fades out once the cursor stops moving
       const decay = Math.exp(-dt * 8);
       pointer.vx *= decay;
       pointer.vy *= decay;
     }
 
-    // Splat each particle's gaussian into the field, only over the cells it reaches
+    // splat each particle's gaussian into the field, only over the cells it reaches
     function accumulate() {
       const w = canvas.width;
       const h = canvas.height;
@@ -225,7 +225,7 @@
       }
     }
 
-    // Tell the mobile home screen clock what the wallpaper looks like behind it
+    // tell the mobile home screen clock what the wallpaper looks like behind it
     // so its ink can adapt (deeper green over the blob, paper if it ever gets dark)
     const inkRgb = cssRgb("--color-ink");
     const deepRgb = cssRgb("--color-moss-900");
@@ -233,7 +233,7 @@
     let lastClockInk = "";
 
     function sampleClockBackdrop() {
-      // Sample wherever the clock actually is (it marks itself with data-wallpaper-sample)
+      // sample wherever the clock actually is (it marks itself with data-wallpaper-sample)
       const target = document.querySelector("[data-wallpaper-sample]");
       if (!target) return;
       const rect = target.getBoundingClientRect();
@@ -300,7 +300,7 @@
     }
 
     function handlePointerUp(e) {
-      // A lifted finger shouldn't keep pushing the blob
+      // a lifted finger shouldn't keep pushing the blob
       if (e.pointerType === "touch") handlePointerLeave();
     }
 
@@ -323,7 +323,7 @@
     const start = last;
 
     function loop(now) {
-      // Clamp so a backgrounded tab doesn't make the blob explode on return
+      // clamp so a backgrounded tab doesn't make the blob explode on return
       const dt = Math.min((now - last) / 1000, 1 / 30);
       last = now;
       step((now - start) / 1000, dt);
@@ -417,7 +417,7 @@
     inset: 0;
     opacity: 0.3;
     mix-blend-mode: overlay;
-    /* Colored fractal noise with its contrast stretched so the speckle reads on light tones */
+    /* colored fractal noise with its contrast stretched so the speckle reads on light tones */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='3 0 0 0 -1 0 3 0 0 -1 0 0 3 0 -1 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 </style>

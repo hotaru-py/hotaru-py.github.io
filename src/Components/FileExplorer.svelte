@@ -6,25 +6,11 @@
   import { playSound } from "../lib/sounds.js";
   import { fileWindow, FILE_ICONS } from "../lib/workFiles.js";
 
-  /**
-   * A folder window: the root lists subfolders, each opens to its files, and a file
-   * opens in a viewer window of its own. Projects and Gallery are both one of these.
-   * @typedef {Object} Folder
-   * @property {string} id
-   * @property {string} name
-   * @property {import("../lib/workFiles.js").WorkFile[]} files
-   * @property {{ label: string, url: string }} [link] Shown in the toolbar inside it
-   *
-   * @typedef {Object} Props
-   * @property {string} rootName The window's top folder, e.g. "Projects"
-   * @property {Folder[]} folders
-   * @property {boolean} [isMobile]
-   */
-
-  /** @type {Props} */
+  // a folder window (Projects, Gallery): subfolders of files that open in a viewer; a
+  // folder's optional `link` shows in the toolbar
   let { rootName, folders, isMobile = false } = $props();
 
-  // Provided by Desktop.svelte, so a file can open in a window of its own
+  // provided by Desktop.svelte, so a file can open in a window of its own
   const desktop = getContext("desktop");
 
   /** @type {string | null} The open subfolder; null is the root */
@@ -32,7 +18,7 @@
   const folder = $derived(folders.find((f) => f.id === path) ?? null);
   const items = $derived(folder ? folder.files.length : folders.length);
 
-  // Going into a folder slides its contents in from the right; going back, from the left
+  // going into a folder slides its contents in from the right; going back, from the left
   let direction = $state(1);
   const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
@@ -145,7 +131,7 @@
 </div>
 
 <style>
-  /* Fills the window edge to edge, cancelling the content padding */
+  /* fills the window edge to edge, cancelling the content padding */
   .explorer {
     display: flex;
     flex-direction: column;
@@ -154,7 +140,7 @@
     color: var(--color-ink);
   }
 
-  /* On phones the window is the scroller and keeps its own padding */
+  /* on phones the window is the scroller and keeps its own padding */
   .explorer.mobile {
     height: auto;
     margin: 0;
@@ -316,7 +302,7 @@
     height: 80%;
   }
 
-  /* Pictures get a little paper print look */
+  /* pictures get a little paper print look */
   .thumb.image {
     border: var(--ink-border);
     border-radius: 6px;

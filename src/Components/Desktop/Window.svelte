@@ -4,20 +4,6 @@
   import { CRASH_EVENT } from "../../lib/xylophone.js";
   import { tactile } from "../../lib/tactile.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {any} window
-   * @property {boolean} [isActive]
-   * @property {boolean} [isMobileView]
-   * @property {boolean} [minimized]
-   * @property {(options?: { quiet?: boolean }) => void} [onClose]
-   * @property {() => void} [onMinimize]
-   * @property {() => void} [onActivate]
-   * @property {(pos: { id: any, x: number, y: number }) => void} [onMove]
-   * @property {(size: { id: any, width: number, height: number }) => void} [onResize]
-   */
-
-  /** @type {Props} */
   let {
     window,
     isActive = false,
@@ -30,12 +16,12 @@
     onResize,
   } = $props();
 
-  // The window owns its position/size after mount; props only seed them
+  // the window owns its position/size after mount; props only seed them
   const { position, size } = untrack(() => window);
 
   let isDragging = false;
   let isResizing = false;
-  // Pointer, frame position and frame size when the drag or resize began
+  // pointer, frame position and frame size when the drag or resize began
   let startX = 0;
   let startY = 0;
   let offsetX = 0;
@@ -48,7 +34,7 @@
   let currentHeight = $state(size.height || 600);
   let windowElement = $state();
 
-  // Maximized windows fill the desktop; `animatingFrame` eases the jump between sizes
+  // maximized windows fill the desktop; `animatingFrame` eases the jump between sizes
   let maximized = $state(false);
   let animatingFrame = $state(false);
   let frameTimer;
@@ -59,9 +45,8 @@
       : `left: ${currentX}px; top: ${currentY}px; width: ${currentWidth}px; height: ${currentHeight}px;`,
   );
 
-  // --- Crashing ----------------------------------------------------------------
-  // Mash the musical pills for too long (see xylophone.js) and the window gives up:
-  // the piano slams, the content is replaced by a dead face, and it closes a beat later.
+  // mashing the musical pills too long (see xylophone.js) crashes the window: a slam, a
+  // dead face, then it closes
   const CRASH_CLOSE_MS = 3000;
   let crashed = $state(false);
 
@@ -96,7 +81,7 @@
 
     onActivate?.();
 
-    // Drag from the title bar, but not from its buttons or while maximized
+    // drag from the title bar, but not from its buttons or while maximized
     if (
       e.target.closest(".title-bar") &&
       !e.target.closest(".window-controls") &&
@@ -117,7 +102,7 @@
   const MIN_WIDTH = 400;
   const MIN_HEIGHT = 300;
 
-  // Which way the grabbed corner grows the window: +1 right/down, -1 left/up
+  // which way the grabbed corner grows the window: +1 right/down, -1 left/up
   let resizeDirX = 1;
   let resizeDirY = 1;
 
@@ -162,7 +147,7 @@
       currentWidth = newWidth;
       currentHeight = newHeight;
 
-      // Left/top corners move the window's origin so the opposite edge stays put
+      // left/top corners move the window's origin so the opposite edge stays put
       if (resizeDirX < 0) currentX = offsetX + (startWidth - newWidth);
       if (resizeDirY < 0) currentY = offsetY + (startHeight - newHeight);
     }
@@ -185,7 +170,7 @@
     }
   }
 
-  // Dragged windows may hang off the sides or slip under the taskbar, but the title
+  // dragged windows may hang off the sides or slip under the taskbar, but the title
   // bar always stays where it can be grabbed again
   const TITLE_BAR_H = 40;
   const MIN_VISIBLE_X = 80;
@@ -309,7 +294,7 @@
       {/if}
       {#if crashed}
         <div class="crash-screen" class:mobile={isMobileView}>
-          <!-- Dead face: X eyes over a frown, drawn straight on the dots -->
+          <!-- dead face: X eyes over a frown, drawn straight on the dots -->
           <svg viewBox="0 0 64 64" aria-hidden="true">
             <path d="M12 14l12 12M24 14L12 26M40 14l12 12M52 14L40 26" />
             <path d="M18 52c8-11 20-11 28 0" />
@@ -335,7 +320,7 @@
 </div>
 
 <style>
-  /* Stacking between windows is set on the wrapper in Desktop.svelte */
+  /* stacking between windows is set on the wrapper in Desktop.svelte */
   .window-container {
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
     position: absolute;
@@ -350,7 +335,7 @@
       visibility 0s;
   }
 
-  /* Fills the desktop, leaving room for the ink border and shadow */
+  /* fills the desktop, leaving room for the ink border and shadow */
   .window-container.maximized {
     left: 8px;
     top: 8px;
@@ -367,7 +352,7 @@
       height 0.3s var(--ease);
   }
 
-  /* Drops toward the taskbar, then hides so it can't be clicked or focused */
+  /* drops toward the taskbar, then hides so it can't be clicked or focused */
   .window-container.minimized {
     transform: translateY(60px) scale(0.9);
     opacity: 0;
@@ -389,7 +374,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Fills the window edge to edge, cancelling the content padding */
+    /* fills the window edge to edge, cancelling the content padding */
     height: calc(100% + 32px);
     margin: -16px;
     background-color: var(--color-paper);
@@ -467,7 +452,7 @@
     cursor: move;
   }
 
-  /* Halftone band that fades in toward the right on the focused window; the dots
+  /* halftone band that fades in toward the right on the focused window; the dots
      swell and vanish in a wave travelling left to right (static if not installed) */
   .title-bar::before {
     content: "";
@@ -534,7 +519,7 @@
     --light-color: var(--color-accent);
   }
 
-  /* Coloured on the focused window or while pointed at; outlined otherwise */
+  /* coloured on the focused window or while pointed at; outlined otherwise */
   .title-bar.active .light,
   .window-controls:hover .light {
     background-color: var(--light-color);
@@ -573,9 +558,8 @@
     padding: 0;
   }
 
-  /* On phones the content area is the window's only scroller. A section that scrolls on
-     its own inside it would stop a swipe dead at its end, before the page has. clip
-     (unlike hidden) trims sideways overflow without making another scroller. */
+  /* phones: the content area is the only scroller so nested ones don't trap swipes; clip
+     (unlike hidden) trims overflow without making a new scroller */
   .mobile-window-content :global(> *:not(.mobile-header)) {
     padding: 16px;
     width: auto;
@@ -633,7 +617,7 @@
     color: var(--color-ink);
   }
 
-  /* Corner grips; only the bottom-right one is drawn. The top ones stay small enough
+  /* corner grips; only the bottom-right one is drawn. the top ones stay small enough
      to clear the traffic lights. */
   .resize-handle {
     position: absolute;

@@ -1,13 +1,12 @@
-// UI sounds through the Web Audio API. Every file is fetched and decoded once at page
-// load, so playback is instant; an <audio> element has to load and decode again on its
-// first play, which made the first hover of each piano note lag.
+// UI sounds via Web Audio, decoded once at load so playback is instant (<audio> lagged
+// on each note's first hover)
 
 const FILES = {
   open: "/click2.mp3",
   close: "/click1.mp3",
   slam: "/slam.mp3",
   tactile: "/tactile.mp3",
-  // Resampled from one recorded B5 (public/b5.mp3)
+  // resampled from one recorded B5 (public/b5.mp3)
   "piano:D5": "/piano/piano_D5.mp3",
   "piano:D#5": "/piano/piano_Dsharp5.mp3",
   "piano:F5": "/piano/piano_F5.mp3",
@@ -17,7 +16,7 @@ const FILES = {
   "piano:F6": "/piano/piano_F6.mp3",
 };
 
-// The tune the musical pills play, one note per hover or tap (an octave up from the
+// the tune the musical pills play, one note per hover or tap (an octave up from the
 // original, around the B5 recording)
 const MELODY = [
   "A#5",
@@ -49,7 +48,7 @@ const MELODY = [
 /** @type {Map<string, AudioBuffer>} */
 const buffers = new Map();
 
-// Decoding needs no permission, so it happens up front on an offline context; the
+// decoding needs no permission, so it happens up front on an offline context; the
 // buffers can then be played by the real context once the browser allows audio
 const decoder = new OfflineAudioContext(1, 1, 44100);
 for (const [name, url] of Object.entries(FILES)) {
@@ -58,11 +57,11 @@ for (const [name, url] of Object.entries(FILES)) {
     .then((data) => decoder.decodeAudioData(data))
     .then((buffer) => buffers.set(name, buffer))
     .catch(() => {
-      // Missing or undecodable: that sound just stays silent
+      // missing or undecodable: that sound just stays silent
     });
 }
 
-// Browsers only allow audio after the visitor interacts, so the context is created on
+// browsers only allow audio after the visitor interacts, so the context is created on
 // the first gesture (creating it earlier just logs a warning and stays suspended)
 /** @type {AudioContext | null} */
 let context = null;
@@ -77,7 +76,7 @@ function unlock() {
 }
 for (const type of GESTURES) window.addEventListener(type, unlock, true);
 
-// Sound effects are on by default; the visitor's mute choice is remembered
+// sound effects are on by default; the visitor's mute choice is remembered
 const MUTE_KEY = "sfx-muted";
 let muted = readMuted();
 
@@ -99,14 +98,14 @@ export function setMuted(value) {
   try {
     localStorage.setItem(MUTE_KEY, value ? "1" : "0");
   } catch {
-    // Storage unavailable; the choice just lasts for this visit
+    // storage unavailable; the choice just lasts for this visit
   }
 }
 
-// Silence at the start of a file, skipped so the sound lands right on the hover
+// silence at the start of a file, skipped so the sound lands right on the hover
 const LEAD_IN = { tactile: 0.03 };
 
-// Per-file loudness trims, applied wherever the sound is played from
+// per-file loudness trims, applied wherever the sound is played from
 const LEVEL = { close: 0.35, slam: 0.5 };
 
 /** @returns {AudioBufferSourceNode | null} */
@@ -123,10 +122,7 @@ function play(name, volume) {
   return source;
 }
 
-/**
- * Plays a UI sound; overlapping plays are fine.
- * @param {"open" | "close" | "slam" | "tactile"} name
- */
+// name is "open", "close", "slam" or "tactile"; overlapping plays are fine
 export function playSound(name, volume = 0.8) {
   play(name, volume);
 }
@@ -135,10 +131,7 @@ let melodyStep = 0;
 /** @type {AudioBufferSourceNode | null} */
 let lastTouchNote = null;
 
-/**
- * Plays the next note of the tune. Notes from hovering may overlap; a touch cuts off
- * the previous touched note so quick taps stay crisp.
- */
+// next note of the tune; a touch cuts off the previous touched note so taps stay crisp
 export function playXylophone({ touch = false } = {}) {
   const note = MELODY[melodyStep];
   melodyStep = (melodyStep + 1) % MELODY.length;

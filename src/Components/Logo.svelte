@@ -2,7 +2,7 @@
   import { LOGO_PATH, LOGO_VIEWBOX, LOGO_ASPECT } from "../lib/logo.js";
 </script>
 
-<!-- Solid logo mark in the current text color; it fills the height of its container -->
+<!-- solid logo mark in the current text color; it fills the height of its container -->
 <svg
   class="logo"
   viewBox={LOGO_VIEWBOX}

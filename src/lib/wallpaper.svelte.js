@@ -1,6 +1,5 @@
-// Which desktop wallpaper is showing (p5.rain unless the visitor picks otherwise).
-// Shared between the desktop, the Wallpaper window and the phone settings menu, and
-// remembered per visitor.
+// the desktop wallpaper (p5.rain by default), shared by the desktop, the Wallpaper
+// window and phone settings, remembered per visitor
 
 const KEY = "wallpaper";
 
@@ -18,8 +17,8 @@ function load() {
   }
 }
 
-// `rainReady`: the p5.rain wallpaper has loaded and faded in. Until then the Motion
-// Blob stays up and the pickers show p5.rain as loading.
+// `rainReady`: the p5.rain wallpaper has loaded and faded in. until then the Motion
+// blob stays up and the pickers show p5.rain as loading.
 export const wallpaper = $state({ current: load(), rainReady: false });
 
 /** @param {"blob" | "rain"} id */
@@ -30,6 +29,6 @@ export function setWallpaper(id) {
   try {
     localStorage.setItem(KEY, id);
   } catch {
-    // Storage unavailable; the choice lasts for this visit
+    // storage unavailable; the choice lasts for this visit
   }
 }

@@ -1,4 +1,4 @@
-// The logo geometry is read from the artwork file, so replacing src/assets/logo-mark.svg
+// the logo geometry is read from the artwork file, so replacing src/assets/logo-mark.svg
 // updates the loader and the start button together
 import markSvg from "../assets/logo-mark.svg?raw";
 

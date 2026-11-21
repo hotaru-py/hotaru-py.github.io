@@ -2,7 +2,7 @@
   import { xylophone } from "../lib/xylophone.js";
   import { credits } from "../lib/siteContent.js";
 
-  // Icon for each inspiration pill, by its id in siteContent.js
+  // icon for each inspiration pill, by its id in siteContent.js
   const ICONS = {
     website: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
     youtube: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>`,
@@ -131,13 +131,13 @@
     border: var(--ink-border);
     top: 0;
     left: 0;
-    /* Offsets, not transform: a transform would lift the halftone shadow above the card */
+    /* offsets, not transform: a transform would lift the halftone shadow above the card */
     transition:
       top 0.15s ease,
       left 0.15s ease;
   }
 
-  /* Halftone drop shadow; the grid isolates it so it stays behind the card */
+  /* halftone drop shadow; the grid isolates it so it stays behind the card */
   .credit-card::after {
     content: "";
     position: absolute;
@@ -197,7 +197,7 @@
     margin-top: 12px;
   }
 
-  /* Outlined like the skill pills; inverts on hover */
+  /* outlined like the skill pills; inverts on hover */
   .credit-pill {
     display: inline-flex;
     align-items: center;
@@ -243,7 +243,7 @@
     margin-top: 6px;
   }
 
-  /* Same static underline as the other inline links */
+  /* same static underline as the other inline links */
   .credit-link {
     color: var(--color-ink);
     font-weight: 700;

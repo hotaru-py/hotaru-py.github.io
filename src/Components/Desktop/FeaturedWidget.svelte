@@ -7,14 +7,7 @@
     FILE_ICONS,
   } from "../../lib/workFiles.js";
 
-  /**
-   * Home-screen widget: one piece of work to show off (set in siteContent.js). It opens
-   * the file it points at, or a link.
-   * @typedef {Object} Props
-   * @property {(file: import("../../lib/workFiles.js").WorkFile) => void} onOpenFile
-   */
-
-  /** @type {Props} */
+  // home-screen widget: one piece of work to show off (`featured` in siteContent.js)
   let { onOpenFile } = $props();
 
   const file = [...liveFiles, ...projectFiles, ...galleryFiles].find(
@@ -62,7 +55,7 @@
     cursor: pointer;
   }
 
-  /* Picture (or the file's icon on a halftone wash) above, words below */
+  /* picture (or the file's icon on a halftone wash) above, words below */
   .art {
     position: relative;
     flex: 1;
@@ -84,7 +77,7 @@
     object-fit: cover;
   }
 
-  /* A square tile filling most of the picture area */
+  /* a square tile filling most of the picture area */
   .icon {
     display: flex;
     box-sizing: border-box;
@@ -131,7 +124,7 @@
     font-size: 11px;
     line-height: 1.3;
     color: var(--color-ink-soft);
-    /* Up to two lines */
+    /* up to two lines */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;

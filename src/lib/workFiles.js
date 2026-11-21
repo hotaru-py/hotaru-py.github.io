@@ -1,6 +1,5 @@
-// The files behind the Projects and Gallery explorers: live sites, personal projects and
-// gallery pictures from siteContent.js, shaped alike so one explorer and one file viewer
-// handle them all.
+// live sites, projects and gallery pictures from siteContent.js, shaped alike so one
+// explorer and one file viewer handle them all
 
 import minitureShot from "../assets/work-miniture.webp";
 import tccShot from "../assets/work-tcc.webp";
@@ -10,7 +9,7 @@ import { liveWork, projects, gallery } from "./siteContent.js";
 import { placeholderArt } from "./placeholderArt.js";
 import FileViewer from "../Components/FileViewer.svelte";
 
-// Screenshot for each live site, by its id in siteContent.js
+// screenshot for each live site, by its id in siteContent.js
 const shots = {
   miniture: minitureShot,
   invente: inventeShot,
@@ -20,8 +19,8 @@ const shots = {
 
 export const workShots = Object.values(shots);
 
-// Ink line icons in the desktop's style; shaded areas use the #halftone pattern that
-// Desktop.svelte defines. Used for the taskbar buttons and the repo file thumbnails.
+// ink line icons in the desktop's style; shaded areas use the #halftone pattern that
+// Desktop.svelte defines. used for the taskbar buttons and the repo file thumbnails.
 export const FILE_ICONS = {
   folder: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   // p5.rain: a canvas of rain cells at different sizes, like its Breathe style
@@ -37,26 +36,7 @@ function slug(name) {
     .replace(/^-|-$/g, "");
 }
 
-/**
- * @typedef {Object} WorkFile
- * @property {string} key Unique across both folders; also the viewer window's id
- * @property {"live" | "project" | "gallery"} kind
- * @property {string} typeLabel Shown as the file's Type in the viewer
- * @property {string} [linkText] The viewer's button text (with `url`)
- * @property {string} [alt] Alt text for `image`
- * @property {string} [date] ISO date, shown in the viewer
- * @property {string} name
- * @property {string} fileName What the explorer would call it on disk
- * @property {string} [description]
- * @property {string} [url]
- * @property {string} [linkLabel]
- * @property {string} [image]
- * @property {{ repo: string, fallback: number }} [stars]
- * @property {"p5rain"} [demo] Shown live in the viewer instead of a picture
- * @property {string} [icon] Overrides the kind's icon (explorer and taskbar)
- */
-
-/** @type {WorkFile[]} */
+// a file's `key` is unique and doubles as its viewer window's id
 export const liveFiles = liveWork.map((site) => ({
   key: `live-${site.id}`,
   kind: "live",
@@ -71,7 +51,6 @@ export const liveFiles = liveWork.map((site) => ({
   image: shots[site.id],
 }));
 
-/** @type {WorkFile[]} */
 export const projectFiles = projects.map((project) => ({
   key: `project-${slug(project.name)}`,
   kind: "project",
@@ -87,10 +66,7 @@ export const projectFiles = projects.map((project) => ({
   icon: project.demo ? FILE_ICONS.rain : undefined,
 }));
 
-/**
- * The Gallery's subfolders and their pictures, as files
- * @type {{ id: string, name: string, files: WorkFile[] }[]}
- */
+// the gallery's subfolders, with their pictures as files
 export const galleryFolders = gallery.map((folder) => ({
   id: folder.id,
   name: folder.name,
@@ -108,14 +84,10 @@ export const galleryFolders = gallery.map((folder) => ({
   })),
 }));
 
-/** Every gallery picture, folder by folder (the phone's gallery widget cycles these) */
+/** every gallery picture, folder by folder (the phone's gallery widget cycles these) */
 export const galleryFiles = galleryFolders.flatMap((folder) => folder.files);
 
-/**
- * What Desktop.svelte's openWindow needs to show a file, so every way of opening one
- * (explorer, widget) opens and brings forward the same window.
- * @param {WorkFile} file
- */
+// openWindow() args for a file, so the explorer and widgets all open the same window
 export function fileWindow(file) {
   return {
     id: file.key,
@@ -123,7 +95,7 @@ export function fileWindow(file) {
     icon: file.icon ?? FILE_ICONS[file.kind],
     component: FileViewer,
     props: { file },
-    // Demos get more room for the artwork next to the details panel
+    // demos get more room for the artwork next to the details panel
     size: file.demo ? { width: 980, height: 600 } : { width: 820, height: 500 },
   };
 }

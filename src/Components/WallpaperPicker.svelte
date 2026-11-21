@@ -12,7 +12,7 @@
     setWallpaper(id);
   }
 
-  // A small, fixed field of rain cells for the p5.rain preview: two storm bands across
+  // a small, fixed field of rain cells for the p5.rain preview: two storm bands across
   // a faint stain, cells bigger where the rain is heavier
   const COLS = 18;
   const ROWS = 11;
@@ -70,7 +70,7 @@
               {/each}
             </svg>
             {#if loading}
-              <!-- Three rain cells lighting up in turn while the data loads -->
+              <!-- three rain cells lighting up in turn while the data loads -->
               <span class="loading" role="status">
                 <span class="cells" aria-hidden="true"
                   ><span></span><span></span><span></span></span
@@ -153,7 +153,7 @@
     height: 100%;
   }
 
-  /* The Motion Blob, at rest: soft moss rings fading into the paper */
+  /* the Motion Blob, at rest: soft moss rings fading into the paper */
   .blob {
     position: absolute;
     inset: 0;
@@ -228,7 +228,7 @@
     font-weight: 700;
   }
 
-  /* Radio dot: outlined, filled with the accent when chosen */
+  /* radio dot: outlined, filled with the accent when chosen */
   .check {
     flex-shrink: 0;
     width: 14px;

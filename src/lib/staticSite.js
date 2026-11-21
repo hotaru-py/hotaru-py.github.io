@@ -1,8 +1,5 @@
-// Build-time outputs for search engines and AI agents, all generated from siteContent.js
-// (blog posts live in blogPosts.js and are deliberately left out of these):
-// the <head> tags, a plain-HTML copy of the content baked into index.html (for crawlers
-// and visitors without JavaScript), /llms.txt, /robots.txt and /sitemap.xml.
-// Used by the plugin in vite.config.js; runs in Node, so no browser APIs here.
+// build-time head tags, no-JS copy, llms.txt, robots.txt and sitemap from siteContent.js
+// (blog posts left out). runs in Node via vite.config.js, so no browser APIs
 
 import {
   site,
@@ -26,7 +23,7 @@ const SITE_NAME = "hotaru's PC";
 const absolute = (path) => new URL(path, site.url).href;
 const simpleModeUrl = absolute("?mode=simple");
 
-/** Escapes text for HTML content and attribute values */
+/** escapes text for HTML content and attribute values */
 function esc(text) {
   return String(text)
     .replaceAll("&", "&amp;")
@@ -112,7 +109,7 @@ export function renderHeadTags() {
     `<meta name="twitter:description" content="${esc(site.description)}" />`,
     `<meta name="twitter:image" content="${esc(image)}" />`,
     `<script type="application/ld+json">${jsonLd}</script>`,
-    // Not the hidden attribute: Tailwind's reset forces that with a layered !important,
+    // not the hidden attribute: Tailwind's reset forces that with a layered !important,
     // which the <noscript> override in renderStaticPage() could never beat
     `<style>#static-content { display: none; }</style>`,
   ].join("\n    ");
@@ -182,7 +179,7 @@ export function renderStaticPage() {
     `</ul><p>More on ${linkHtml(githubProfile, "GitHub")}</p>`,
     `</section>`,
 
-    // Gallery: only once it has work in it
+    // gallery: only once it has work in it
     ...(gallery.length
       ? [
           `<section><h2>Gallery</h2>`,
@@ -199,10 +196,8 @@ export function renderStaticPage() {
     `</ul></section>`,
   ].join("\n");
 
-  // Hidden once JavaScript runs (the app shows the same content); shown as a plain,
-  // monospace page when it doesn't
-  // Sections carry no ids: Simple Mode uses those for its in-page links, and duplicates
-  // here would send them to this hidden copy
+  // hidden once JS runs, a plain mono page without it. no section ids: they'd catch
+  // Simple Mode's in-page links
   return `<div id="static-content">
 ${html}
 </div>
@@ -222,7 +217,7 @@ ${html}
 }
 
 // ------------------------------------------------------------------------ /llms.txt
-// Format: https://llmstxt.org
+// format: https://llmstxt.org
 
 export function renderLlmsTxt() {
   const lines = [

@@ -3,9 +3,8 @@
   import { playSound } from "../lib/sounds.js";
   import { loadP5Rain, applyLoopFade } from "../lib/p5rain.js";
 
-  // The p5.rain hero from github.com/hotaru-py/p5-rain, sized to whatever box it's in:
-  // a live NASA precipitation field with its palette, motion, grid and theme switches.
-  // p5.js and the plugin load only once this mounts, so nobody else pays for them.
+  // the p5.rain hero (github.com/hotaru-py/p5-rain), fitted to its box; p5.js only loads
+  // once this mounts
 
   const PALETTES = [
     { id: "ocean", label: "Ocean" },
@@ -20,14 +19,14 @@
     { id: "snap", label: "Snap" },
     { id: "free", label: "Free" },
   ];
-  // The pixel world map under the rain: off, or soft (as p5.rain's `map` strength)
+  // the pixel world map under the rain: off, or soft (as p5.rain's `map` strength)
   const MAPS = [
     { id: "off", label: "Off", value: false },
     { id: "soft", label: "Soft", value: 0.18 },
   ];
   const mapStrength = (id) => MAPS.find((m) => m.id === id)?.value ?? false;
 
-  // Choices are remembered per visitor, like on the p5.rain site
+  // choices are remembered per visitor, like on the p5.rain site
   const store = {
     get(key, allowed, fallback) {
       try {
@@ -41,7 +40,7 @@
       try {
         localStorage.setItem("p5rain-" + key, value);
       } catch {
-        // Storage unavailable; the choice lasts until the window closes
+        // storage unavailable; the choice lasts until the window closes
       }
     },
   };
@@ -53,7 +52,7 @@
     grid: store.get("grid", ids(GRIDS), "free"),
     map: store.get("map", ids(MAPS), "soft"),
   });
-  // Light by default, to sit with the paper desktop
+  // light by default, to sit with the paper desktop
   let theme = $state(store.get("theme", ["light", "dark"], "light"));
   let status = $state("loading p5.js…");
   let shortStatus = $state("loading…");
@@ -79,7 +78,7 @@
     playSound("tactile", 0.1);
   }
 
-  // The controls and heading sit over the canvas, so the lens follows the pointer on
+  // the controls and heading sit over the canvas, so the lens follows the pointer on
   // the whole demo rather than the canvas alone
   let pointer = null;
   function handlePointerMove(e) {
@@ -127,23 +126,23 @@
           p.setup = () => {
             p.pixelDensity(1);
             p.createCanvas(...size());
-            // The published week (one download), or live NASA until that exists
+            // the published week (one download), or live NASA until that exists
             field = p.createRain({
               source: "weekly",
               theme,
               ...look,
-              // The pixel world map under the rain, so it's clear where it falls
+              // the pixel world map under the rain, so it's clear where it falls
               map: mapStrength(look.map),
               start: 96,
             });
           };
           p.draw = () => {
-            // Minimized windows stay mounted; skip the work while hidden
+            // minimized windows stay mounted; skip the work while hidden
             if (root.closest(".minimized")) return;
             field.pointer(pointer?.x ?? null, pointer?.y ?? null);
             field.update();
             field.draw();
-            // Fade out and back in where the week loops, instead of a hard cut
+            // fade out and back in where the week loops, instead of a hard cut
             applyLoopFade(p.canvas, field);
           };
         }, layer);
@@ -247,7 +246,7 @@
     color-scheme: light;
   }
 
-  /* The accent follows the rain palette */
+  /* the accent follows the rain palette */
   .rain[data-palette="moss"] {
     --accent: #c4e35a;
   }
@@ -287,7 +286,7 @@
     image-rendering: pixelated;
   }
 
-  /* Keeps the heading and controls readable over the rain */
+  /* keeps the heading and controls readable over the rain */
   .scrim {
     position: absolute;
     inset: 0;
@@ -379,7 +378,7 @@
     );
   }
 
-  /* Status on the left, switches on the right; stacked when the box is narrow */
+  /* status on the left, switches on the right; stacked when the box is narrow */
   .bottom {
     position: absolute;
     left: clamp(16px, 6cqi, 64px);
@@ -490,7 +489,7 @@
     }
   }
 
-  /* Medium boxes: the status line shortens to just the time shown */
+  /* medium boxes: the status line shortens to just the time shown */
   @container (max-width: 820px) {
     .meta {
       flex-shrink: 0;
@@ -503,7 +502,7 @@
     }
   }
 
-  /* Narrow boxes (small windows, phones): switches stack under the status, heading
+  /* narrow boxes (small windows, phones): switches stack under the status, heading
      moves up, and the scrim darkens from the bottom instead of the left */
   @container (max-width: 560px) {
     .bottom {

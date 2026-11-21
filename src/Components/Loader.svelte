@@ -5,19 +5,14 @@
   import { LOGO_PATH, LOGO_VIEWBOX, LOGO_ASPECT } from "../lib/logo.js";
   import fillImage from "../assets/logo-fill.webp";
 
-  /**
-   * @typedef {Object} Props
-   * @property {() => void} [onExit] Called as the loader starts fading out, so the page can animate in underneath
-   */
-
-  /** @type {Props} */
+  // onExit fires as the loader starts fading, so the page can animate in underneath
   let { onExit } = $props();
 
-  // Timings in seconds; they mirror the keyframes in the style block
+  // timings in seconds; they mirror the keyframes in the style block
   const FILL_DELAY = 0.5;
   const FILL_DURATION = 1.05;
   const HOLD = 0.3;
-  // Never hold the page back longer than this waiting for the fill image
+  // never hold the page back longer than this waiting for the fill image
   const IMAGE_WAIT_MS = 1500;
 
   const reduceMotion = window.matchMedia(
@@ -25,7 +20,7 @@
   ).matches;
 
   let visible = $state(true);
-  // The mark only renders (and so only starts animating) once the fill image is decoded
+  // the mark only renders (and so only starts animating) once the fill image is decoded
   let ready = $state(false);
 
   onMount(() => {
@@ -69,7 +64,7 @@
   >
     {#if ready}
       <div class="mark" style:aspect-ratio={LOGO_ASPECT}>
-        <!-- Outline fades in, then wipes away from the bottom as the fill rises. (Not
+        <!-- outline fades in, then wipes away from the bottom as the fill rises. (Not
              class "outline": that's a Tailwind utility, which drew a 1px box around it.) -->
         <svg class="layer outline-layer" viewBox={LOGO_VIEWBOX} fill="none">
           <path
@@ -81,7 +76,7 @@
           />
         </svg>
 
-        <!-- Noisy gradient, clipped to the logo shape -->
+        <!-- noisy gradient, clipped to the logo shape -->
         <svg class="layer fill" viewBox={LOGO_VIEWBOX}>
           <defs>
             <clipPath id="loader-logo-clip">
@@ -178,7 +173,7 @@
     }
   }
 
-  /* Skip straight to the filled logo */
+  /* skip straight to the filled logo */
   @media (prefers-reduced-motion: reduce) {
     .outline-layer {
       display: none;

@@ -1,6 +1,4 @@
-// Works out p5.rain's motion field for an hour off the main thread. On the page it
-// takes ~10ms in Chrome and up to ~35ms in Firefox, once per data-hour (every half
-// second), which showed up as a hitch; here it is computed ahead of time instead.
+// works out an hour's motion field off the main thread (10-35ms on it, a visible hitch)
 import { computeMotion } from "../vendor/p5.rain.esm.js";
 
 self.onmessage = ({ data: { key, a, b, span } }) => {

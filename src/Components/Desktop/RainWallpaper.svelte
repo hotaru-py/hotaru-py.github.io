@@ -3,33 +3,23 @@
   import { fade } from "svelte/transition";
   import { cellView, cssToRGB, paintGaps } from "../../lib/rainCells.js";
 
-  /**
-   * The p5.rain wallpaper: NASA's last week of rain as a full-screen pixel field. It
-   * stays invisible until the data is in, then fades in over whatever is underneath.
-   * @typedef {Object} Props
-   * @property {() => void} [onReady] Called once it has fully faded in
-   */
-
-  /** @type {Props} */
+  // NASA's last week of rain as a pixel field; fades in once the data is in, then onReady
   let { onReady } = $props();
 
   const FADE_MS = 600;
 
-  // The rain moves slowly, so the wallpaper runs at a calm 30 fps, drops to 15 while
-  // the p5.rain window is showing so the demo gets the frames, and stops while
-  // something covers the screen
+  // 30fps, 15 while the p5.rain window is open, paused while something covers the screen
   const FPS = 30;
   const FPS_WITH_DEMO = 15;
   const COVERED =
     ".window-container.maximized:not(.minimized), .mobile-window-container:not(.minimized)";
   const DEMO = ".window-container:not(.minimized) [data-p5rain-demo]";
 
-  // Where the week loops, the end crossfades into the start over this many data-hours: a
-  // second field plays the start of the week from the moment the first has this long
-  // left, fading in over it, and then carries on as the main one
+  // data-hours over which a second field, playing the week's start, fades in over the end
+  // and takes over
   const CROSSFADE_HOURS = 4;
 
-  // Faint grid lines in the 1px gaps between the squares, only on this wallpaper
+  // faint grid lines in the 1px gaps between the squares, only on this wallpaper
   const GRID_LINE = "rgba(70, 92, 36, 0.05)";
   const GRID_LINE_TENTH = "rgba(70, 92, 36, 0.1)";
   function drawGridLines(ctx, g) {
@@ -37,7 +27,7 @@
     const x1 = ox + 240 * cell;
     const y1 = oy + rows * cell;
     for (let i = 1, x = ox + cell - 1; x <= x1; i++, x += cell) {
-      // Every 10th line, across and down, is stronger
+      // every 10th line, across and down, is stronger
       ctx.fillStyle = i % 10 === 0 ? GRID_LINE_TENTH : GRID_LINE;
       ctx.fillRect(x, oy, 1, y1 - oy);
     }
@@ -74,7 +64,7 @@
     let readyTimer;
     let worker;
 
-    // The wallpaper sits under the icons and windows, so the lens follows the pointer
+    // the wallpaper sits under the icons and windows, so the lens follows the pointer
     // over the whole page
     let pointer = null;
     const handleMove = (e) => (pointer = { x: e.clientX, y: e.clientY });
@@ -82,13 +72,13 @@
     window.addEventListener("pointermove", handleMove, { passive: true });
     document.documentElement.addEventListener("pointerleave", handleLeave);
 
-    // The desktop's own paper colour sits behind the rain, so it matches the taskbar
+    // the desktop's own paper colour sits behind the rain, so it matches the taskbar
     const paper =
       getComputedStyle(document.documentElement)
         .getPropertyValue("--color-moss-50")
         .trim() || "#f8f7ed";
 
-    // Only p5.rain itself is needed here, not p5.js: the fields are drawn by
+    // only p5.rain itself is needed here, not p5.js: the fields are drawn by
     // rainCells.js, so the 1MB p5 download is left to the p5.rain window
     import("../../vendor/p5.rain.esm.js")
       .then((rain) => {
@@ -96,11 +86,11 @@
         start(rain);
       })
       .catch(() => {
-        // Couldn't load: never becomes ready, so the Motion Blob stays up
+        // couldn't load: never becomes ready, so the Motion Blob stays up
       });
 
     function start(rain) {
-      // The layer's size and place, kept up to date by the observer below rather than
+      // the layer's size and place, kept up to date by the observer below rather than
       // measured every frame (measuring can force the page to lay itself out mid-frame)
       const box = { w: 1, h: 1, left: 0, top: 0 };
       const measure = () => {
@@ -127,7 +117,7 @@
         deltaTime: 16.7,
       };
       const first = new rain.RainField(host, look);
-      // The second shares the first's data, so nothing is downloaded twice
+      // the second shares the first's data, so nothing is downloaded twice
       const second = new rain.RainField(host, { ...look, data: first.data, start: 0 });
       const fields = [first, second];
       const rgb = cssToRGB(paper);
@@ -140,7 +130,7 @@
 
       observer = new ResizeObserver(() => {
         measure();
-        // Lay the fields out again for the new size on their next update
+        // lay the fields out again for the new size on their next update
         for (const f of fields) f._g = null;
       });
       observer.observe(layer);
@@ -157,7 +147,7 @@
       raf = requestAnimationFrame(loop);
 
       function frame(dt) {
-        // Hidden behind a maximized (or phone) window: skip the work
+        // hidden behind a maximized (or phone) window: skip the work
         if (ready && document.querySelector(COVERED)) return;
         fps = document.querySelector(DEMO) ? FPS_WITH_DEMO : FPS;
 
@@ -178,7 +168,7 @@
         if (crossfading) {
           other.pointer(px, py);
           other.update(dt);
-          // The main field has wrapped to the start of the week: the other one,
+          // the main field has wrapped to the start of the week: the other one,
           // already there and fully faded in, takes over
           if (main.st.f < before) {
             cur = 1 - cur;
@@ -193,7 +183,7 @@
           paintGaps(gaps, gapLayout, rain.COLS, paper, drawGridLines);
         }
 
-        // The crossfade is just the top canvas's opacity: the browser blends the two
+        // the crossfade is just the top canvas's opacity: the browser blends the two
         const top = views[1 - cur].canvas;
         views[cur].canvas.style.zIndex = "1";
         views[cur].canvas.style.opacity = "1";
@@ -206,7 +196,7 @@
           top.style.opacity = "0";
         }
 
-        // Work out the motion for hours coming up before they're needed
+        // work out the motion for hours coming up before they're needed
         motion.prefetch(main.st.i);
         if (main.st.f >= span - CROSSFADE_HOURS - 1) motion.prefetch(-1);
         if (crossfading) motion.prefetch(fields[1 - cur].st.i);
@@ -218,12 +208,8 @@
       }
     }
 
-    /**
-     * p5.rain works out each hour's motion when it first needs it, which stalled a frame
-     * every data-hour. This works out the next couple of hours in a worker ahead of time
-     * and hands them to p5.rain's own cache. If the worker can't start, p5.rain just
-     * carries on working them out itself.
-     */
+    // works out the next hours' motion in a worker and fills p5.rain's cache, so it doesn't
+    // stall a frame every data-hour
     function motionAhead(data) {
       // p5.rain's motion for hour i compares it with the hour this many later (BASE)
       const BASE = 3;
@@ -240,7 +226,7 @@
         const [version, i] = key.split(":").map(Number);
         if (version !== data.version || data._motion.has(i)) return;
         data._motion.set(i, { vx, vy });
-        // Same limit as p5.rain's cache
+        // same limit as p5.rain's cache
         if (data._motion.size > 16) data._motion.delete(data._motion.keys().next().value);
       };
       worker.onerror = () => {
@@ -257,7 +243,7 @@
         worker.postMessage({ key, a: data.frames[i], b: data.frames[j], span: Math.max(1, j - i) });
       };
       return {
-        /** The hours after `i` (or the start of the week, for -1) */
+        /** the hours after `i` (or the start of the week, for -1) */
         prefetch(i) {
           if (i < 0) [0, 1, 2].forEach(ask);
           else [i + 1, i + 2].forEach(ask);
@@ -305,14 +291,14 @@
     opacity: 1;
   }
 
-  /* Phones: a touch see-through, so the home screen's icons and widgets stand out */
+  /* phones: a touch see-through, so the home screen's icons and widgets stand out */
   @media (max-width: 768px) {
     .rain-wallpaper.ready {
       opacity: 0.9;
     }
   }
 
-  /* One pixel per cell, scaled up square-edged; positioned and sized from script */
+  /* one pixel per cell, scaled up square-edged; positioned and sized from script */
   canvas {
     position: absolute;
     display: block;

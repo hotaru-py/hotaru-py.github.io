@@ -1,10 +1,5 @@
-/**
- * Svelte action for a <details>: opens and closes with a height animation in every
- * browser (the CSS-only ::details-content route only works in recent Chromium). Skipped
- * for visitors who prefer reduced motion. While it closes, `data-expanded="false"` lets
- * the marker flip straight away, before the element's own `open` attribute is dropped.
- * @param {HTMLDetailsElement} details
- */
+// svelte action: animates a <details> open and shut (::details-content is Chromium-only).
+// `data-expanded` flips the marker straight away, before `open` is dropped
 export function foldable(details) {
   const summary = details.querySelector("summary");
   if (!summary) return;
@@ -27,10 +22,10 @@ export function foldable(details) {
       finish(opening);
       return;
     }
-    // Starts from wherever an interrupted animation had got to
+    // starts from wherever an interrupted animation had got to
     const from = details.offsetHeight;
     animation?.cancel();
-    // Measured before clipping: overflow:hidden stops the content's margins collapsing
+    // measured before clipping: overflow:hidden stops the content's margins collapsing
     // out of the box, which would make the end height differ from the settled one
     details.style.overflow = "";
     details.dataset.expanded = String(opening);

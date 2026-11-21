@@ -5,20 +5,15 @@
   import { playSound } from "../../lib/sounds.js";
   import avatar from "../../assets/firefly-avatar.webp";
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} isMobile Phones get a banner from the top; desktops an XP-style tray balloon
-   */
-
-  /** @type {Props} */
+  // phones get a banner from the top, desktops an XP-style tray balloon
   let { isMobile } = $props();
 
-  // Shown once per visitor; only marked as seen once it has actually been closed
+  // shown once per visitor; only marked as seen once it has actually been closed
   const SEEN_KEY = "welcome-seen";
   const APPEAR_DELAY_MS = 900;
   const DESKTOP_TIMEOUT_MS = 20000;
   const MOBILE_TIMEOUT_MS = 10000;
-  // How far a swipe has to travel (px) before letting go dismisses the banner
+  // how far a swipe has to travel (px) before letting go dismisses the banner
   const SWIPE_UP = 40;
   const SWIPE_SIDE = 90;
 
@@ -28,7 +23,7 @@
 
   let visible = $state(false);
 
-  // The countdown pauses while the notice is hovered or touched
+  // the countdown pauses while the notice is hovered or touched
   let remaining = 0;
   let startedAt = 0;
   let timer;
@@ -48,7 +43,7 @@
     try {
       if (localStorage.getItem(SEEN_KEY)) return;
     } catch {
-      // Storage unavailable: show it, it just can't be remembered
+      // storage unavailable: show it, it just can't be remembered
     }
     const appear = setTimeout(() => {
       visible = true;
@@ -68,7 +63,7 @@
     try {
       localStorage.setItem(SEEN_KEY, "1");
     } catch {
-      // Storage unavailable; it may show again next visit
+      // storage unavailable; it may show again next visit
     }
   }
 
@@ -96,7 +91,7 @@
 
   function handlePointerMove(e) {
     if (!drag.active || e.pointerId !== pointerId) return;
-    // Free sideways; upwards only (dragging down just resists)
+    // free sideways; upwards only (dragging down just resists)
     const dy = e.clientY - startY;
     drag = {
       x: e.clientX - startX,
@@ -113,13 +108,13 @@
     } else if (Math.abs(x) > SWIPE_SIDE) {
       fling(x < 0 ? "left" : "right");
     } else {
-      // Not far enough: spring back and carry on counting down
+      // not far enough: spring back and carry on counting down
       drag = { x: 0, y: 0, active: false };
       startTimer();
     }
   }
 
-  // Let it slide off-screen in the swipe's direction first, then remove it
+  // let it slide off-screen in the swipe's direction first, then remove it
   function fling(direction) {
     clearTimeout(timer);
     flungTo = direction;
@@ -168,7 +163,7 @@
 {/if}
 
 {#if visible && isMobile}
-  <!-- Banner that slides down from the top; swipe it up or sideways to dismiss -->
+  <!-- banner that slides down from the top; swipe it up or sideways to dismiss -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="banner"
@@ -210,7 +205,7 @@
     margin-bottom: 6px;
   }
 
-  /* Same green, ink-ringed circle as the start menu and About avatars */
+  /* same green, ink-ringed circle as the start menu and About avatars */
   .avatar {
     width: 32px;
     height: 32px;
@@ -239,11 +234,11 @@
   /* --- Desktop balloon --- */
   .balloon {
     --tail: 18px;
-    /* Where the tail sits from the right edge: over the centre of the tray clock */
+    /* where the tail sits from the right edge: over the centre of the tray clock */
     --tail-right: 37px;
     position: fixed;
     right: 20px;
-    /* Top of the taskbar (50px bar + 16px gap below it), plus the tail, so its tip
+    /* top of the taskbar (50px bar + 16px gap below it), plus the tail, so its tip
        lands just above the bar */
     bottom: calc(66px + var(--tail) + 2px);
     z-index: 2000;
@@ -255,7 +250,7 @@
     box-shadow: 4px 4px 0 var(--color-ink);
   }
 
-  /* Tail: an ink triangle with a smaller paper one on top, so it reads as outlined */
+  /* tail: an ink triangle with a smaller paper one on top, so it reads as outlined */
   .balloon::before,
   .balloon::after {
     content: "";
@@ -331,7 +326,7 @@
       opacity 0.26s ease;
   }
 
-  /* Follow the finger exactly while dragging */
+  /* follow the finger exactly while dragging */
   .banner.dragging {
     transition: none;
     cursor: grabbing;

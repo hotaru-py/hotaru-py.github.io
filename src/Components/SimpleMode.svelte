@@ -25,12 +25,6 @@
     BLOG_TITLE,
   } from "../lib/blogPosts.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {() => void} onSwitchUser Back to the login screen to pick a style
-   */
-
-  /** @type {Props} */
   let { onSwitchUser } = $props();
 
   const sections = [
@@ -43,7 +37,7 @@
     { id: "links", title: "Links" },
   ];
 
-  // Every project as a page of its own, under its group's heading in the Projects list
+  // every project as a page of its own, under its group's heading in the Projects list
   const slug = (name) =>
     name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const projectGroups = [
@@ -71,9 +65,8 @@
   ];
   const allProjects = projectGroups.flatMap((group) => group.entries);
 
-  // One tab at a time, with the address as a path: #about, #blog, #blog/<post id>. The
-  // tab is the top directory and anything inside it (a post or project) a subdirectory,
-  // so the browser's back button and shared links work like a file tree.
+  // one tab at a time, addressed like a path (#blog, #blog/<post id>) so back and shared
+  // links work
   function parseHash() {
     const [tab, sub] = location.hash.replace(/^#\/?/, "").split("/");
     const id = sections.some((section) => section.id === tab) ? tab : "about";
@@ -99,7 +92,7 @@
       : null,
   );
 
-  // Phones: the sticky bar shows the current tab, and a button opens the full list
+  // phones: the sticky bar shows the current tab, and a button opens the full list
   let menuOpen = $state(false);
   /** @type {HTMLButtonElement | undefined} */
   let menuButton = $state();
@@ -112,14 +105,14 @@
   let liveStars = $state({});
 
   onMount(() => {
-    // A new page starts at the top, under the bar
+    // a new page starts at the top, under the bar
     const onHash = () => {
       route = parseHash();
       menuOpen = false;
       window.scrollTo({ top: 0, behavior: "instant" });
     };
     window.addEventListener("hashchange", onHash);
-    // Scrolling away from an open list closes it
+    // scrolling away from an open list closes it
     const onScroll = () => menuOpen && (menuOpen = false);
     window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -136,12 +129,12 @@
   });
 </script>
 
-<!-- Escape closes the phone section list -->
+<!-- escape closes the phone section list -->
 <svelte:window
   onkeydown={(e) => menuOpen && e.key === "Escape" && closeMenu(true)}
 />
 
-<!-- Plain, markdown-flavoured version of the site: text only, top to bottom -->
+<!-- plain, markdown-flavoured version of the site: text only, top to bottom -->
 <div class="simple">
   <main class="page">
     <header>
@@ -149,7 +142,7 @@
         <h1>
           <span class="mark" aria-hidden="true">{"# "}</span>{site.name} <span class="real-name">({about.realName})</span>
         </h1>
-        <!-- Switch website styles: back to the picker, from anywhere on the page -->
+        <!-- switch website styles: back to the picker, from anywhere on the page -->
         <span class="link switch-icon"
           ><span class="bracket" aria-hidden="true">{"[ "}</span><button
             type="button"
@@ -167,10 +160,8 @@
       <p class="tagline">{site.jobTitle}</p>
     </header>
 
-    <!-- Phones: one line that sticks to the top. It names the section being read, and its
-         button opens a list of every section as big tap targets (the tab strip below
-         doesn't fit a phone: its last tabs hid off the edge with nothing to show it
-         scrolls). -->
+    <!-- phones: a sticky bar naming the current section, with a button for the full list
+         (the tab strip below doesn't fit) -->
     <div class="jump">
       <div class="jump-bar">
         <span class="jump-current" aria-live="polite">
@@ -190,7 +181,7 @@
         </button>
       </div>
       {#if menuOpen}
-        <!-- Tap outside the list to close it -->
+        <!-- tap outside the list to close it -->
         <button
           type="button"
           class="jump-backdrop"
@@ -214,7 +205,7 @@
       {/if}
     </div>
 
-    <!-- Wider screens: tabs that stick to the top while reading, with the current
+    <!-- wider screens: tabs that stick to the top while reading, with the current
          section marked -->
     <nav class="toc" aria-label="Sections">
       {#each sections as section}
@@ -244,7 +235,7 @@
       </ul>
 
       <h3><span class="mark" aria-hidden="true">{"### "}</span>Education</h3>
-      <!-- Same list style as Experience: school in bold, details underneath -->
+      <!-- same list style as Experience: school in bold, details underneath -->
       <ul>
         {#each about.education as entry}
           <li>
@@ -320,7 +311,7 @@
         <p>{@render link(openProject.url, openProject.linkLabel)}</p>
       {:else}
         <h2><span class="mark" aria-hidden="true">{"## "}</span>Projects</h2>
-        <!-- A directory listing: each project opens as its own page -->
+        <!-- a directory listing: each project opens as its own page -->
         {#each projectGroups as group}
           <h3>
             <span class="mark" aria-hidden="true">{"### "}</span>{group.title}
@@ -354,7 +345,7 @@
         {#if posts.length === 0}
           <p class="muted">{NO_POSTS}</p>
         {/if}
-        <!-- A directory listing: each post opens as its own page -->
+        <!-- a directory listing: each post opens as its own page -->
         <ul class="listing">
           {#each posts as post (post.id)}
             <li>
@@ -388,7 +379,7 @@
     {/if}
 
     <footer>
-      <!-- A little wave goodbye; hidden from screen readers, which would spell it out -->
+      <!-- a little wave goodbye; hidden from screen readers, which would spell it out -->
       <p aria-hidden="true">(^_^)/</p>
       <p class="rule" aria-hidden="true">---</p>
       <p>{@render switchButton()}</p>
@@ -461,12 +452,12 @@
     font-size: 22px;
   }
 
-  /* The real name moves as a unit, never splitting the surname onto its own line */
+  /* the real name moves as a unit, never splitting the surname onto its own line */
   .real-name {
     white-space: nowrap;
   }
 
-  /* The title with the switch icon at the right end of its row */
+  /* the title with the switch icon at the right end of its row */
   .title-row {
     display: flex;
     align-items: flex-start;
@@ -482,7 +473,7 @@
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
-    /* Lines the 44px tap target up with the title's first line */
+    /* lines the 44px tap target up with the title's first line */
     margin-top: -9px;
   }
 
@@ -530,7 +521,7 @@
     color: var(--muted);
   }
 
-  /* Sticky section bar: scrolls sideways on narrow screens rather than wrapping */
+  /* sticky section bar: scrolls sideways on narrow screens rather than wrapping */
   .toc {
     position: sticky;
     top: 0;
@@ -567,7 +558,7 @@
   }
 
   @media (max-width: 540px) {
-    /* The tab strip needs about 480px; below that the bar and list replace it */
+    /* the tab strip needs about 480px; below that the bar and list replace it */
     .toc {
       display: none;
     }
@@ -606,7 +597,7 @@
       white-space: nowrap;
     }
 
-    /* Dims the page behind the list; sits under the bar and list but over the page */
+    /* dims the page behind the list; sits under the bar and list but over the page */
     .jump-backdrop {
       position: fixed;
       inset: 0;
@@ -616,7 +607,7 @@
       cursor: default;
     }
 
-    /* Floats over the page under the bar rather than pushing it down: growing the bar
+    /* floats over the page under the bar rather than pushing it down: growing the bar
        made the browser's scroll anchoring shift the page, which closed the list */
     .jump-menu {
       position: absolute;
@@ -664,12 +655,12 @@
     }
   }
 
-  /* Jumps land below the sticky bar, not under it */
+  /* jumps land below the sticky bar, not under it */
   section {
     scroll-margin-top: 56px;
   }
 
-  /* Folding "### " headings */
+  /* folding "### " headings */
   details {
     margin-top: 20px;
   }
@@ -693,7 +684,7 @@
     content: " −";
   }
 
-  /* The first couple of lines of a post, then an ellipsis */
+  /* the first couple of lines of a post, then an ellipsis */
   .excerpt {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -702,7 +693,7 @@
     overflow: hidden;
   }
 
-  /* A role's details, folding open inside its club's list item */
+  /* a role's details, folding open inside its club's list item */
   .role-detail {
     margin-top: 0;
   }
@@ -724,7 +715,7 @@
     margin-top: 14px;
   }
 
-  /* Markdown-style "- " bullets */
+  /* markdown-style "- " bullets */
   ul {
     list-style: none;
     padding: 0;
@@ -802,12 +793,12 @@
       padding-top: 40px;
     }
 
-    /* Sized so "# hotaru (Prajesh Raam)" fits one line beside the switch icon */
+    /* sized so "# hotaru (Prajesh Raam)" fits one line beside the switch icon */
     h1 {
       font-size: 18px;
     }
 
-    /* Long link labels in lists may wrap on narrow screens; the short section links
+    /* long link labels in lists may wrap on narrow screens; the short section links
        above stay whole so a bracket never ends up alone on a line */
     li .link {
       white-space: normal;

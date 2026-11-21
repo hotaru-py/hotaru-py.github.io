@@ -82,7 +82,7 @@
     border: var(--ink-border);
     top: 0;
     left: 0;
-    /* Offsets, not transform: a transform would lift the halftone shadow above the card */
+    /* offsets, not transform: a transform would lift the halftone shadow above the card */
     transition:
       top 0.15s ease,
       left 0.15s ease;
@@ -90,7 +90,7 @@
     flex-direction: column;
   }
 
-  /* Halftone drop shadow; the grid isolates it so it stays behind the card */
+  /* halftone drop shadow; the grid isolates it so it stays behind the card */
   .skill-card::after {
     content: "";
     position: absolute;

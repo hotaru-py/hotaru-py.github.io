@@ -2,14 +2,7 @@
   import { onMount } from "svelte";
   import { galleryFiles } from "../../lib/workFiles.js";
 
-  /**
-   * Home-screen widget: a square that cycles through every picture in the Gallery.
-   * Tapping it opens the picture showing.
-   * @typedef {Object} Props
-   * @property {(file: import("../../lib/workFiles.js").WorkFile) => void} onOpenFile
-   */
-
-  /** @type {Props} */
+  // home-screen widget cycling through the gallery's pictures; a tap opens the one showing
   let { onOpenFile } = $props();
 
   const INTERVAL_MS = 4000;
@@ -20,7 +13,7 @@
   onMount(() => {
     if (galleryFiles.length < 2) return;
     const timer = setInterval(() => {
-      // Hold still while the page isn't being looked at
+      // hold still while the page isn't being looked at
       if (document.hidden) return;
       index = (index + 1) % galleryFiles.length;
     }, INTERVAL_MS);
@@ -35,7 +28,7 @@
     onclick={() => onOpenFile(current)}
     aria-label="Gallery: {current.name}"
   >
-    <!-- Every picture stays stacked; only the current one is opaque, so they crossfade -->
+    <!-- every picture stays stacked; only the current one is opaque, so they crossfade -->
     {#each galleryFiles as file, i (file.key)}
       <img src={file.image} alt="" class:shown={i === index} />
     {/each}

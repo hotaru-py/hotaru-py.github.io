@@ -113,7 +113,7 @@
     font-weight: 700;
   }
 
-  /* A club's roles, indented under its name with a rule down the side */
+  /* a club's roles, indented under its name with a rule down the side */
   .roles {
     margin: 4px 0 0;
     padding: 0 0 0 12px;

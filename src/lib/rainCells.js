@@ -1,17 +1,5 @@
-// A faster way to draw a p5.rain field for the wallpaper: one pixel per cell.
-//
-// p5.rain draws every raindrop as its own square (fillRect). That's a few thousand
-// canvas calls a frame: fine in Chrome (~3ms), but ~17ms in Firefox/Zen, enough to make
-// everything else on the page (the Start menu, dragging) stutter. With `grid: "snap"`
-// every drop sits exactly on a cell, so the same picture can be built as a tiny image
-// (240 × rows pixels, one per cell) in plain JS, handed over with one putImageData, and
-// scaled up by the browser with `image-rendering: pixelated`. The 1px gaps between the
-// squares (which p5.rain leaves as background) are a separate, static canvas on top.
-//
-// What it reproduces from p5.rain's own draw(): the "flow" style on a snapped grid,
-// transparent background (`background: false`) over the page's paper, the window-total
-// stain, and the lens brightening drops under the pointer. It doesn't do the world map,
-// "breathe", or the free grid, which the wallpaper doesn't use.
+// draws a p5.rain field as one pixel per cell, scaled up by CSS: far cheaper than its
+// per-drop fillRect in Firefox. only what the wallpaper uses ("flow", snapped, stain, lens)
 
 const LEVELS = 64;
 
@@ -36,10 +24,7 @@ function coloursOf(T) {
   return P;
 }
 
-/**
- * Any CSS colour → [r, g, b], as the browser paints it
- * @param {string} colour
- */
+// any CSS colour → [r, g, b], as the browser paints it
 export function cssToRGB(colour) {
   const c = document.createElement("canvas");
   c.width = c.height = 1;
@@ -50,13 +35,8 @@ export function cssToRGB(colour) {
   return [r, g, b];
 }
 
-/**
- * Draws one field into a <canvas> sized one pixel per cell, positioned and scaled over
- * the wallpaper by CSS.
- * @param {HTMLCanvasElement} canvas
- * @param {any} rain the p5.rain module (for COLS and paletteLUT)
- * @param {[number, number, number]} paper the colour under the rain
- */
+// draws a field into a one-pixel-per-cell <canvas>; `rain` is the p5.rain module, `paper`
+// the [r, g, b] under it
 export function cellView(canvas, rain, paper) {
   const { COLS, paletteLUT } = rain;
   const ctx = canvas.getContext("2d");
@@ -81,8 +61,8 @@ export function cellView(canvas, rain, paper) {
     baseKey = "";
   }
 
-  // Paper with the window-total stain over it: only changes with the data or colours.
-  // Same maths as p5.rain's stain (sqrt of the total, 32 steps, at `stain` strength).
+  // paper with the window-total stain over it: only changes with the data or colours.
+  // same maths as p5.rain's stain (sqrt of the total, 32 steps, at `stain` strength).
   function paintBase(field, P) {
     const { data: d, o } = field;
     const g = layout;
@@ -106,7 +86,7 @@ export function cellView(canvas, rain, paper) {
 
   return {
     canvas,
-    /** Draw the field as it is now (call after field.update()) */
+    /** draw the field as it is now (call after field.update()) */
     render(field) {
       const g = field._g;
       if (!g) return;
@@ -123,7 +103,7 @@ export function cellView(canvas, rain, paper) {
       const px = image.data;
       px.set(base);
 
-      // The drops, as p5.rain's flow style draws them on a snapped grid: alpha in 20
+      // the drops, as p5.rain's flow style draws them on a snapped grid: alpha in 20
       // steps, colour from the level (brightened by the lens), snow from its own ramp
       const { px: X, py: Y, pa, plv, psn, boost, pn } = field;
       const scale = o.intensity;
@@ -152,15 +132,7 @@ export function cellView(canvas, rain, paper) {
   };
 }
 
-/**
- * The 1px gaps between the squares: paper, with the faint grid lines over it. Drawn
- * once per layout onto a canvas the size of the wallpaper; everything else stays clear.
- * @param {HTMLCanvasElement} canvas
- * @param {{ w: number, h: number, cell: number, ox: number, oy: number, rows: number }} g
- * @param {number} cols
- * @param {string} paper CSS colour
- * @param {(ctx: CanvasRenderingContext2D, g: any) => void} drawLines the grid lines, as before
- */
+// paints the 1px gaps between squares (paper plus grid lines), once per layout
 export function paintGaps(canvas, g, cols, paper, drawLines) {
   canvas.width = g.w;
   canvas.height = g.h;

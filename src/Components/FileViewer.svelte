@@ -6,16 +6,9 @@
   import { formatPostDate } from "../lib/blogPosts.js";
   import P5Rain from "./P5Rain.svelte";
 
-  /**
-   * @typedef {Object} Props
-   * @property {import("../lib/workFiles.js").WorkFile} file
-   * @property {boolean} [isMobile]
-   */
-
-  /** @type {Props} */
   let { file, isMobile = false } = $props();
 
-  // Shown until (or if) the live count can't be fetched
+  // shown until (or if) the live count can't be fetched
   let stars = $state(untrack(() => file.stars?.fallback ?? null));
 
   onMount(() => {
@@ -26,19 +19,19 @@
   });
 </script>
 
-<!-- Photos-app style: the picture on the left, its details in a side panel -->
+<!-- photos-app style: the picture on the left, its details in a side panel -->
 <div class="shell" class:mobile={isMobile}>
   <div class="viewer" class:mobile={isMobile}>
     <div class="stage" class:demo={file.demo}>
       {#if file.demo === "p5rain"}
-        <!-- Projects with a demo run it live where the picture would be -->
+        <!-- projects with a demo run it live where the picture would be -->
         <div class="demo-frame">
           <P5Rain />
         </div>
       {:else if file.image}
         <img src={file.image} alt={file.alt ?? file.name} />
       {:else}
-        <!-- Repos have no screenshot: a big file icon on a halftone card instead -->
+        <!-- repos have no screenshot: a big file icon on a halftone card instead -->
         <div class="placeholder">
           <span class="placeholder-icon">{@html FILE_ICONS.project}</span>
           <span class="placeholder-name">{file.fileName}</span>
@@ -104,7 +97,7 @@
 </div>
 
 <style>
-  /* Fills the window edge to edge, cancelling the content padding. Also the size
+  /* fills the window edge to edge, cancelling the content padding. also the size
      container the layout responds to, since a desktop window can be any width. */
   .shell {
     container-type: inline-size;
@@ -144,7 +137,7 @@
     background: none;
   }
 
-  /* A live demo fills the stage, framed like the screenshots */
+  /* a live demo fills the stage, framed like the screenshots */
   .stage.demo {
     align-items: stretch;
     justify-content: stretch;
@@ -160,7 +153,7 @@
     overflow: hidden;
   }
 
-  /* On phones the window scrolls, so the demo gets a height of its own */
+  /* on phones the window scrolls, so the demo gets a height of its own */
   .mobile .stage.demo {
     padding: 0 4px 4px 0;
     height: min(68vh, 560px);
@@ -195,7 +188,7 @@
     overflow: hidden;
   }
 
-  /* Halftone wash fading in from one corner */
+  /* halftone wash fading in from one corner */
   .placeholder::before {
     content: "";
     position: absolute;
@@ -338,7 +331,7 @@
     box-shadow: 1px 1px 0 var(--color-ink);
   }
 
-  /* Narrow desktop windows stack the panel under the picture too */
+  /* narrow desktop windows stack the panel under the picture too */
   @container (max-width: 560px) {
     .viewer:not(.mobile) {
       grid-template-columns: minmax(0, 1fr);

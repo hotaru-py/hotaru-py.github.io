@@ -7,21 +7,6 @@
   import { cubicOut } from "svelte/easing";
   import { tactile } from "../../lib/tactile.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {any} [windows]
-   * @property {any} [activeWindowId]
-   * @property {any} [desktopIcons]
-   * @property {any} [currentTime]
-   * @property {(windowId: any) => void} [onActivateWindow]
-   * @property {(windowId: any) => void} [onMinimizeWindow]
-   * @property {(icon: any, options?: { quiet?: boolean }) => void} [onOpenWindow]
-   * @property {boolean} [showReset] Only offered once icons or widgets have been moved
-   * @property {() => void} [onResetLayout]
-   * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
-   */
-
-  /** @type {Props} */
   let {
     windows = [],
     activeWindowId = null,
@@ -30,14 +15,13 @@
     onActivateWindow,
     onMinimizeWindow,
     onOpenWindow,
-    showReset = false,
+    showReset = false, // once icons or widgets have been moved
     onResetLayout,
     onSwitchUser,
   } = $props();
 
-  // A window's taskbar button makes room, then fades in rising from the bottom of the
-  // bar. Closing plays it backwards: it sinks out, then the buttons after it close the
-  // gap. The gap is a negative margin rather than a width, so nothing gets squashed.
+  // a window's button makes room, then rises in; closing plays it backwards. the room is a
+  // negative margin, not a width, so nothing gets squashed
   const BUTTON_GAP = 8; // .window-buttons' gap
   const ROOM_SHARE = 0.35; // share of the time spent making (or closing) the room
   const rise = (node) => {
@@ -78,7 +62,7 @@
 
   let muted = $state(isMuted());
 
-  // Muting clicks just before going quiet; unmuting clicks just after
+  // muting clicks just before going quiet; unmuting clicks just after
   function toggleMute() {
     muted = !muted;
     if (muted) playSound("close");
@@ -96,7 +80,7 @@
     onResetLayout?.();
   }
 
-  // Like Windows: clicking the focused window's button minimizes it, anything else brings it up
+  // like Windows: clicking the focused window's button minimizes it, anything else brings it up
   function handleTaskbarButtonClick(windowId) {
     const win = windows.find((w) => w.id === windowId);
     if (win && !win.minimized && activeWindowId === windowId) {
@@ -112,7 +96,7 @@
     onSwitchUser?.();
   }
 
-  // Start menu picks tick instead of playing the window-open click
+  // start menu picks tick instead of playing the window-open click
   function openWindow(iconData) {
     playSound("tactile", 0.1);
     onOpenWindow?.(iconData, { quiet: true });
@@ -446,7 +430,7 @@
     box-shadow: 3px 3px 0 var(--color-ink);
   }
 
-  /* Halftone shading sparkles on hover */
+  /* halftone shading sparkles on hover */
   @media (prefers-reduced-motion: no-preference) {
     .start-menu-item:hover .start-menu-item-icon,
     .taskbar-window-button:hover .window-icon :global([fill="url(#halftone)"]) {
@@ -547,7 +531,7 @@
     border-left: var(--ink-border);
   }
 
-  /* Reset-icons and mute buttons, left of the clock */
+  /* reset-icons and mute buttons, left of the clock */
   .tray-actions {
     display: flex;
     align-items: center;
@@ -572,9 +556,8 @@
       border-color 0.15s ease;
   }
 
-  /* Collapses while hidden so the tray's separator slides over to hug the mute button.
-     The tray is pinned to the right edge, so mute and the clock stay put; visibility
-     also takes the button out of the tab order. */
+  /* collapses while hidden so the separator hugs the mute button; visibility also drops
+     it from the tab order */
   .reset-button {
     margin-right: 4px;
     overflow: hidden;

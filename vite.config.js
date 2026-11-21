@@ -9,7 +9,7 @@ import {
   renderSitemap,
 } from "./src/lib/staticSite.js";
 
-// SEO and crawler files, generated from src/lib/siteContent.js. In dev, restart the
+// SEO and crawler files, generated from src/lib/siteContent.js. in dev, restart the
 // server after editing that file to see these update (the app itself hot-reloads).
 function siteSeo() {
   const textFiles = () => ({

@@ -1,13 +1,7 @@
 <script>
   import { fade } from "svelte/transition";
 
-  /**
-   * @typedef {Object} Props
-   * @property {Date} currentTime
-   * @property {string | null} [note] Small print under the time (the wallpaper's data credit)
-   */
-
-  /** @type {Props} */
+  // note is small print under the time (the wallpaper's data credit)
   let { currentTime, note = null } = $props();
 
   // "Tue, 13 Oct"
@@ -21,7 +15,7 @@
     return `${get("weekday")}, ${get("day")} ${get("month")}`;
   });
 
-  // Follows the visitor's locale; the AM/PM marker, if any, is split out so it can sit small
+  // follows the visitor's locale; the AM/PM marker, if any, is split out so it can sit small
   const time = $derived.by(() => {
     const parts = new Intl.DateTimeFormat([], {
       hour: "numeric",
@@ -43,7 +37,7 @@
   datetime={currentTime.toISOString()}
   data-wallpaper-sample
 >
-  <!-- One paper card behind the date and time, so they read over the wallpaper -->
+  <!-- one paper card behind the date and time, so they read over the wallpaper -->
   <span class="clock-face">
     <span class="clock-date">{date}</span>
     <span class="clock-time">
@@ -57,7 +51,7 @@
 </time>
 
 <style>
-  /* Top centre of the home screen; --clock-ink is set by the wallpaper to suit what is
+  /* top centre of the home screen; --clock-ink is set by the wallpaper to suit what is
      behind it (data-wallpaper-sample tells the wallpaper where to look) */
   .mobile-clock {
     position: absolute;
@@ -100,7 +94,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Paper backing keeps it readable over a busy wallpaper */
+  /* paper backing keeps it readable over a busy wallpaper */
   .clock-note {
     margin-top: 4px;
     padding: 1px 8px;

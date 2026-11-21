@@ -13,10 +13,10 @@
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
-  // The open post lives in blogNav, so the phone's blog widget can open one directly
+  // the open post lives in blogNav, so the phone's blog widget can open one directly
   const post = $derived(posts.find((p) => p.id === blogNav.post) ?? null);
 
-  // A post slides in from the right; the list, from the left
+  // a post slides in from the right; the list, from the left
   const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;

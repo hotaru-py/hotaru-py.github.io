@@ -3,16 +3,10 @@
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
-  /**
-   * @typedef {Object} Props
-   * @property {HTMLElement | undefined} anchor The dock icon the tail points at
-   * @property {() => void} onDismiss
-   */
-
-  /** @type {Props} */
+  // anchor is the dock icon the tail points at
   let { anchor, onDismiss } = $props();
 
-  // Waits for the dock icons to finish flying in before measuring where they landed
+  // waits for the dock icons to finish flying in before measuring where they landed
   const APPEAR_DELAY_MS = 1100;
   const WIDTH = 220;
   const GUTTER = 12;
@@ -69,7 +63,7 @@
 {/if}
 
 <style>
-  /* Speech bubble above the dock, its tail pointing down at the About icon */
+  /* speech bubble above the dock, its tail pointing down at the About icon */
   .tip {
     position: fixed;
     z-index: 1500;
@@ -92,7 +86,7 @@
     animation: none;
   }
 
-  /* Tail: an ink triangle with a smaller paper one on top, so it reads as outlined */
+  /* tail: an ink triangle with a smaller paper one on top, so it reads as outlined */
   .tip::before,
   .tip::after {
     content: "";

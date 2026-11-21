@@ -6,15 +6,9 @@
   import Logo from "./Logo.svelte";
   import { sparkleDots } from "../lib/halftone.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {(mode: "full" | "simple") => void} onChoose
-   */
-
-  /** @type {Props} */
   let { onChoose } = $props();
 
-  // Twinkling version of the icon halftone, swapped in on hover (same as the desktop icons)
+  // twinkling version of the icon halftone, swapped in on hover (same as the desktop icons)
   const iconSparkle = sparkleDots({
     cols: 12,
     rows: 12,
@@ -23,7 +17,7 @@
     fill: "var(--color-ink)",
   });
 
-  // Phones get the phone-style version of the "full" experience
+  // phones get the phone-style version of the "full" experience
   let isPhone = $state(false);
   onMount(() => {
     const query = window.matchMedia("(max-width: 768px)");
@@ -37,14 +31,14 @@
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
-  // Picking a user plays the exit (content fades, bars slide away) before switching
+  // picking a user plays the exit (content fades, bars slide away) before switching
   const EXIT_MS = 480;
   let leaving = $state(false);
 
-  // Hovering (or focusing) Simple Mode previews it: the green glow fades out
+  // hovering (or focusing) Simple Mode previews it: the green glow fades out
   let previewSimple = $state(false);
 
-  // Once a user is picked the preview is locked in, so the exit doesn't flick back to
+  // once a user is picked the preview is locked in, so the exit doesn't flick back to
   // the green look when the pointer or focus moves away
   function setPreview(on) {
     if (!leaving) previewSimple = on;
@@ -74,7 +68,7 @@
   ]);
 </script>
 
-<!-- First visit: XP-style "pick a user" screen. The mode switch itself crossfades
+<!-- first visit: XP-style "pick a user" screen. the mode switch itself crossfades
      (App.svelte), so this only animates its own way in and out. -->
 <div
   class="picker"
@@ -170,7 +164,7 @@
           >
             <span class="avatar">
               {#if user.mode === "full" && isPhone}
-                <!-- Phone: halftone dots over a paper-white screen -->
+                <!-- phone: halftone dots over a paper-white screen -->
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <rect
                     x="6"
@@ -191,7 +185,7 @@
                   <path d="M10.5 18.5h3" />
                 </svg>
               {:else if user.mode === "full"}
-                <!-- Monitor: halftone dots over a paper-white screen -->
+                <!-- monitor: halftone dots over a paper-white screen -->
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <rect
                     x="2.5"
@@ -212,7 +206,7 @@
                   <path d="M8.5 20.5h7M12 16.5v4" />
                 </svg>
               {:else}
-                <!-- Page of plain text -->
+                <!-- page of plain text -->
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M14 2.5H6.5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8z"
@@ -237,7 +231,7 @@
 <style>
   .picker {
     --bar-height: clamp(56px, 11vh, 96px);
-    /* The login screen is in the mono face, like Simple Mode */
+    /* the login screen is in the mono face, like Simple Mode */
     font-family: var(--font-terminal);
     position: fixed;
     inset: 0;
@@ -246,7 +240,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Keep the content clear of the two bars */
+    /* keep the content clear of the two bars */
     padding: calc(var(--bar-height) + 24px) 24px;
     box-sizing: border-box;
     color: var(--color-ink);
@@ -267,7 +261,7 @@
     opacity: 1;
   }
 
-  /* All the green drains out: bars go beige, icon tiles go paper-white */
+  /* all the green drains out: bars go beige, icon tiles go paper-white */
   .preview-simple .bar {
     --bar-highlight: transparent;
     background-color: var(--color-moss-100);
@@ -294,14 +288,14 @@
     --bar-highlight: var(--color-moss-300);
     background-color: var(--color-moss-600);
     pointer-events: none;
-    /* Leaving: accelerate away, like the bars being pulled off-screen */
+    /* leaving: accelerate away, like the bars being pulled off-screen */
     transition:
       transform 0.45s cubic-bezier(0.7, 0, 0.84, 0),
       background-color 0.4s ease,
       box-shadow 0.4s ease;
   }
 
-  /* Halftone texture, fading out toward one end */
+  /* halftone texture, fading out toward one end */
   .bar::before {
     content: "";
     position: absolute;
@@ -312,7 +306,7 @@
     opacity: 0.35;
   }
 
-  /* Ink edge plus XP's thin highlight line along the inside */
+  /* ink edge plus XP's thin highlight line along the inside */
   .bar.top {
     top: 0;
     border-bottom: var(--ink-border);
@@ -408,7 +402,7 @@
       box-shadow 0.15s ease;
   }
 
-  /* Icon halftone sparkles on hover, like the desktop icons */
+  /* icon halftone sparkles on hover, like the desktop icons */
   @media (prefers-reduced-motion: no-preference) {
     .user:hover .avatar :global([fill="url(#picker-halftone)"]) {
       fill: url(#picker-halftone-sparkle);
@@ -425,7 +419,7 @@
     box-shadow: 1px 1px 0 var(--color-ink);
   }
 
-  /* Same green, ink-ringed tile as the avatars elsewhere */
+  /* same green, ink-ringed tile as the avatars elsewhere */
   .avatar {
     flex-shrink: 0;
     display: flex;

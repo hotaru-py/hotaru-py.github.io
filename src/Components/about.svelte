@@ -1,6 +1,6 @@
 <script module>
   import { preloadImages } from "../lib/preload.js";
-  // Padded so the whole drawing fits inside a circle (the start menu uses it too)
+  // padded so the whole drawing fits inside a circle (the start menu uses it too)
   import avatar from "../assets/firefly-avatar.webp";
 
   preloadImages([avatar]);

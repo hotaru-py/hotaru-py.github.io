@@ -1,13 +1,9 @@
-// Stand-in pictures for gallery items that don't have an image yet: a few moss shapes
+// stand-in pictures for gallery items that don't have an image yet: a few moss shapes
 // on paper with a halftone wash, drawn from the item's id so each one stays the same.
 
 const SHADES = ["#c9d69a", "#aac374", "#89b04f", "#69913b", "#4b732b", "#335620"];
 
-/**
- * @param {string} seed usually the item's id
- * @param {string} label shown small in the corner
- * @returns {string} an SVG data URL
- */
+// returns an SVG data URL; seed is usually the item's id, label goes in the corner
 export function placeholderArt(seed, label) {
   let h = 2166136261;
   for (const ch of seed) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;

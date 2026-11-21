@@ -7,15 +7,13 @@ import uiBold from "./assets/fonts/google-sans-700.woff2?url";
 import monoText from "./assets/fonts/geist-mono-500.woff2?url";
 import monoBold from "./assets/fonts/geist-mono-700.woff2?url";
 
-// Fetch the first screen's font straight away, in its two main weights, so the first
-// piece of text doesn't flash the fallback font. A visitor who last used the desktop
-// comes back to it (Google Sans); anyone else starts on the login screen or Simple Mode
-// (Geist Mono).
+// preload the first screen's font so it doesn't flash the fallback: Google Sans for a
+// returning desktop visitor, Geist Mono for the login screen and Simple Mode
 let returningToDesktop = false;
 try {
   returningToDesktop = localStorage.getItem("site-mode") === "full";
 } catch {
-  // Storage unavailable: they'll see the login screen
+  // storage unavailable: they'll see the login screen
 }
 for (const href of returningToDesktop ? [uiText, uiBold] : [monoText, monoBold]) {
   const preload = document.createElement("link");

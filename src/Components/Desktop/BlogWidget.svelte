@@ -6,15 +6,7 @@
     NO_POSTS,
   } from "../../lib/blogPosts.js";
 
-  /**
-   * Home-screen widget: the newest posts in a list that scrolls on its own, then a
-   * button for the full blog.
-   * @typedef {Object} Props
-   * @property {(postId: string) => void} onOpenPost
-   * @property {() => void} onViewAll
-   */
-
-  /** @type {Props} */
+  // home-screen widget: the newest posts, scrolling on their own, then a button for the rest
   let { onOpenPost, onViewAll } = $props();
 
   const entries = posts.slice(0, 5);
@@ -62,7 +54,7 @@
     font-weight: 700;
   }
 
-  /* Its own scroller: swiping up and down here scrolls the posts, sideways still
+  /* its own scroller: swiping up and down here scrolls the posts, sideways still
      changes page */
   .scroller {
     flex: 1;

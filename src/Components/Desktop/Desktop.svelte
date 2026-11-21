@@ -32,20 +32,13 @@
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [booted] Flips once the loader starts fading, so the icons animate in where they can be seen
-   * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
-   */
-
-  /** @type {Props} */
+  // booted flips once the loader starts fading, so the icons animate in where they're seen
   let { booted = true, onSwitchUser } = $props();
 
-  // The very first time the desktop is shown (remembered in this browser), its parts
-  // arrive one by one over about two seconds: the taskbar, then the icons and widgets,
-  // then the About Me window. Every later visit keeps the quick version.
+  // first visit only: the taskbar, icons and widgets, then About Me arrive one by one over
+  // ~2s. later visits get the quick version
   const INTRO_SEEN_KEY = "desktop-intro-seen";
-  // Picking the mode crossfades into the desktop for ~450ms; the sequence waits that
+  // picking the mode crossfades into the desktop for ~450ms; the sequence waits that
   // out (INTRO_LEAD), or the taskbar and first icons would already be in place
   const INTRO_LEAD = 500;
   const INTRO_WINDOW_DELAY = INTRO_LEAD + 1600;
@@ -55,7 +48,7 @@
       if (localStorage.getItem(INTRO_SEEN_KEY)) return false;
       localStorage.setItem(INTRO_SEEN_KEY, "1");
     } catch {
-      // Storage unavailable: show the quick version rather than replaying every time
+      // storage unavailable: show the quick version rather than replaying every time
       return false;
     }
     return true;
@@ -66,7 +59,7 @@
   /** @type {IconGrid | undefined} */
   let iconGrid = $state();
   let layoutCustomized = $state(false);
-  // Window ids from back to front; `windows` itself stays in open order for the taskbar
+  // window ids from back to front; `windows` itself stays in open order for the taskbar
   let stackOrder = $state([]);
   let activeWindowId = $state(null);
   let closingWindowId = $state(null);
@@ -75,20 +68,20 @@
   let isMobileView = $state(false);
   let currentTime = $state(new Date());
 
-  // Ink line icons; shaded areas use the shared #halftone pattern defined in the markup below
+  // ink line icons; shaded areas use the shared #halftone pattern defined in the markup below
   const ICONS = {
     about: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.5 21v-1.5a4.5 4.5 0 0 1 4.5-4.5h6a4.5 4.5 0 0 1 4.5 4.5V21z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7.5" r="4" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     skills: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5.5 7.5 1 12l4.5 4.5M18.5 7.5 23 12l-4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><g transform="rotate(25 12 12)"><g style="fill: var(--color-paper); stroke: var(--color-paper)" stroke-width="3" stroke-linejoin="round"><rect x="10.2" y="4" width="3.6" height="2.3" rx="1" /><rect x="10.2" y="6.3" width="3.6" height="10.2" /><path d="M10.2 16.5h3.6L12 20z" /></g><rect x="10.2" y="4" width="3.6" height="2.3" rx="1" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="10.2" y="6.3" width="3.6" height="10.2" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.2 16.5h3.6L12 20z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.4 18.8 12 20l.6-1.2z" fill="currentColor"/></g></svg>`,
     work: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     browser: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" style="fill: var(--color-paper)"/><path d="M12 2a10 10 0 0 0 0 20a4 10 0 0 1 0-20z" fill="url(#halftone)"/><path d="M12 2a10 10 0 0 1 0 20a4 10 0 0 0 0-20z" fill="url(#halftone)"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1.5"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.5"/></svg>`,
     credits: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11v6" style="stroke: var(--color-paper)" stroke-width="5" stroke-linecap="round"/><circle cx="12" cy="7.5" r="2.4" style="fill: var(--color-paper)"/><path d="M12 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7.5" r="1.25" fill="currentColor"/></svg>`,
-    // Briefcase with a halftone flap
+    // briefcase with a halftone flap
     experience: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M8.5 7V5a1.5 1.5 0 0 1 1.5-1.5h4A1.5 1.5 0 0 1 15.5 5v2" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="2.5" y="7" width="19" height="13" rx="2" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/><path d="M2.5 12.5h19V9a2 2 0 0 0-2-2h-15a2 2 0 0 0-2 2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="10" y="11" width="4" height="3" rx="1" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/></svg>`,
-    // Notebook with a halftone spine and ruled lines
+    // notebook with a halftone spine and ruled lines
     blog: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4.5" y="2.5" width="15" height="19" rx="2" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/><path d="M4.5 4.5a2 2 0 0 1 2-2h2v19h-2a2 2 0 0 1-2-2z" fill="url(#halftone)" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11.5 8h5M11.5 12h5M11.5 16h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
-    // Two photos, one tilted behind the other
+    // two photos, one tilted behind the other
     gallery: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="6" y="2.5" width="15.5" height="12.5" rx="2" transform="rotate(8 13.75 8.75)" fill="url(#halftone)" stroke="currentColor" stroke-width="2"/><rect x="2.5" y="8" width="15.5" height="12.5" rx="2" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/><path d="M2.5 18l4.5-4.5 3.5 3.5 2.5-2.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13.5" cy="12" r="1.4" fill="currentColor"/></svg>`,
-    // Framed picture on a stand: a halftone hill under a sun
+    // framed picture on a stand: a halftone hill under a sun
     wallpaper: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="3.5" width="19" height="14" rx="2" style="fill: var(--color-paper)" stroke="currentColor" stroke-width="2"/><path d="M3.5 14.5c2.5-3 5-4 8-2s5.5 1 9-2.5v5.5a1.5 1.5 0 0 1-1.5 1.5h-14a1.5 1.5 0 0 1-1.5-1.5z" fill="url(#halftone)"/><path d="M2.5 14c3-3.5 6-4.5 9-2.5s6 1.5 10-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8.5" r="1.75" fill="currentColor"/><path d="M12 17.5v3M8.5 21h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
   };
 
@@ -132,7 +125,7 @@
       size: { width: 640, height: 520 },
     },
     { id: "skills", title: "Skills", icon: ICONS.skills, component: Skills },
-    // Hidden while the gallery is empty (see `gallery` in siteContent.js)
+    // hidden while the gallery is empty (see `gallery` in siteContent.js)
     // {
     //   id: "gallery",
     //   title: "Gallery",
@@ -148,7 +141,7 @@
       corner: "bottom-right", // default desktop spot
       homeColumn: 4, // phones: the last column of the home row, a gap before it
     },
-    // Desktop only: phones switch wallpapers from the settings menu instead
+    // desktop only: phones switch wallpapers from the settings menu instead
     {
       id: "wallpaper",
       title: "Wallpaper",
@@ -161,7 +154,7 @@
     },
   ];
   const dockIcons = desktopIcons.filter((icon) => icon.core);
-  // The desktop grid's own order (it fills columns top to bottom); the Start menu and
+  // the desktop grid's own order (it fills columns top to bottom); the Start menu and
   // phone dock keep the list's order
   const GRID_ORDER = ["about", "browser", "projects", "experience", "skills", "blog"];
   const sortedIcons = [...desktopIcons].sort((a, b) => {
@@ -172,10 +165,8 @@
     return rank(a) - rank(b);
   });
 
-  // Desktop widgets live on the icon grid too, as blocks of cells, so they drag, snap,
-  // animate and reset just like the icons. They start in the top-right corner: the blog
-  // across 4×2 cells, the two squares (2×2 each) side by side under it. Hidden on
-  // narrow desktops, where there's no room beside the windows.
+  // widgets sit on the icon grid as blocks of cells, top-right: the blog 4×2, two 2×2
+  // squares under it. hidden on narrow desktops
   const DESKTOP_WIDGETS = [
     {
       id: "widget-blog",
@@ -209,9 +200,7 @@
   );
   const openApp = (id) => openWindow(desktopIcons.find((icon) => icon.id === id));
 
-  // --- Phone home screen: two pages side by side, swiped between ----------------
-  // Page 1: the clock, with the remaining apps in a row above the dock.
-  // Page 2: the widgets.
+  // phone home screen: page 1 is the clock and the other apps, page 2 the widgets
   let homePages = $state();
   let homePage = $state(0);
   let dockHeight = $state(0);
@@ -234,7 +223,7 @@
     openApp("blog");
   }
 
-  // One 24-unit tile covers a whole icon, so every dot twinkles independently
+  // one 24-unit tile covers a whole icon, so every dot twinkles independently
   const iconSparkle = sparkleDots({
     cols: 12,
     rows: 12,
@@ -243,22 +232,20 @@
     fill: "var(--color-ink)",
   });
 
-  // Mobile dock labels, toggled from the settings menu
+  // mobile dock labels, toggled from the settings menu
   let showDockLabels = $state(true);
 
   const showRainCredit = $derived(
     wallpaper.current === "rain" && wallpaper.rainReady,
   );
 
-  // Lets window contents open windows of their own (e.g. a file from the Work folder)
+  // lets window contents open windows of their own (e.g. a file from the Work folder)
   setContext("desktop", { openWindow });
 
-  // --- First thing on screen ---------------------------------------------------
-  // Desktops open About Me just right of the icon columns on the left, its top in line
-  // with the first icon. Phones never open it: the first time the phone desktop is shown in a
-  // visit, a bubble points at its dock icon instead (not again after Switch User).
+  // desktops open About Me right of the icon columns; phones point a bubble at its dock
+  // icon instead, once per visit
   const INTRO_MARGIN = 24;
-  // Fallback if the icon grid can't say where its icons end: one column's worth
+  // fallback if the icon grid can't say where its icons end: one column's worth
   const INTRO_LEFT = 24 + 88 + 24;
   const TIP_SEEN_KEY = "about-tip-seen";
   let introDone = false;
@@ -270,13 +257,13 @@
     if (!booted || introDone || !desktopWidth || !desktopHeight) return;
     introDone = true;
     untrack(() => {
-      // Read straight from the viewport, so a remount (e.g. back from Switch User)
+      // read straight from the viewport, so a remount (e.g. back from Switch User)
       // can't catch isMobileView before it's been set
       if (window.matchMedia("(max-width: 768px)").matches) {
         try {
           const show = !sessionStorage.getItem(TIP_SEEN_KEY);
           sessionStorage.setItem(TIP_SEEN_KEY, "1");
-          // On a first visit the bubble waits until everything has arrived
+          // on a first visit the bubble waits until everything has arrived
           if (show && firstVisit) introTimer = setTimeout(() => (showAboutTip = true), INTRO_LEAD + 1900);
           else showAboutTip = show;
         } catch {
@@ -289,7 +276,7 @@
     });
   });
 
-  // Waits (a few frames at most) for the icon grid to lay out, so About Me opens clear
+  // waits (a few frames at most) for the icon grid to lay out, so About Me opens clear
   // of however many icon columns there are
   function openIntroWindow(framesLeft = 30) {
     const right = iconGrid?.leftIconsRight();
@@ -298,7 +285,7 @@
       return;
     }
     const left = right == null ? INTRO_LEFT : right + INTRO_MARGIN;
-    // Room is left for the window's border and drop shadow
+    // room is left for the window's border and drop shadow
     const width = Math.min(700, desktopWidth - left - INTRO_MARGIN - 7);
     const height = Math.min(500, desktopHeight - INTRO_MARGIN * 2 - 78);
     const about = desktopIcons.find((icon) => icon.id === "about");
@@ -313,12 +300,12 @@
     try {
       sessionStorage.setItem(TIP_SEEN_KEY, "1");
     } catch {
-      // Storage unavailable; it may show again on reload
+      // storage unavailable; it may show again on reload
     }
   }
 
   onMount(() => {
-    // A fresh desktop (e.g. back from Switch User) starts a fresh rain wallpaper
+    // a fresh desktop (e.g. back from Switch User) starts a fresh rain wallpaper
     wallpaper.rainReady = false;
     const timer = setInterval(() => {
       currentTime = new Date();
@@ -340,11 +327,7 @@
     isMobileView = window.innerWidth <= 768;
   }
 
-  /**
-   * Opens a window, or brings it forward if it's already open. Beyond a desktop icon's
-   * fields, `position`, `size`, `props` (passed to the component) and `icon` (for the
-   * taskbar) are optional.
-   */
+  // opens a window or brings it forward; `position`, `size`, `props` and `icon` are optional
   function openWindow(iconData, { quiet = false } = {}) {
     if (iconData.id === "about" && showAboutTip) dismissAboutTip();
 
@@ -377,7 +360,7 @@
   }
 
   function closeWindow(id, { quiet = false } = {}) {
-    // Already on its way out (e.g. a double-click on close)
+    // already on its way out (e.g. a double-click on close)
     if (closingWindowId === id) return;
     closingWindowId = id;
     if (!quiet) playSound("close");
@@ -385,7 +368,7 @@
     setTimeout(() => {
       windows = windows.filter((w) => w.id !== id);
       stackOrder = stackOrder.filter((wid) => wid !== id);
-      // Focus falls to the next window down the stack, like on Windows
+      // focus falls to the next window down the stack, like on Windows
       if (activeWindowId === id) {
         activeWindowId = topVisibleWindow();
       }
@@ -393,7 +376,7 @@
     }, 300);
   }
 
-  // Bring a window to the front without disturbing the order of the others,
+  // bring a window to the front without disturbing the order of the others,
   // restoring it first if it was minimized
   function activateWindow(id) {
     if (windows.some((w) => w.id === id && w.minimized)) {
@@ -416,7 +399,7 @@
     }
   }
 
-  // Topmost window that isn't minimized, if any
+  // topmost window that isn't minimized, if any
   function topVisibleWindow() {
     const visible = new Set(
       windows.filter((w) => !w.minimized).map((w) => w.id),
@@ -424,7 +407,7 @@
     return stackOrder.findLast((id) => visible.has(id)) ?? null;
   }
 
-  // Clicking empty desktop (or an icon) takes focus away from the windows, like on
+  // clicking empty desktop (or an icon) takes focus away from the windows, like on
   // Windows; the taskbar then shows none of them as active
   function handleDesktopPointerDown(e) {
     if (isMobileView || e.target.closest(".window-container")) return;
@@ -455,7 +438,7 @@
 {/snippet}
 
 <div class="desktop-container">
-  <!-- The Motion Blob stays up while the p5.rain wallpaper loads its data, so there's
+  <!-- the Motion Blob stays up while the p5.rain wallpaper loads its data, so there's
        never a blank screen; the rain then fades in over it -->
   <div class="wallpaper-layer">
     {#if wallpaper.current === "blob" || !wallpaper.rainReady}
@@ -465,7 +448,7 @@
       <RainWallpaper onReady={() => (wallpaper.rainReady = true)} />
     {/if}
   </div>
-  <!-- NASA asks for credit wherever its data is shown (full wording in Credits). It fades
+  <!-- NASA asks for credit wherever its data is shown (full wording in Credits). it fades
        in once the rain wallpaper has, and out with it; phones show it under the clock. -->
   {#if showRainCredit && !isMobileView}
     <p class="rain-attribution" transition:fade={{ duration: 300 }}>
@@ -473,7 +456,7 @@
     </p>
   {/if}
 
-  <!-- Shared halftone fill for the icons -->
+  <!-- shared halftone fill for the icons -->
   <svg class="svg-defs" aria-hidden="true">
     <defs>
       <pattern
@@ -549,7 +532,7 @@
     {/if}
 
     {#if isMobileView}
-      <!-- Swipe sideways between pages; the dock stays put -->
+      <!-- swipe sideways between pages; the dock stays put -->
       <div
         class="home-pages"
         class:hidden-under-app={activeWindowId}
@@ -594,7 +577,7 @@
         </section>
       </div>
 
-      <!-- Off the home page the big clock is out of view, so a small one sits top-left,
+      <!-- off the home page the big clock is out of view, so a small one sits top-left,
            level with the settings cog -->
       {#if homePage !== 0 && !activeWindowId}
         <time
@@ -665,7 +648,7 @@
   </div>
 
   {#if !isMobileView && (booted || !firstVisit)}
-    <!-- Floats over the bottom of the desktop, so windows slide under it instead of
+    <!-- floats over the bottom of the desktop, so windows slide under it instead of
          being cut off at its edge -->
     <div
       class="taskbar-dock"
@@ -690,7 +673,7 @@
 </div>
 
 <style>
-  /* First visit: parts fade and rise in after a delay set per element. `backwards` keeps
+  /* first visit: parts fade and rise in after a delay set per element. `backwards` keeps
      them hidden until their turn without pinning a transform afterwards. */
   .intro-in {
     animation: intro-in 450ms cubic-bezier(0.22, 1, 0.36, 1) var(--intro-delay, 0ms)
@@ -704,7 +687,7 @@
     }
   }
 
-  /* Phone, first visit: the clock and settings cog come first, then the sequence above */
+  /* phone, first visit: the clock and settings cog come first, then the sequence above */
   .phone-intro :global(.mobile-clock),
   .phone-intro :global(.mobile-settings) {
     animation: intro-in 450ms cubic-bezier(0.22, 1, 0.36, 1) var(--intro-lead) backwards;
@@ -725,9 +708,7 @@
 
   .desktop-container {
     width: 100vw;
-    /* dvh = the height you can actually see. On phones, vh is the height with the
-       browser's address bar hidden, which left the home pages reaching below the
-       visible screen (and under the fixed-position dock) while the bar was showing. */
+    /* dvh is the visible height; on phones vh ignores the address bar and runs under the dock */
     height: 100vh;
     height: 100dvh;
     display: flex;
@@ -743,14 +724,13 @@
     overflow: hidden;
   }
 
-  /* Height the taskbar covers (12px gap + 50px bar + 16px below it). Icons and
-     maximized windows keep clear of it; windows read it to keep their title bar out
-     from under it. */
+  /* height the taskbar covers (12 + 50 + 16px); icons, maximized windows and title bars
+     keep clear of it */
   .desktop-background:not(.mobile-view) {
     --taskbar-space: 78px;
   }
 
-  /* Small print in the bottom-right corner, above the taskbar. Under the windows and
+  /* small print in the bottom-right corner, above the taskbar. under the windows and
      icons, and never in the way of a click. */
   .rain-attribution {
     position: absolute;
@@ -760,7 +740,7 @@
     margin: 0;
     padding: 1px 6px;
     border-radius: 4px;
-    /* A soft paper backing keeps it readable over the rain cells */
+    /* a soft paper backing keeps it readable over the rain cells */
     background: color-mix(in srgb, var(--color-moss-50) 85%, transparent);
     font-size: 11px;
     font-weight: 600;
@@ -774,7 +754,7 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
-    /* Only the bar itself catches clicks; the gap around it lets them through */
+    /* only the bar itself catches clicks; the gap around it lets them through */
     pointer-events: none;
   }
 
@@ -782,7 +762,7 @@
     pointer-events: auto;
   }
 
-  /* As wide as the widgets (12px in from each side), four even columns */
+  /* as wide as the widgets (12px in from each side), four even columns */
   .mobile-icons-additional {
     position: fixed;
     bottom: 20px;
@@ -835,7 +815,7 @@
     scroll-snap-stop: always;
   }
 
-  /* The remaining apps, in a row just above the page dots, lined up with the dock's
+  /* the remaining apps, in a row just above the page dots, lined up with the dock's
      columns */
   .home-row {
     position: absolute;
@@ -848,11 +828,11 @@
     padding: 0 12px;
   }
 
-  /* Widgets: the blog one full width and half the screen tall; under it two squares
+  /* widgets: the blog one full width and half the screen tall; under it two squares
      side by side */
   .home-page.widgets {
     box-sizing: border-box;
-    /* Bottom: clears the page dots, plus the widgets' 4px drop shadow */
+    /* bottom: clears the page dots, plus the widgets' 4px drop shadow */
     padding: calc(72px + env(safe-area-inset-top, 0px)) 12px
       calc(var(--dock-space) + 42px);
     display: flex;
@@ -861,7 +841,7 @@
     overflow-y: auto;
   }
 
-  /* Half the screen tall, giving some up on shorter phones so the squares below still
+  /* half the screen tall, giving some up on shorter phones so the squares below still
      clear the page dots */
   .widget-blog {
     flex: 0 1 50vh;
@@ -917,7 +897,7 @@
     cursor: pointer;
   }
 
-  /* The visible dot inside a 22px tap target */
+  /* the visible dot inside a 22px tap target */
   .page-dot::before {
     content: "";
     display: block;
@@ -934,7 +914,7 @@
     background: var(--color-ink);
   }
 
-  /* Under an open app the home screen fades out of the way */
+  /* under an open app the home screen fades out of the way */
   .hidden-under-app {
     opacity: 0;
     pointer-events: none;

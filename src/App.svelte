@@ -14,24 +14,21 @@
   const showLoader = initialMode !== "simple";
   let booted = $state(!showLoader);
 
-  // The desktop (wallpaper, sounds, window images) is only downloaded when it's used,
+  // the desktop (wallpaper, sounds, window images) is only downloaded when it's used,
   // so Simple Mode stays light
   let Desktop = $state(null);
   async function ensureDesktop() {
     Desktop ??= (await import("./Components/Desktop/Desktop.svelte")).default;
   }
-  // Start fetching it during the loader if it's likely to be needed
+  // start fetching it during the loader if it's likely to be needed
   if (initialMode !== "simple") ensureDesktop();
 
   const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
-  /**
-   * Swaps screens with a crossfade (View Transitions API) where the browser supports
-   * it; elsewhere, or with reduced motion, it just swaps.
-   * @param {() => void} update
-   */
+  // crossfades screens with the View Transitions API; a plain swap without it or with
+  // reduced motion
   function crossfade(update) {
     const apply = () => {
       update();
@@ -44,7 +41,7 @@
 
   /** @param {"full" | "simple"} next */
   async function choose(next) {
-    // The new screen has to render synchronously inside the transition, so make sure
+    // the new screen has to render synchronously inside the transition, so make sure
     // the desktop's code is already here
     if (next === "full") await ensureDesktop();
     crossfade(() => {
@@ -53,7 +50,7 @@
     });
   }
 
-  // "Switch User": back to the login screen to pick a mode again. The saved choice
+  // "Switch User": back to the login screen to pick a mode again. the saved choice
   // stays until a new one is picked, so a reload returns to the current mode.
   function switchUser() {
     crossfade(() => {
@@ -61,7 +58,7 @@
     });
   }
 
-  // Lets the page scroll in Simple Mode; the desktop and login screen are fixed
+  // lets the page scroll in Simple Mode; the desktop and login screen are fixed
   $effect(() => {
     document.documentElement.dataset.mode = mode ?? "picker";
   });
@@ -95,7 +92,7 @@
     height: auto;
   }
 
-  /* Only the page itself scrolls: a scrolling body would also trap Simple Mode's sticky
+  /* only the page itself scrolls: a scrolling body would also trap Simple Mode's sticky
      section bar, which sticks to its nearest scroller */
   :global(html[data-mode="simple"]) {
     overflow: auto;
@@ -107,14 +104,12 @@
 
   .desktop-main {
     width: 100vw;
-    /* dvh = the height you can actually see. On phones, vh is the height with the
-       browser's address bar hidden, which left the home pages reaching below the
-       visible screen (and under the fixed-position dock) while the bar was showing. */
+    /* dvh is the visible height; on phones vh ignores the address bar and runs under the dock */
     height: 100vh;
     height: 100dvh;
   }
 
-  /* Mode switches: a slightly slower, eased crossfade than the browser default */
+  /* mode switches: a slightly slower, eased crossfade than the browser default */
   :global(::view-transition-old(root)),
   :global(::view-transition-new(root)) {
     animation-duration: 0.45s;

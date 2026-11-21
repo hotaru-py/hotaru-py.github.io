@@ -2,21 +2,11 @@
   import { slide } from "svelte/transition";
   import { tactile } from "../../lib/tactile.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {any} icon
-   * @property {boolean} [isMobile]
-   * @property {boolean} [lifted] Picked up and being dragged
-   * @property {boolean} [showLabel] Dock icons only: show the title under the icon
-   * @property {() => void} [onclick]
-   */
-
-  /** @type {Props} */
   let {
     icon,
     isMobile = false,
-    lifted = false,
-    showLabel = false,
+    lifted = false, // picked up and being dragged
+    showLabel = false, // dock icons only
     onclick,
   } = $props();
 
@@ -77,7 +67,7 @@
     outline-offset: 3px;
   }
 
-  /* Halftone shading sparkles on hover */
+  /* halftone shading sparkles on hover */
   @media (prefers-reduced-motion: no-preference) {
     .desktop-icon:hover .icon :global([fill="url(#halftone)"]) {
       fill: url(#halftone-sparkle);
@@ -100,7 +90,7 @@
       box-shadow 0.15s ease;
   }
 
-  /* On a paper-coloured pill, so it reads over the wallpaper (the dock's own paper
+  /* on a paper-coloured pill, so it reads over the wallpaper (the dock's own paper
      panel hides the pill there) */
   .mobile-icon-title {
     margin-top: 6px;
@@ -131,7 +121,7 @@
     box-shadow: 1px 1px 0 var(--color-ink);
   }
 
-  /* Picked up: tilted and raised higher off the desktop */
+  /* picked up: tilted and raised higher off the desktop */
   .desktop-icon.lifted .icon-container {
     transform: translate(-3px, -3px) rotate(-4deg);
     box-shadow: 7px 7px 0 var(--color-ink);
@@ -160,7 +150,7 @@
     height: 100%;
   }
 
-  /* A label wider than the icon (like "Experience") may run into the gap beside it,
+  /* a label wider than the icon (like "Experience") may run into the gap beside it,
      centred under the icon, up to 96px; only past that does it wrap */
   .icon-title {
     text-align: center;

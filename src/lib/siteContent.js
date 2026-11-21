@@ -1,8 +1,5 @@
-// Everything the site says, in one place. The desktop windows, Simple Mode, the static
-// copy baked into index.html for crawlers, and /llms.txt are all built from this file,
-// so edit content here. Plain data only (no asset imports): vite.config.js reads it too.
-//
-// Text may use **double asterisks** for emphasis; see emphasis() below.
+// everything the site says; every view and llms.txt is built from it. plain data only
+// (vite.config.js reads it too). **double asterisks** mark emphasis
 
 export const site = {
   url: "https://www.byhotaru.com/",
@@ -14,7 +11,7 @@ export const site = {
   jobTitle: "mix of a designer-developer",
 };
 
-// The copyright notice, shown in the About window and Simple Mode's footer. The end year
+// the copyright notice, shown in the About window and Simple Mode's footer. the end year
 // is always the current one.
 export const copyright = { holder: "Prajesh Raam / hotaru", since: 2024 };
 
@@ -29,17 +26,17 @@ export function copyrightLine(year = new Date().getFullYear()) {
 
 export const about = {
   greeting: "Hello, I'm hotaru (^_^)/",
-  // Shown under the greeting
+  // shown under the greeting
   realName: "Prajesh Raam",
   pronouns: "he/him",
-  // Shown first, on its own line
+  // shown first, on its own line
   tldr: "tl;dr: I make stuff that looks good to me.",
   intro: [
     "Usually, I'm a frustrated consumer trying to fix things around me with my weird concoction of design, engineering and other skills, so they're usable and look good.",
     "Professionally, I'm a designer, engineer and artist working primarily in product engineering, trying to understand how humans have interacted with technology in the past and present, and work on how we'll interact with technology in the near and far future, especially with calm and ambient interfaces.",
     "Other than these, I sometimes do the following (and a lot more, I just can't keep track of them):",
   ],
-  // The list after the intro
+  // the list after the intro
   interests: [
     "Play the piano",
     "Random doodling",
@@ -50,7 +47,7 @@ export const about = {
     "Listen to music (playlist more diverse than a friend group in a college brochure)",
     "Can't think of anything else at this hour, will add more later",
   ],
-  // Most recent first. `board` is shown after the name ("School - CBSE"); `type` is the
+  // most recent first. `board` is shown after the name ("School - CBSE"); `type` is the
   // schema.org kind of school, for search engines
   education: [
     {
@@ -67,7 +64,7 @@ export const about = {
   ],
 };
 
-// Most recent first; `url` is optional (freelancing has no company page)
+// most recent first; `url` is optional (freelancing has no company page)
 export const experience = [
   {
     role: "Software Development Engineering Intern",
@@ -86,9 +83,8 @@ export const experience = [
   },
 ];
 
-// College clubs and activities, shown after work experience. Each club lists its roles,
-// most recent first. A club's `url` and a role's `period` and `description` are optional;
-// a description folds open under its role.
+// clubs, roles most recent first. a club's `url` and a role's `period` and `description`
+// are optional; descriptions fold open under the role
 export const activities = [
   {
     org: "SNUC Coding Club",
@@ -178,9 +174,8 @@ export const activities = [
   // (if anyone from the team is reading this, love y'all, best team)
 ];
 
-// The phone's Featured widget: something new, or anything worth showing off. `file` is
-// the key of a file in the Projects or Gallery windows (it opens there); or give a `url`
-// instead. `image` overrides the file's own picture.
+// the Featured widget: `file` is a file key from Projects or Gallery (or give a `url`);
+// `image` overrides its picture
 export const featured = {
   label: "Featured",
   title: "p5.rain",
@@ -188,10 +183,8 @@ export const featured = {
   file: "project-p5-rain",
 };
 
-// The Gallery app's subfolders. Hidden for now (the app, its widget and its Simple Mode
-// section are commented out in Desktop.svelte and SimpleMode.svelte; staticSite.js
-// lists it once it isn't empty); bring those back once there's work to show. Each item gets an `image` URL (e.g. from
-// public/); without one a placeholder is drawn from its id.
+// gallery subfolders, hidden while empty (commented out in Desktop and SimpleMode). an
+// item without an `image` gets a placeholder drawn from its id
 export const gallery = [
   // {
   //   id: "art",
@@ -284,7 +277,7 @@ export const projects = [
     description:
       "NASA's IMERG global precipitation data as a live, interactive pixel field for p5.js.",
     link: "https://github.com/hotaru-py/p5-rain",
-    // Opens with a live demo in the Projects window
+    // opens with a live demo in the Projects window
     demo: "p5rain",
   },
   {
@@ -310,7 +303,7 @@ export const projects = [
     description:
       "Minimalist theme for the GRUB bootloader, built around ASUS ROG branding",
     link: "https://github.com/hotaru-py/rog-grub",
-    // Shown until (or if) the live count can't be fetched
+    // shown until (or if) the live count can't be fetched
     stars: { repo: "hotaru-py/rog-grub", fallback: 27 },
   },
   {
@@ -351,7 +344,7 @@ export const bookmarks = [
     url: "https://linkedin.com/in/prajeshraam",
   },
   { id: "github", name: "GitHub", url: "https://github.com/hotaru-py" },
-  // Delisted for now
+  // delisted for now
   // {
   //   id: "behance",
   //   name: "Behance",
@@ -404,7 +397,7 @@ export const credits = {
     disclaimer:
       "This website and p5.rain are not affiliated with or endorsed by NASA.",
   },
-  // Every sound on the site comes from Pixabay; each creator is listed once
+  // every sound on the site comes from Pixabay; each creator is listed once
   sounds: {
     source: {
       text: "Pixabay",
@@ -436,11 +429,7 @@ export const credits = {
   },
 };
 
-/**
- * Splits text on **double asterisks** into plain and emphasised parts.
- * @param {string} text
- * @returns {{ text: string, strong: boolean }[]}
- */
+// splits text on **double asterisks** into plain and emphasised parts
 export function emphasis(text) {
   return text
     .split("**")
@@ -453,7 +442,7 @@ export function schoolName(entry) {
   return entry.board ? `${entry.school} - ${entry.board}` : entry.school;
 }
 
-/** Text with the ** markers removed, for plain-text outputs */
+/** text with the ** markers removed, for plain-text outputs */
 export function plain(text) {
   return text.replaceAll("**", "");
 }

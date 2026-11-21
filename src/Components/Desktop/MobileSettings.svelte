@@ -9,13 +9,7 @@
     setWallpaper,
   } from "../../lib/wallpaper.svelte.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [showLabels] Dock labels on/off (on by default); restored from and saved to storage here
-   * @property {() => void} [onSwitchUser] Goes back to the login screen to pick a mode
-   */
-
-  /** @type {Props} */
+  // showLabels (dock labels) is restored from and saved to storage here
   let { showLabels = $bindable(true), onSwitchUser } = $props();
 
   const LABELS_KEY = "dock-labels";
@@ -26,10 +20,10 @@
 
   onMount(() => {
     try {
-      // On unless the visitor turned them off
+      // on unless the visitor turned them off
       showLabels = localStorage.getItem(LABELS_KEY) !== "0";
     } catch {
-      // Storage unavailable: labels stay on
+      // storage unavailable: labels stay on
     }
 
     function closeOnOutside(e) {
@@ -51,7 +45,7 @@
     playSound(open ? "open" : "close");
   }
 
-  // Turning sound off clicks just before going quiet; turning it on clicks just after
+  // turning sound off clicks just before going quiet; turning it on clicks just after
   function toggleSound() {
     muted = !muted;
     if (muted) playSound("close");
@@ -77,7 +71,7 @@
     try {
       localStorage.setItem(LABELS_KEY, showLabels ? "1" : "0");
     } catch {
-      // Storage unavailable; the choice just lasts for this visit
+      // storage unavailable; the choice just lasts for this visit
     }
   }
 </script>
@@ -163,7 +157,7 @@
     z-index: 1000;
   }
 
-  /* Just the gear on the wallpaper; the 44px box keeps it easy to tap */
+  /* just the gear on the wallpaper; the 44px box keeps it easy to tap */
   .cog {
     width: 44px;
     height: 44px;
@@ -229,7 +223,7 @@
     cursor: pointer;
   }
 
-  /* Label on top, the two choices side by side under it */
+  /* label on top, the two choices side by side under it */
   .wallpaper-row {
     flex-direction: column;
     align-items: stretch;
@@ -265,7 +259,7 @@
       color 0.15s ease;
   }
 
-  /* A rain cell pulsing next to "p5.rain" while it loads */
+  /* a rain cell pulsing next to "p5.rain" while it loads */
   .loading-dot {
     display: inline-block;
     width: 7px;
@@ -312,7 +306,7 @@
     background: var(--color-moss-100);
   }
 
-  /* Ink-outlined switch; the accent green marks "on" */
+  /* ink-outlined switch; the accent green marks "on" */
   .switch {
     position: relative;
     flex-shrink: 0;

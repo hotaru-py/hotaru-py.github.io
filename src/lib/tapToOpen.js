@@ -1,5 +1,5 @@
-// Touch screens have no hover, so a card's first tap "arms" it (highlighted, standing in
-// for the hover preview) and a second tap opens its link. Mouse and keyboard are untouched.
+// touch screens have no hover, so a card's first tap "arms" it (highlighted, standing in
+// for the hover preview) and a second tap opens its link. mouse and keyboard are untouched.
 
 const TOUCH_ONLY = "(hover: none) and (pointer: coarse)";
 const ARMED_CLASS = "tap-armed";
@@ -26,17 +26,13 @@ function disarmOnOutsideTouch(e) {
   }
 }
 
-/**
- * Svelte action for a link card: on touch screens, tap once to highlight, tap again to open.
- * Style the highlight with `:global(.tap-armed)`.
- * @param {HTMLElement} node
- * @param {string} url
- */
+// svelte action for a link card: on touch screens the first tap highlights (.tap-armed),
+// the second opens
 export function tapToOpen(node, url) {
   function handleClick(e) {
     if (!window.matchMedia(TOUCH_ONLY).matches) return;
 
-    // Also stops a link inside the card from opening on the first tap
+    // also stops a link inside the card from opening on the first tap
     e.preventDefault();
     if (armed !== node) {
       arm(node);
