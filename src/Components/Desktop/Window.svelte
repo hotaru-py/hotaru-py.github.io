@@ -1,7 +1,5 @@
 <script>
   import { onMount, untrack } from "svelte";
-  import { scale, fade } from "svelte/transition";
-  import { cubicOut } from "svelte/easing";
   import { playSound } from "../../lib/sounds.js";
   import { CRASH_EVENT } from "../../lib/xylophone.js";
   import { tactile } from "../../lib/tactile.js";
@@ -35,19 +33,19 @@
   // The window owns its position/size after mount; props only seed them
   const { position, size } = untrack(() => window);
 
-  // Variables to track dragging and resizing
   let isDragging = false;
   let isResizing = false;
+  // Pointer, frame position and frame size when the drag or resize began
   let startX = 0;
   let startY = 0;
-  let offsetX = position.x;
-  let offsetY = position.y;
+  let offsetX = 0;
+  let offsetY = 0;
+  let startWidth = 0;
+  let startHeight = 0;
   let currentX = $state(position.x);
   let currentY = $state(position.y);
-  let startWidth = size.width;
-  let startHeight = size.height;
-  let currentWidth = $state(size.width);
-  let currentHeight = $state(size.height);
+  let currentWidth = $state(size.width || 800);
+  let currentHeight = $state(size.height || 600);
   let windowElement = $state();
 
   // Maximized windows fill the desktop; `animatingFrame` eases the jump between sizes
@@ -61,10 +59,6 @@
       : `left: ${currentX}px; top: ${currentY}px; width: ${currentWidth}px; height: ${currentHeight}px;`,
   );
 
-  function close() {
-    onClose?.();
-  }
-
   // --- Crashing ----------------------------------------------------------------
   // Mash the musical pills for too long (see xylophone.js) and the window gives up:
   // the piano slams, the content is replaced by a dead face, and it closes a beat later.
@@ -74,17 +68,9 @@
   function handleCrash() {
     if (crashed) return;
     crashed = true;
-    activate();
+    onActivate?.();
     playSound("slam");
     setTimeout(() => onClose?.({ quiet: true }), CRASH_CLOSE_MS);
-  }
-
-  function activate() {
-    onActivate?.();
-  }
-
-  function minimize() {
-    onMinimize?.();
   }
 
   function toggleMaximize() {
@@ -101,11 +87,6 @@
   }
 
   onMount(() => {
-    currentX = window.position.x;
-    currentY = window.position.y;
-    currentWidth = window.size.width || 800;
-    currentHeight = window.size.height || 600;
-
     windowElement.addEventListener(CRASH_EVENT, handleCrash);
     return () => windowElement.removeEventListener(CRASH_EVENT, handleCrash);
   });
@@ -113,7 +94,7 @@
   function handleMouseDown(e) {
     if (isMobileView) return;
 
-    activate();
+    onActivate?.();
 
     // Drag from the title bar, but not from its buttons or while maximized
     if (
@@ -150,7 +131,7 @@
   function handleResizeMouseDown(e, dirX, dirY) {
     if (isMobileView) return;
 
-    activate();
+    onActivate?.();
     isResizing = true;
     resizeDirX = dirX;
     resizeDirY = dirY;
@@ -259,7 +240,7 @@
         <div class="window-controls">
           <button
             class="light close"
-            onclick={close}
+            onclick={() => onClose?.()}
             aria-label="Close"
             use:tactile
           >
@@ -269,7 +250,7 @@
           </button>
           <button
             class="light minimize"
-            onclick={minimize}
+            onclick={() => onMinimize?.()}
             use:tactile
             aria-label="Minimize"
           >
@@ -303,7 +284,7 @@
           <div class="mobile-header-content">
             <button
               class="mobile-back-button"
-              onclick={close}
+              onclick={() => onClose?.()}
               aria-label="Back"
             >
               <svg
@@ -467,10 +448,7 @@
   }
 
   .mobile-window-inner {
-    width: 100%;
-    height: 100%;
     border-radius: 0;
-    box-shadow: none;
     border: none;
   }
 

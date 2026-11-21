@@ -3,16 +3,9 @@
   import { playSound } from "../lib/sounds.js";
   import { loadP5Rain, applyLoopFade } from "../lib/p5rain.js";
 
-  /**
-   * The p5.rain hero from github.com/hotaru-py/p5-rain, sized to whatever box it's in:
-   * a live NASA precipitation field with its palette, motion, grid and theme switches.
-   * p5.js and the plugin load only once this mounts, so nobody else pays for them.
-   * @typedef {Object} Props
-   * @property {boolean} [isMobile]
-   */
-
-  /** @type {Props} */
-  let { isMobile = false } = $props();
+  // The p5.rain hero from github.com/hotaru-py/p5-rain, sized to whatever box it's in:
+  // a live NASA precipitation field with its palette, motion, grid and theme switches.
+  // p5.js and the plugin load only once this mounts, so nobody else pays for them.
 
   const PALETTES = [
     { id: "ocean", label: "Ocean" },
@@ -175,7 +168,6 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="rain"
-  class:mobile={isMobile}
   data-theme={theme}
   data-palette={look.palette}
   data-p5rain-demo

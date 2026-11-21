@@ -35,6 +35,23 @@
     onSwitchUser,
   } = $props();
 
+  // A window's taskbar button makes room, then fades in rising from the bottom of the
+  // bar. Closing plays it backwards: it sinks out, then the buttons after it close the
+  // gap. The gap is a negative margin rather than a width, so nothing gets squashed.
+  const BUTTON_GAP = 8; // .window-buttons' gap
+  const ROOM_SHARE = 0.35; // share of the time spent making (or closing) the room
+  const rise = (node) => {
+    const room = node.offsetWidth + BUTTON_GAP;
+    return {
+      duration: 340,
+      css: (t) => {
+        const open = cubicOut(Math.min(1, t / ROOM_SHARE));
+        const shown = cubicOut(Math.max(0, (t - ROOM_SHARE) / (1 - ROOM_SHARE)));
+        return `margin-right: ${-room * (1 - open)}px; opacity: ${shown}; transform: translateY(${(1 - shown) * 16}px);`;
+      },
+    };
+  };
+
   let isStartMenuOpen = $state(false);
   let startMenuContainer = $state();
 
@@ -79,17 +96,13 @@
     onResetLayout?.();
   }
 
-  function activateWindow(windowId) {
-    onActivateWindow?.(windowId);
-  }
-
   // Like Windows: clicking the focused window's button minimizes it, anything else brings it up
   function handleTaskbarButtonClick(windowId) {
     const win = windows.find((w) => w.id === windowId);
     if (win && !win.minimized && activeWindowId === windowId) {
       onMinimizeWindow?.(windowId);
     } else {
-      activateWindow(windowId);
+      onActivateWindow?.(windowId);
     }
   }
 
@@ -214,8 +227,7 @@
           class:minimized={window.minimized}
           onclick={() => handleTaskbarButtonClick(window.id)}
           use:tactile
-          in:slide={{ duration: 200, easing: cubicOut }}
-          out:slide={{ duration: 200, easing: cubicOut }}
+          transition:rise
         >
           <span class="window-icon">
             {@html window.icon ??
@@ -285,7 +297,6 @@
     padding: 12px 16px 16px;
     position: relative;
     z-index: 1000;
-    background-color: transparent;
   }
 
   .taskbar {
@@ -297,7 +308,6 @@
     box-shadow: var(--ink-shadow);
     width: 100%;
     box-sizing: border-box;
-    z-index: 1000;
   }
 
   .start-button-container {
@@ -593,10 +603,6 @@
       visibility 0s linear 0.25s;
   }
 
-  .tray-button svg {
-    flex-shrink: 0;
-  }
-
   .tray-button:hover {
     transform: translate(-1px, -1px);
     border-color: var(--color-ink);
@@ -610,6 +616,7 @@
   }
 
   .tray-button svg {
+    flex-shrink: 0;
     width: 18px;
     height: 18px;
     fill: none;

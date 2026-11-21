@@ -150,8 +150,7 @@
     height: 32px;
   }
 
-  .mobile-icon-container .icon,
-  .mobile-icon-container .icon :global(svg) {
+  .mobile-icon-container .icon {
     width: 55%;
     height: 55%;
   }
@@ -161,9 +160,8 @@
     height: 100%;
   }
 
-  /* In a monospace font every character is 0.6em wide, so "Experience" is 84px at 12px:
-     wider than the icon's 80px, so the label may be as wide as its text (centred under
-     the icon, into the gap beside it) up to 96px, and only wraps past that */
+  /* A label wider than the icon (like "Experience") may run into the gap beside it,
+     centred under the icon, up to 96px; only past that does it wrap */
   .icon-title {
     text-align: center;
     font-size: 12px;
@@ -174,49 +172,5 @@
     background-color: var(--color-paper);
     padding: 2px 6px;
     border-radius: 4px;
-  }
-
-  @media (max-width: 768px) {
-    .desktop-icon:not(.mobile-icon) {
-      width: 80px;
-      padding: 8px 4px;
-    }
-
-    .icon-container:not(.mobile-icon-container) {
-      width: 50px;
-      height: 50px;
-    }
-
-    .icon:not(.mobile-icon-container .icon) {
-      font-size: 28px;
-    }
-
-    .icon-title {
-      font-size: 12px;
-      max-width: 80px;
-      padding: 2px 4px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .desktop-icon:not(.mobile-icon) {
-      width: 70px;
-      padding: 6px 2px;
-    }
-
-    .icon-container:not(.mobile-icon-container) {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 6px;
-    }
-
-    .icon:not(.mobile-icon-container .icon) {
-      font-size: 26px;
-    }
-
-    .icon-title {
-      font-size: 11px;
-      max-width: 70px;
-    }
   }
 </style>

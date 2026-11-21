@@ -27,7 +27,7 @@ const LOOP_FADE_HOURS = 2.5;
  * 7-day loop wraps around. Apply it as the canvas's opacity (it is cheap to change).
  * @param {any} field a p5.rain field
  */
-export function loopFade(field) {
+function loopFade(field) {
   const data = field?.data;
   if (!field?.ready || !data?.earliest || !data?.latest) return 1;
   const span = (data.latest - data.earliest) / 3600e3;

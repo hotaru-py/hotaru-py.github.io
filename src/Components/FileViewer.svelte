@@ -24,7 +24,6 @@
       if (count !== null) stars = count;
     });
   });
-
 </script>
 
 <!-- Photos-app style: the picture on the left, its details in a side panel -->
@@ -34,7 +33,7 @@
       {#if file.demo === "p5rain"}
         <!-- Projects with a demo run it live where the picture would be -->
         <div class="demo-frame">
-          <P5Rain {isMobile} />
+          <P5Rain />
         </div>
       {:else if file.image}
         <img src={file.image} alt={file.alt ?? file.name} />

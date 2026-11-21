@@ -1,10 +1,5 @@
-<script>
-  /**
-   * Square home-screen widget holding the gallery's spot until there's work to show:
-   * dashed outline, three rain cells taking turns, and a line saying so.
-   */
-</script>
-
+<!-- Square home-screen widget holding the gallery's spot until there's work to show:
+     dashed outline, three rain cells taking turns, and a line saying so. -->
 <div class="widget" role="note">
   <span class="cells" aria-hidden="true"
     ><span></span><span></span><span></span></span

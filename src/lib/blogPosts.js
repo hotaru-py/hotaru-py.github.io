@@ -1,14 +1,14 @@
-// Blog posts, newest first. Free to read on the site and in Simple Mode, but kept out
-// of llms.txt and the crawler copy: staticSite.js doesn't import this file.
-//
-// `body` is a list of paragraphs; text may use **double asterisks** for emphasis.
+// Blog posts. Free to read on the site and in Simple Mode, but kept out of llms.txt and
+// the crawler copy: staticSite.js doesn't import this file.
+
 // What the Blog window calls itself (the app and its icon are still just "Blog")
 export const BLOG_TITLE = "hotaru's memdump";
 
 // Shown wherever the blog is (app, widgets, Simple Mode) while there are no posts
 export const NO_POSTS = "This is where I'd put my blog posts, IF I HAD ANY!!!";
 
-// Newest first. `date` is ISO (YYYY-MM-DD). Lists show the start of the post itself (see
+// Newest first. `date` is ISO (YYYY-MM-DD). `body` is a list of paragraphs, which may use
+// **double asterisks** for emphasis. Lists show the start of the post itself (see
 // `preview`), so there is no separate blurb to write.
 export const posts = [
   {
@@ -25,11 +25,6 @@ export const posts = [
 /** The start of a post, plain: lists clamp it to a couple of lines with an ellipsis */
 export function preview(post) {
   return post.body[0].replace(/\*\*/g, "");
-}
-
-/** The newest `count` posts */
-export function latestPosts(count) {
-  return posts.slice(0, count);
 }
 
 /** "Nov 18, 2026" */

@@ -3,14 +3,6 @@
   import { playSound } from "../lib/sounds.js";
   import { tactile } from "../lib/tactile.js";
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [isMobile]
-   */
-
-  /** @type {Props} */
-  let { isMobile = false } = $props();
-
   // p5.rain is picked but its data hasn't arrived yet (the Motion Blob is still up)
   const loading = $derived(wallpaper.current === "rain" && !wallpaper.rainReady);
 
@@ -50,7 +42,7 @@
   }
 </script>
 
-<div class="picker" class:mobile={isMobile}>
+<div class="picker">
   <p class="intro">Pick a wallpaper for the desktop.</p>
   <div class="options" role="radiogroup" aria-label="Wallpaper">
     {#each WALLPAPERS as option (option.id)}

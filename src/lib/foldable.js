@@ -42,13 +42,11 @@ export function foldable(details) {
       to = summary.offsetHeight;
     }
     details.style.overflow = "hidden";
-    const run = details.animate(
+    animation = details.animate(
       { height: [`${from}px`, `${to}px`] },
       { duration: MS, easing: "ease" },
     );
-    animation = run;
-    run.onfinish = () => finish(opening);
-    run.oncancel = () => {};
+    animation.onfinish = () => finish(opening);
   }
 
   summary.addEventListener("click", onClick);

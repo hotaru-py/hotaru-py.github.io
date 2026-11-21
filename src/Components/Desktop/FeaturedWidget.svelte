@@ -131,7 +131,7 @@
     font-size: 11px;
     line-height: 1.3;
     color: var(--color-ink-soft);
-    /* Up to two lines: a monospace font is too wide for most one-line blurbs */
+    /* Up to two lines */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;

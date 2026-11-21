@@ -41,8 +41,7 @@
   const EXIT_MS = 480;
   let leaving = $state(false);
 
-  // Hovering (or focusing) Simple Mode previews it: the green glow fades and the text
-  // turns monospace
+  // Hovering (or focusing) Simple Mode previews it: the green glow fades out
   let previewSimple = $state(false);
 
   // Once a user is picked the preview is locked in, so the exit doesn't flick back to
@@ -238,6 +237,8 @@
 <style>
   .picker {
     --bar-height: clamp(56px, 11vh, 96px);
+    /* The login screen is in the mono face, like Simple Mode */
+    font-family: var(--font-terminal);
     position: fixed;
     inset: 0;
     isolation: isolate;
@@ -274,10 +275,6 @@
 
   .preview-simple .avatar {
     background-color: var(--color-paper);
-  }
-
-  .preview-simple {
-    font-family: var(--font-terminal);
   }
 
   .svg-defs {

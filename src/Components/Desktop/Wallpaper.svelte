@@ -354,11 +354,7 @@
 
   // 256-step RGB lookup table built from the moss tokens in app.css
   function buildColorLut() {
-    const styles = getComputedStyle(document.documentElement);
-    const stops = STOPS.map(([at, token]) => [
-      at,
-      hexToRgb(styles.getPropertyValue(token).trim()),
-    ]);
+    const stops = STOPS.map(([at, token]) => [at, cssRgb(token)]);
     const lut = new Uint8ClampedArray(256 * 3);
     for (let i = 0; i < 256; i++) {
       const t = i / 255;

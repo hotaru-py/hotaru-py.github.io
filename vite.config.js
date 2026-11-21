@@ -41,7 +41,6 @@ function siteSeo() {
   };
 }
 
-// https://vite.dev/config/
 export default defineConfig({
   base: "/",
   plugins: [tailwindcss(), svelte(), siteSeo()],

@@ -87,7 +87,8 @@ export const experience = [
 ];
 
 // College clubs and activities, shown after work experience. Each club lists its roles,
-// most recent first. `url` (club or job), `description` (job) and `period` and `description` (role) are optional; a description folds open under its role.
+// most recent first. A club's `url` and a role's `period` and `description` are optional;
+// a description folds open under its role.
 export const activities = [
   {
     org: "SNUC Coding Club",
@@ -188,8 +189,8 @@ export const featured = {
 };
 
 // The Gallery app's subfolders. Hidden for now (the app, its widget and its Simple Mode
-// section are commented out in Desktop.svelte, SimpleMode.svelte and staticSite.js);
-// bring those back once there's work to show. Each item gets an `image` URL (e.g. from
+// section are commented out in Desktop.svelte and SimpleMode.svelte; staticSite.js
+// lists it once it isn't empty); bring those back once there's work to show. Each item gets an `image` URL (e.g. from
 // public/); without one a placeholder is drawn from its id.
 export const gallery = [
   // {
@@ -233,7 +234,7 @@ export const skillCategories = [
   },
 ];
 
-// `id` picks the screenshot in the Work window
+// `id` picks the screenshot in the Projects window
 export const liveWork = [
   {
     id: "miniture",
@@ -283,7 +284,7 @@ export const projects = [
     description:
       "NASA's IMERG global precipitation data as a live, interactive pixel field for p5.js.",
     link: "https://github.com/hotaru-py/p5-rain",
-    // Opens with a live demo in the Work window, and gets its own desktop icon
+    // Opens with a live demo in the Projects window
     demo: "p5rain",
   },
   {
@@ -389,14 +390,6 @@ export const credits = {
     character: "Firefly",
     source: "Honkai: Star Rail",
     note: "Character and artwork © HoYoverse. Non-commercial usage.",
-  },
-  // The site's typeface, an open font whose licence asks to be shown with it
-  typeface: {
-    name: "Ioskeley Mono",
-    by: "Ahmed Hatem, built on Iosevka by Renzhi Li",
-    url: "https://github.com/ahatem/IoskeleyMono",
-    site: "github.com/ahatem/IoskeleyMono",
-    license: "SIL Open Font License 1.1",
   },
   // NASA's terms for the p5.rain data (window and wallpaper), as the p5.rain README
   // asks: credit "NASA GPM IMERG via GIBS", GIBS's acknowledgement, no implied endorsement

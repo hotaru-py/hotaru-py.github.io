@@ -77,11 +77,6 @@ function unlock() {
 }
 for (const type of GESTURES) window.addEventListener(type, unlock, true);
 
-/**
- * @param {string} name
- * @param {number} volume
- * @returns {AudioBufferSourceNode | null}
- */
 // Sound effects are on by default; the visitor's mute choice is remembered
 const MUTE_KEY = "sfx-muted";
 let muted = readMuted();
@@ -114,6 +109,7 @@ const LEAD_IN = { tactile: 0.03 };
 // Per-file loudness trims, applied wherever the sound is played from
 const LEVEL = { close: 0.35, slam: 0.5 };
 
+/** @returns {AudioBufferSourceNode | null} */
 function play(name, volume) {
   const buffer = buffers.get(name);
   if (muted || !context || !buffer) return null;

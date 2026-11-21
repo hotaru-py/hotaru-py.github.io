@@ -34,14 +34,7 @@
   --halftone-fade: linear-gradient(to left, black, transparent 85%);
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+/* Tailwind v3's default border colour (v4 uses currentcolor) */
 @layer base {
   *,
   ::after,
@@ -60,49 +53,82 @@ body {
   background-color: var(--color-moss-50);
 }
 
-/* Ioskeley Mono (SIL OFL, see assets/fonts/IoskeleyMono-OFL.txt): Latin, Latin-1/Extended-A,
-   punctuation, arrows and the few symbols the site uses, in the weights it uses (500 for
-   text, 600 and 700 for emphasis) and one italic. The font has no star (U+2605); that one
-   glyph falls back to a system font. */
+/* Google Sans and Geist Mono (both SIL OFL, see assets/fonts/GoogleSans-OFL.txt and
+   GeistMono-OFL.txt), on trial in place of Ioskeley Mono (its files are still in assets/fonts for
+   switching back). Subset to Latin, Latin-1/Extended-A, punctuation, arrows, box drawing
+   and the few symbols the site uses, in the weights it uses (500 for text, 600 and 700
+   for emphasis) and one italic. */
 @font-face {
-  font-family: "Ioskeley Mono";
-  src: url("./assets/fonts/ioskeley-mono-500.woff2") format("woff2");
+  font-family: "Google Sans";
+  src: url("./assets/fonts/google-sans-500.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Ioskeley Mono";
-  src: url("./assets/fonts/ioskeley-mono-600.woff2") format("woff2");
+  font-family: "Google Sans";
+  src: url("./assets/fonts/google-sans-600.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Ioskeley Mono";
-  src: url("./assets/fonts/ioskeley-mono-700.woff2") format("woff2");
+  font-family: "Google Sans";
+  src: url("./assets/fonts/google-sans-700.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Ioskeley Mono";
-  src: url("./assets/fonts/ioskeley-mono-500i.woff2") format("woff2");
+  font-family: "Google Sans";
+  src: url("./assets/fonts/google-sans-500i.woff2") format("woff2");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
 }
 
-/* The site's two typefaces: both Ioskeley Mono, one for the desktop and phone, one for
-   Simple Mode, so either can be changed on its own. */
+@font-face {
+  font-family: "Geist Mono";
+  src: url("./assets/fonts/geist-mono-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("./assets/fonts/geist-mono-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("./assets/fonts/geist-mono-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("./assets/fonts/geist-mono-500i.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* The site's two typefaces: Google Sans on the desktop and phone, Geist Mono on the login
+   screen and in Simple Mode */
 :root {
   --font-ui:
-    "Ioskeley Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    "Google Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-terminal:
-    "Ioskeley Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 body {
@@ -150,54 +176,4 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-}
-
-.bold {
-  font-weight: 500;
-}
-
-.arrow-up,
-.arrow-down {
-  border-width: 0 3px 3px 0;
-  display: inline-block;
-  padding: 6px;
-  transition: transform 0.2s ease;
-}
-
-.arrow-up {
-  transform: rotate(-135deg);
-  -webkit-transform: rotate(-135deg);
-}
-
-.arrow-down {
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-
-.arrow-left,
-.arrow-right {
-  border-width: 0 3px 3px 0;
-  display: inline-block;
-  padding: 6px;
-  transition: transform 0.2s ease;
-}
-
-.arrow-left {
-  transform: rotate(135deg);
-  -webkit-transform: rotate(135deg);
-}
-
-.arrow-right {
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
-
-.arrow-up:hover {
-  transform: scale(1.4) rotate(-135deg);
-  -webkit-transform: scale(1.4) rotate(-135deg);
-}
-
-.arrow-down:hover {
-  transform: scale(1.4) rotate(45deg);
-  -webkit-transform: scale(1.4) rotate(45deg);
 }

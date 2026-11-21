@@ -13,14 +13,6 @@
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [isMobile]
-   */
-
-  /** @type {Props} */
-  let { isMobile = false } = $props();
-
   // The open post lives in blogNav, so the phone's blog widget can open one directly
   const post = $derived(posts.find((p) => p.id === blogNav.post) ?? null);
 
@@ -45,7 +37,7 @@
   }
 </script>
 
-<div class="blog" class:mobile={isMobile}>
+<div class="blog">
   {#if post}
     <article class="post" in:fly={slide(28)}>
       <button type="button" class="back" onclick={back}>← All posts</button>

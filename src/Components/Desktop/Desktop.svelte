@@ -66,7 +66,6 @@
   /** @type {IconGrid | undefined} */
   let iconGrid = $state();
   let layoutCustomized = $state(false);
-  // Flips once the loader starts fading, so the icons animate in where they can be seen
   // Window ids from back to front; `windows` itself stays in open order for the taskbar
   let stackOrder = $state([]);
   let activeWindowId = $state(null);
@@ -212,7 +211,7 @@
 
   // --- Phone home screen: two pages side by side, swiped between ----------------
   // Page 1: the clock, with the remaining apps in a row above the dock.
-  // Page 2: the blog and gallery widgets.
+  // Page 2: the widgets.
   let homePages = $state();
   let homePage = $state(0);
   let dockHeight = $state(0);
@@ -341,10 +340,6 @@
     isMobileView = window.innerWidth <= 768;
   }
 
-  function handleIconClick(iconData) {
-    openWindow(iconData);
-  }
-
   /**
    * Opens a window, or brings it forward if it's already open. Beyond a desktop icon's
    * fields, `position`, `size`, `props` (passed to the component) and `icon` (for the
@@ -447,18 +442,6 @@
       w.id === id ? { ...w, size: { width, height } } : w,
     );
   }
-
-  function formatTime(date) {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  }
-
-  function formatDate(date) {
-    return date.toLocaleDateString([], {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    });
-  }
 </script>
 
 {#snippet blogWidget()}
@@ -557,7 +540,7 @@
         bind:customized={layoutCustomized}
         icons={gridIcons}
         intro={firstVisit}
-        onOpen={handleIconClick}
+        onOpen={openWindow}
       />
     {/if}
 
@@ -591,7 +574,7 @@
                 >
                   <DesktopIcon
                     {icon}
-                    onclick={() => handleIconClick(icon)}
+                    onclick={() => openWindow(icon)}
                     isMobile={true}
                     showLabel={true}
                   />
@@ -660,12 +643,11 @@
             class:intro-in={firstVisit}
             style:--intro-delay="{INTRO_LEAD + 1000 + i * 120}ms"
             style:--intro-y="16px"
-            class="mobile-icon-wrapper"
             data-icon={icon.id}
           >
             <DesktopIcon
               {icon}
-              onclick={() => handleIconClick(icon)}
+              onclick={() => openWindow(icon)}
               isMobile={true}
               showLabel={showDockLabels}
             />
@@ -708,12 +690,6 @@
 </div>
 
 <style>
-  :global(body) {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-  }
-
   /* First visit: parts fade and rise in after a delay set per element. `backwards` keeps
      them hidden until their turn without pinning a transform afterwards. */
   .intro-in {
@@ -792,7 +768,6 @@
     pointer-events: none;
   }
 
-
   .taskbar-dock {
     position: absolute;
     left: 0;
@@ -805,10 +780,6 @@
 
   .taskbar-dock :global(.taskbar) {
     pointer-events: auto;
-  }
-
-  .desktop-background.mobile-view {
-    padding-top: 0;
   }
 
   /* As wide as the widgets (12px in from each side), four even columns */
@@ -827,23 +798,16 @@
     z-index: 1000;
     border: var(--ink-border);
     box-shadow: var(--ink-shadow);
+    transform: translateY(0);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
   }
 
   .mobile-icons-hidden {
     opacity: 0;
     pointer-events: none;
     transform: translateY(50px);
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
-  }
-
-  .mobile-icons-additional:not(.mobile-icons-hidden) {
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
   }
 
   /* --- Phone home pages --- */
@@ -884,8 +848,8 @@
     padding: 0 12px;
   }
 
-  /* Widgets: the blog one full width and half the screen tall; under it the square
-     gallery and featured ones side by side */
+  /* Widgets: the blog one full width and half the screen tall; under it two squares
+     side by side */
   .home-page.widgets {
     box-sizing: border-box;
     /* Bottom: clears the page dots, plus the widgets' 4px drop shadow */
@@ -912,10 +876,9 @@
     gap: 14px;
   }
 
-  /* Same row as the settings cog (16px down, 44px tall) */
+  /* 36px tall, centred on the settings cog's row (16px down, 44px tall) */
   .corner-clock {
     position: fixed;
-    /* 36px tall, centred on the 44px cog's row */
     top: calc(20px + env(safe-area-inset-top, 0px));
     left: 12px;
     z-index: 1000;
@@ -975,11 +938,6 @@
   .hidden-under-app {
     opacity: 0;
     pointer-events: none;
-  }
-
-  .mobile-icon-wrapper {
-    width: auto !important;
-    flex: 0 0 auto;
   }
 
   .mobile-window {

@@ -18,7 +18,6 @@
     {#each experience as job}
       <li>
         {#if job.description}
-          <!-- The details fold open under the role -->
           <details use:foldable>
             <summary>
               <span class="role">{job.role}</span>
@@ -50,7 +49,6 @@
           {#each club.roles as entry}
             <li>
               {#if entry.description}
-                <!-- The details fold open under the role -->
                 <details use:foldable>
                   <summary>
                     <span class="role-name">{entry.role}</span>

@@ -7,7 +7,6 @@
     about,
     experience,
     activities,
-    gallery,
     skillCategories,
     liveWork,
     githubProfile,
@@ -44,11 +43,6 @@
     { id: "links", title: "Links" },
   ];
 
-  // One tab at a time, with the address as a path: #about, #blog, #blog/<post id>. The
-  // tab is the top directory and anything inside it (a blog post) a subdirectory, so the
-  // browser's back button and shared links work like a file tree.
-  const tabIds = sections.map((section) => section.id);
-
   // Every project as a page of its own, under its group's heading in the Projects list
   const slug = (name) =>
     name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -76,9 +70,13 @@
     },
   ];
   const allProjects = projectGroups.flatMap((group) => group.entries);
+
+  // One tab at a time, with the address as a path: #about, #blog, #blog/<post id>. The
+  // tab is the top directory and anything inside it (a post or project) a subdirectory,
+  // so the browser's back button and shared links work like a file tree.
   function parseHash() {
     const [tab, sub] = location.hash.replace(/^#\/?/, "").split("/");
-    const id = tabIds.includes(tab) ? tab : "about";
+    const id = sections.some((section) => section.id === tab) ? tab : "about";
     return {
       tab: id,
       sub:
@@ -89,7 +87,6 @@
     };
   }
   let route = $state(parseHash());
-  const currentSection = $derived(route.tab);
   const currentTitle = $derived(
     sections.find((section) => section.id === route.tab)?.title ?? "",
   );
@@ -205,11 +202,11 @@
           {#each sections as section}
             <a
               href="#{section.id}"
-              class:current={currentSection === section.id}
-              aria-current={currentSection === section.id ? "location" : undefined}
+              class:current={route.tab === section.id}
+              aria-current={route.tab === section.id ? "location" : undefined}
               onclick={() => closeMenu()}
               ><span class="mark" aria-hidden="true"
-                >{currentSection === section.id ? "> " : "- "}</span
+                >{route.tab === section.id ? "> " : "- "}</span
               >{section.title}</a
             >
           {/each}
@@ -223,8 +220,8 @@
       {#each sections as section}
         <a
           href="#{section.id}"
-          class:current={currentSection === section.id}
-          aria-current={currentSection === section.id ? "location" : undefined}
+          class:current={route.tab === section.id}
+          aria-current={route.tab === section.id ? "location" : undefined}
           >{section.title}</a
         >
       {/each}
@@ -258,14 +255,12 @@
       </ul>
     </section>
     {:else if route.tab === "experience"}
-
     <section id="experience">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>Experience</h2>
       <ul>
         {#each experience as job}
           <li>
             {#if job.description}
-              <!-- The details fold open under the role -->
               <details class="role-detail" use:foldable>
                 <summary>
                   <strong>{job.role}</strong><br />
@@ -292,7 +287,6 @@
             {#if club.url}{@render link(club.url, club.org)}{:else}<strong>{club.org}</strong>{/if}
             {#each club.roles as entry}
               {#if entry.description}
-                <!-- The details fold open under the role -->
                 <details class="role-detail" use:foldable>
                   <summary>
                     {entry.role}
@@ -309,7 +303,6 @@
       </ul>
     </section>
     {:else if route.tab === "projects"}
-
     <section id="projects">
       {#if openProject}
         <p>{@render link("#projects", "← ../", false)}</p>
@@ -346,9 +339,6 @@
       {/if}
     </section>
     {:else if route.tab === "blog"}
-
-    <!-- Gallery: hidden while it is empty (see `gallery` in siteContent.js) -->
-
     <section id="blog">
       {#if openPost}
         <p>{@render link("#blog", "← ../", false)}</p>
@@ -377,7 +367,6 @@
       {/if}
     </section>
     {:else if route.tab === "skills"}
-
     <section id="skills">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>Skills</h2>
       {#each skillCategories as category}
@@ -388,7 +377,6 @@
       {/each}
     </section>
     {:else if route.tab === "links"}
-
     <section id="links">
       <h2><span class="mark" aria-hidden="true">{"## "}</span>Links</h2>
       <ul>

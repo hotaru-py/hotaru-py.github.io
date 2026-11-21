@@ -1,6 +1,6 @@
 <script>
   import {
-    latestPosts,
+    posts,
     formatPostDate,
     preview,
     NO_POSTS,
@@ -17,8 +17,7 @@
   /** @type {Props} */
   let { onOpenPost, onViewAll } = $props();
 
-  const LATEST = 5;
-  const entries = latestPosts(LATEST);
+  const entries = posts.slice(0, 5);
 </script>
 
 <section class="widget" aria-label="Blog">
