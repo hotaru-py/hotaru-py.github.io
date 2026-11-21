@@ -12,9 +12,9 @@
   const flyIn = (i) => ({ y: 20, duration: 200, delay: 300 + i * 50 });
   const introDelay = (i) => 750 + i * 110;
 
-  // icon footprint (tile + label), the smallest gap between icons, and the edge margin
-  const ICON_W = 88;
-  const ICON_H = 102;
+  // square cells, so icons and widgets (blocks of cells) share one shape; the smallest
+  // gap between cells, and the edge margin
+  const CELL = 96;
   const MIN_GAP = 12;
   // gaps stretch to use the space, but never past this; any rest stays at the far edges
   const MAX_GAP = 20;
@@ -25,23 +25,23 @@
 
   let width = $state(0);
   let height = $state(0);
-  // as many cells as fit (the last one needs no trailing gap)...
-  const cols = $derived(fit(width, ICON_W));
-  const rows = $derived(fit(height, ICON_H));
-  // ...then spread evenly so the grid reaches every edge with the same margin
-  const pitchX = $derived(pitch(width, ICON_W, cols));
-  const pitchY = $derived(pitch(height, ICON_H, rows));
+  // rows fill the height top to bottom like a desktop's; columns take the same step so
+  // cells stay square, centred across (any spare height, past MAX_GAP, goes at the bottom)
+  const rows = $derived(fit(height));
+  const step = $derived(spread(height, rows));
+  const cols = $derived(
+    Math.max(1, Math.floor((width - 2 * MARGIN - CELL) / step) + 1),
+  );
+  const originX = $derived((width - (cols - 1) * step - CELL) / 2);
+  const originY = MARGIN;
 
-  function fit(size, icon) {
-    return Math.max(
-      1,
-      Math.floor((size - 2 * MARGIN + MIN_GAP) / (icon + MIN_GAP)),
-    );
+  function fit(size) {
+    return Math.max(1, Math.floor((size - 2 * MARGIN + MIN_GAP) / (CELL + MIN_GAP)));
   }
 
-  function pitch(size, icon, count) {
-    if (count < 2) return icon + MIN_GAP;
-    return Math.min((size - 2 * MARGIN - icon) / (count - 1), icon + MAX_GAP);
+  function spread(size, count) {
+    if (count < 2) return CELL + MIN_GAP;
+    return Math.min((size - 2 * MARGIN - CELL) / (count - 1), CELL + MAX_GAP);
   }
 
   const spanOf = (item) => item.span ?? { cols: 1, rows: 1 };
@@ -76,8 +76,8 @@
   const dropCell = $derived.by(() => {
     if (!dragged) return null;
     const from = placed[dragged.id];
-    const col = Math.round(from.col + drag.dx / pitchX);
-    const row = Math.round(from.row + drag.dy / pitchY);
+    const col = Math.round(from.col + drag.dx / step);
+    const row = Math.round(from.row + drag.dy / step);
     return nearestFree(
       { col, row },
       spanOf(dragged),
@@ -87,16 +87,13 @@
     );
   });
 
-  const cellX = (cell) => MARGIN + cell.col * pitchX;
-  const cellY = (cell) => MARGIN + cell.row * pitchY;
+  const cellX = (cell) => originX + cell.col * step;
+  const cellY = (cell) => originY + cell.row * step;
   // a block of cells, from the first cell's corner to the far edge of the last one
-  const spanW = (span) => (span.cols - 1) * pitchX + ICON_W;
-  const spanH = (span) => (span.rows - 1) * pitchY + ICON_H;
-  // what an item actually covers: square widgets are as tall as they are wide, inside
-  // their (taller) block of cells, and the drop outline should match that
+  const spanW = (span) => (span.cols - 1) * step + CELL;
+  const spanH = (span) => (span.rows - 1) * step + CELL;
   const boxW = (item) => spanW(spanOf(item));
-  const boxH = (item) =>
-    item.square ? Math.min(boxW(item), spanH(spanOf(item))) : spanH(spanOf(item));
+  const boxH = (item) => spanH(spanOf(item));
 
   function loadPreferred() {
     try {
@@ -340,8 +337,7 @@
 
 <div
   class="icon-grid"
-  style:--icon-w="{ICON_W}px"
-  style:--icon-h="{ICON_H}px"
+  style:--cell="{CELL}px"
   bind:clientWidth={width}
   bind:clientHeight={height}
   in:fade={{ duration: 300, delay: 100 }}
@@ -369,8 +365,8 @@
       class:settling
       style:left="{cellX(cell)}px"
       style:top="{cellY(cell)}px"
-      style:width={icon.widget ? `${boxW(icon)}px` : undefined}
-      style:height={icon.widget ? `${boxH(icon)}px` : undefined}
+      style:width="{boxW(icon)}px"
+      style:height="{boxH(icon)}px"
       style:transform="translate({offset.x}px, {offset.y}px)"
       onpointerdown={(e) => handlePointerDown(e, icon)}
       onclickcapture={icon.widget ? handleWidgetClick : undefined}
@@ -399,6 +395,12 @@
     position: absolute;
     touch-action: none;
     user-select: none;
+  }
+
+  /* an icon sits centred at the top of its cell */
+  .grid-item:not(.widget) {
+    display: flex;
+    justify-content: center;
   }
 
   .grid-item.intro-in {
@@ -435,8 +437,8 @@
   /* where it will land: a dashed ink outline over a halftone wash */
   .drop-target {
     position: absolute;
-    width: var(--icon-w);
-    height: var(--icon-h);
+    width: var(--cell);
+    height: var(--cell);
     border: 2px dashed var(--color-ink);
     border-radius: 12px;
     background-image: var(--halftone);

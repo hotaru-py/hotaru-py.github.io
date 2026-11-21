@@ -1,5 +1,4 @@
 <script>
-  import { tapToOpen } from "../lib/tapToOpen.js";
   import { tactile } from "../lib/tactile.js";
   import { bookmarks } from "../lib/siteContent.js";
 
@@ -20,9 +19,11 @@
   <h2 class="browser-title">Bookmarks</h2>
   <div class="browser-grid">
     {#each bookmarks as method}
-      <div
+      <a
         class="browser-card"
-        use:tapToOpen={method.url}
+        href={method.url}
+        target={method.url.startsWith("mailto:") ? undefined : "_blank"}
+        rel="noopener noreferrer"
         use:tactile
       >
         <div class="browser-row">
@@ -30,16 +31,8 @@
             {@html ICONS[method.icon ?? method.id]}
           </div>
           <h3 class="browser-name">{method.name}</h3>
-          <a
-            href={method.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="browser-link"
-          >
-            →
-          </a>
         </div>
-      </div>
+      </a>
     {/each}
   </div>
 </div>
@@ -99,6 +92,8 @@
       left 0.15s ease;
     display: flex;
     flex-direction: column;
+    color: inherit;
+    text-decoration: none;
   }
 
   /* halftone drop shadow; the grid isolates it so it stays behind the card */
@@ -155,26 +150,8 @@
     flex-grow: 1;
   }
 
-  .browser-link {
-    font-size: 20px;
-    color: var(--color-ink);
-    text-decoration: none;
-    padding: 4px 8px;
-    margin-left: auto;
-    border-radius: 6px;
-    transition:
-      transform 0.2s ease,
-      background-color 0.2s ease,
-      color 0.2s ease;
-    flex-shrink: 0;
-  }
-
-  .browser-link:hover {
-    transform: translateX(2px);
-  }
-
-  /* first tap on a touch screen (see tapToOpen) */
-  .browser-card:global(.tap-armed) {
-    background-color: var(--color-moss-100);
+  .browser-card:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
   }
 </style>

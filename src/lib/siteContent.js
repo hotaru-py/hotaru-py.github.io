@@ -89,27 +89,64 @@ export const activities = [
   {
     org: "SNUC Coding Club",
     roles: [
-      { role: "Club Head", period: "Jul 2026 - Present" },
+      {
+        role: "Club Head",
+        period: "Jul 2026 - Present",
+        description:
+          "Coordinate between verticals and manage overall club workflow across events, documentation of events and more buzzwords. Mostly play the mediator when there are disagreeing points of view on some plan.",
+      },
       {
         role: "Core Member - Software Development Vertical",
         period: "Sep 2025 - Present",
+        description:
+          "Conducted workshops in Web Development and UI/UX, with a special focus on interactions and frontend. Work on projects and requirements across campus, and currently guide junior members through them.",
       },
       {
-        role: "Founding Team - Game Development & AR/VR Vertical",
+        role: "Founding Team Coordinator - Game Development & AR/VR Vertical",
         period: "Sep 2026 - Present",
+        description:
+          "Guiding a team of juniors in setting up the new vertical, doing the boring paperwork so the team can work on workshops, events and their roadmap.",
       },
-      { role: "Graphic Designer", period: "Oct 2023 - Aug 2025" },
+      {
+        role: "Founding Team Coordinator - PR & Marketing Vertical",
+        period: "Aug 2026 - Present",
+        description:
+          "Set up a vertical with competent people to handle what this bunch of nerds struggles with — talking to people.",
+      },
+      {
+        role: "Graphic Designer",
+        period: "Oct 2023 - Aug 2025",
+        description:
+          "Started off with the now-defunct Design vertical, then moved on to the now-defunct META vertical, before just being a core member while making posters and assets for most of the club's events.",
+      },
     ],
   },
   {
     org: "Aura - SNUC Design Club",
-    roles: [{ role: "Senior Core Member", period: "Jul 2026 - Present" }],
+    roles: [
+      {
+        role: "Senior Core Member",
+        period: "Jul 2026 - Present",
+        description:
+          "Making graphic designs, posters and web designs for events, while acting as a consultant/auditor for design work across web, graphics and assets for approaching people and teams. Mainly the UI/UX guy.",
+      },
+    ],
   },
   {
     org: "Cognition - The SNUC Quiz Club",
     roles: [
-      { role: "Club Head", period: "May 2026 - Present" },
-      { role: "Core Member", period: "Aug 2024 - May 2026" },
+      {
+        role: "Club Head",
+        period: "May 2026 - Present",
+        description:
+          "Currently organizing quizzes across topics and mediums: in person, on stage and online. Setting up a (hopefully) self-sustaining quizzing culture on campus for the foreseeable future.",
+      },
+      {
+        role: "Core Member",
+        period: "Aug 2024 - May 2026",
+        description:
+          "Made questions. A lot of them. I mean, a lot. Sometimes till 2am. Highly recommended.",
+      },
     ],
   },
   {
@@ -120,7 +157,7 @@ export const activities = [
         role: "Founding member",
         period: "2023 - Present",
         description:
-          "Joined a bunch of people I met online to do CTFs, then organized them, and a few more things.",
+          "Joined a bunch of people I met on Discord to do CTFs, then organized a few with the Coding Club, and made a few projects and a lot of events before taking over as the now-Coding Club.",
       },
     ],
   },
@@ -142,22 +179,37 @@ export const activities = [
     ],
   },
   {
+    org: "Team Delta",
+    url: "https://www.linkedin.com/company/snucdelta/",
+    roles: [
+      {
+        role: "Member",
+        period: "Nov 2023 - May 2026",
+        description:
+          "Collective of programmers participating in various hackathons under the Delta banner.",
+      },
+    ],
+  },
+  {
     org: "University Work",
     roles: [
       {
         role: "Website Head, SSN-SNUC Invente '26",
         period: "Jul - Sep 2026",
         description:
-          "Coordinated design, frontend and backend teams for the website and other technologies used across the technical festival, while building initial identity and a few pages and components in the website myself.",
+          "Coordinated design, frontend and backend teams for the website and other technologies used across the technical festival, while building initial identity and a few pages and components in the website myself, with one of the best teams to work with (say hi if one of you is reading this).",
       },
       {
         role: "Frontend Developer & UI/UX Designer, University Faculty and Student Capstone Portal",
+        period: "Oct 2026 - Present",
         description:
           "Absolutely hated the UI of the portal, so volunteered to replace it with a visually better, on-brand and significantly more usable interface with a design system implemented for future developers when scope creep happens.",
       },
       {
         role: "Conference Website Developer",
-        description: "NCVPRIPG '26 GLOFeagles Challenge & ICACM '27",
+        period: "Feb 2026 - Present",
+        description:
+          "Developed and maintained websites for NCVPRIPG '26 GLOFeagles Challenge & ICACM '27.",
       },
       {
         role: "Web Designer & Developer, SSN-SNUC Instincts '26",
@@ -168,6 +220,8 @@ export const activities = [
       {
         role: "Graphic Designer - Marketing, SNUC",
         period: "Sep 2023 - Mar 2024",
+        description:
+          "Worked on various on and off-campus marketing material, most notably assets for QuBiz & ProjectX '24, SNUC's premier national-level school competition series.",
       },
     ],
   },
