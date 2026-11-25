@@ -11,7 +11,7 @@ export const site = {
   jobTitle: "mix of a designer-developer",
 };
 
-// the copyright notice, shown in the About window and Simple Mode's footer. the end year
+// the copyright notice, shown at the bottom of Credits and in Simple Mode's footer. the end year
 // is always the current one.
 export const copyright = { holder: "Prajesh Raam / hotaru", since: 2024 };
 
@@ -33,7 +33,7 @@ export const about = {
   tldr: "tl;dr: I make stuff that looks good to me.",
   intro: [
     "Usually, I'm a frustrated consumer trying to fix things around me with my weird concoction of design, engineering and other skills, so they're usable and look good.",
-    "Professionally, I'm a designer, engineer and artist working primarily in product engineering, trying to understand how humans have interacted with technology in the past and present, and work on how we'll interact with technology in the near and far future, especially with calm and ambient interfaces.",
+    "Professionally, I'm a designer, engineer and artist, trying to understand how humans have interacted with technology in the past and present, and work on how we'll interact with technology in the near and far future.",
     "Other than these, I sometimes do the following (and a lot more, I just can't keep track of them):",
   ],
   // the list after the intro
@@ -408,7 +408,7 @@ export const bookmarks = [
   {
     id: "youtube-random",
     icon: "youtube",
-    name: "YouTube Channel (random stuff)",
+    name: "YouTube",
     url: "https://www.youtube.com/@hotaruuuh",
   },
 ];
@@ -418,11 +418,10 @@ const PIXABAY_ATTRIBUTION =
   "?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=";
 
 export const credits = {
-  heading: "What made this website?",
+  heading: "Credits",
   inspiration: {
     lead: "Website inspired by",
     name: "shar",
-    aside: "w person",
     // `id` picks the icon on the pill
     links: [
       { id: "website", label: "sharyap.com", url: "https://sharyap.com" },

@@ -11,8 +11,8 @@ const OLD_KEYS = ["wallpaper", "colours"];
 const SLIDE_MS = 5 * 60 * 1000;
 
 export const WALLPAPERS = [
-  { id: "rain", name: "p5.rain" },
   { id: "blob", name: "Motion Blob" },
+  { id: "rain", name: "p5.rain" },
 ];
 
 // `theme`: the :root[data-theme] in app.css (none: the base moss tokens). `rain`: the
@@ -53,7 +53,7 @@ const pickedColours = byId(COLOURS, read(COLOURS_KEY))?.id;
 // p5.rain wallpaper has loaded and faded in; until then the Motion blob stays up and
 // the pickers show p5.rain as loading
 export const wallpaper = $state({
-  current: pickedWallpaper ?? "rain",
+  current: pickedWallpaper ?? "blob",
   colours: pickedColours ?? "bloom",
   pinned: { wallpaper: !!pickedWallpaper, colours: !!pickedColours },
   rainReady: false,

@@ -3,7 +3,6 @@
   import { scale } from "svelte/transition";
   import { expoOut } from "svelte/easing";
   import { LOGO_PATH, LOGO_VIEWBOX, LOGO_ASPECT } from "../lib/logo.js";
-  import fillImage from "../assets/logo-fill.webp";
 
   // onExit fires as the loader starts fading, so the page can animate in underneath
   let { onExit } = $props();
@@ -12,41 +11,28 @@
   const FILL_DELAY = 0.5;
   const FILL_DURATION = 1.05;
   const HOLD = 0.3;
-  // never hold the page back longer than this waiting for the fill image
-  const IMAGE_WAIT_MS = 1500;
+
+  // the fill's grain: about this many noise cycles per screen pixel, at the mark's ~104px
+  // height. feTurbulence counts in viewBox units, so it's scaled to the logo's own size
+  const GRAIN_PER_PX = 1.1;
+  const MARK_PX = 104;
+  const grainFrequency = (GRAIN_PER_PX * MARK_PX) / Number(LOGO_VIEWBOX.split(/\s+/)[3]);
 
   const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
   let visible = $state(true);
-  // the mark only renders (and so only starts animating) once the fill image is decoded
-  let ready = $state(false);
 
   onMount(() => {
-    let dismissTimer;
-
-    function start() {
-      if (ready) return;
-      ready = true;
-      dismissTimer = setTimeout(
-        () => {
-          visible = false;
-          onExit?.();
-        },
-        reduceMotion ? 150 : (FILL_DELAY + FILL_DURATION + HOLD) * 1000,
-      );
-    }
-
-    const image = new Image();
-    image.src = fillImage;
-    image.decode().then(start, start);
-    const fallbackTimer = setTimeout(start, IMAGE_WAIT_MS);
-
-    return () => {
-      clearTimeout(dismissTimer);
-      clearTimeout(fallbackTimer);
-    };
+    const dismissTimer = setTimeout(
+      () => {
+        visible = false;
+        onExit?.();
+      },
+      reduceMotion ? 150 : (FILL_DELAY + FILL_DURATION + HOLD) * 1000,
+    );
+    return () => clearTimeout(dismissTimer);
   });
 </script>
 
@@ -62,8 +48,7 @@
       easing: expoOut,
     }}
   >
-    {#if ready}
-      <div class="mark" style:aspect-ratio={LOGO_ASPECT}>
+    <div class="mark" style:aspect-ratio={LOGO_ASPECT}>
         <!-- outline fades in, then wipes away from the bottom as the fill rises. (Not
              class "outline": that's a Tailwind utility, which drew a 1px box around it.) -->
         <svg class="layer outline-layer" viewBox={LOGO_VIEWBOX} fill="none">
@@ -76,23 +61,34 @@
           />
         </svg>
 
-        <!-- noisy gradient, clipped to the logo shape -->
+        <!-- a grainy gradient in the site's colours (app.css --logo-fill-*), clipped to
+             the logo shape -->
         <svg class="layer fill" viewBox={LOGO_VIEWBOX}>
           <defs>
             <clipPath id="loader-logo-clip">
               <path d={LOGO_PATH} />
             </clipPath>
+            <linearGradient id="loader-fill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" style:stop-color="var(--logo-fill-from)" />
+              <stop offset="1" style:stop-color="var(--logo-fill-to)" />
+            </linearGradient>
+            <!-- coloured fractal noise, contrast stretched, laid over the gradient -->
+            <filter id="loader-grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+              <feTurbulence type="fractalNoise" baseFrequency={grainFrequency} numOctaves="2" seed="7" />
+              <feColorMatrix values="3 0 0 0 -1  0 3 0 0 -1  0 0 3 0 -1  0 0 0 0 0.12" />
+              <feBlend in2="SourceGraphic" mode="overlay" />
+              <feComposite in2="SourceGraphic" operator="in" />
+            </filter>
           </defs>
-          <image
-            href={fillImage}
+          <rect
             width="100%"
             height="100%"
-            preserveAspectRatio="none"
+            fill="url(#loader-fill)"
+            filter="url(#loader-grain)"
             clip-path="url(#loader-logo-clip)"
           />
         </svg>
       </div>
-    {/if}
 
     <span class="sr-only">Loading</span>
   </div>

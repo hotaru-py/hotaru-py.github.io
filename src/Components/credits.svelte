@@ -1,6 +1,6 @@
 <script>
   import { xylophone } from "../lib/xylophone.js";
-  import { credits } from "../lib/siteContent.js";
+  import { credits, copyrightLine } from "../lib/siteContent.js";
 
   // icon for each inspiration pill, by its id in siteContent.js
   const ICONS = {
@@ -17,7 +17,6 @@
       <h3 class="credit-heading">Inspiration</h3>
       <p class="credit-text">
         {credits.inspiration.lead} <strong>{credits.inspiration.name}</strong>
-        <span class="credit-aside">({credits.inspiration.aside})</span>
       </p>
       <div class="credit-links">
         {#each credits.inspiration.links as link}
@@ -82,6 +81,8 @@
       </ul>
     </section>
   </div>
+
+  <p class="copyright">{copyrightLine()}</p>
 </div>
 
 <style>
@@ -241,6 +242,13 @@
 
   .credit-list li + li {
     margin-top: 6px;
+  }
+
+  .copyright {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink-muted);
   }
 
   /* same static underline as the other inline links */

@@ -40,9 +40,15 @@
   --color-ink-soft: #4b4868;
   --color-ink-muted: #7d7894;
   --color-accent: #a3cbef;
+  /* the loading screen's logo fill: deep sky into rose */
+  --logo-fill-from: #2f65a2;
+  --logo-fill-to: #fa8b99;
 }
 
 :root {
+  /* the loading screen's logo fill: a dim, greyed moss into bright moss */
+  --logo-fill-from: color-mix(in srgb, var(--color-moss-700) 55%, var(--color-ink-muted));
+  --logo-fill-to: var(--color-moss-500);
   --ink-border: 2px solid var(--color-ink);
   --ink-shadow: 4px 4px 0 var(--color-ink);
   /* print-style halftone dots; pair with --halftone-size */
