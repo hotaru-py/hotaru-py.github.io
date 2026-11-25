@@ -847,12 +847,12 @@
   }
 
   /* the remaining apps, in a row just above the page dots, lined up with the dock's
-     columns */
+     columns. as far above the dots as the widgets' shadows on the next page */
   .home-row {
     position: absolute;
     left: 12px;
     right: 12px;
-    bottom: calc(var(--dock-space) + 34px);
+    bottom: calc(var(--dock-space) + 38px);
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     justify-items: center;
