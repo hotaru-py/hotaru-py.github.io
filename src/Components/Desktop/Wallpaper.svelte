@@ -67,7 +67,7 @@
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    const lut = buildColorLut();
+    let lut = buildColorLut();
     let width = 0;
     let height = 0;
     let unit = 0; // blob size basis: the short side on desktop
@@ -227,9 +227,20 @@
 
     // tell the mobile home screen clock what the wallpaper looks like behind it
     // so its ink can adapt (deeper green over the blob, paper if it ever gets dark)
-    const inkRgb = cssRgb("--color-ink");
-    const deepRgb = cssRgb("--color-moss-900");
-    const paperRgb = cssRgb("--color-paper");
+    let inkRgb = cssRgb("--color-ink");
+    let deepRgb = cssRgb("--color-moss-900");
+    let paperRgb = cssRgb("--color-paper");
+
+    // the site's colours can change under it (Bloom / Komorebi): re-read the tokens
+    const themeWatch = new MutationObserver(() => {
+      lut = buildColorLut();
+      inkRgb = cssRgb("--color-ink");
+      deepRgb = cssRgb("--color-moss-900");
+      paperRgb = cssRgb("--color-paper");
+      lastClockInk = "";
+      if (reducedMotion) draw(); // still: nothing else would repaint it
+    });
+    themeWatch.observe(document.documentElement, { attributeFilter: ["data-theme"] });
     let lastClockInk = "";
 
     function sampleClockBackdrop() {
@@ -315,7 +326,10 @@
         draw();
       };
       window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
+      return () => {
+        themeWatch.disconnect();
+        window.removeEventListener("resize", handleResize);
+      };
     }
 
     let frame;
@@ -341,6 +355,7 @@
     frame = requestAnimationFrame(loop);
 
     return () => {
+      themeWatch.disconnect();
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", handlePointerMove);

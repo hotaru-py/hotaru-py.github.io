@@ -86,6 +86,11 @@ export function cellView(canvas, rain, paper) {
 
   return {
     canvas,
+    /** a new paper colour (the desktop's theme changed) */
+    setPaper(rgb) {
+      paper = rgb;
+      baseKey = "";
+    },
     /** draw the field as it is now (call after field.update()) */
     render(field) {
       const g = field._g;

@@ -1,6 +1,8 @@
 import { mount } from "svelte";
 import "./app.css";
 import App from "./App.svelte";
+// applies the chosen wallpaper's colour theme before anything is drawn
+import "./lib/wallpaper.svelte.js";
 import { installSparkleHalftone, installWaveHalftone } from "./lib/halftone.js";
 import uiText from "./assets/fonts/google-sans-500.woff2?url";
 import uiBold from "./assets/fonts/google-sans-700.woff2?url";

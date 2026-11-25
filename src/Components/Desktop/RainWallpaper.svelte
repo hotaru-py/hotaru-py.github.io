@@ -3,8 +3,9 @@
   import { fade } from "svelte/transition";
   import { cellView, cssToRGB, paintGaps } from "../../lib/rainCells.js";
 
-  // NASA's last week of rain as a pixel field; fades in once the data is in, then onReady
-  let { onReady } = $props();
+  // NASA's last week of rain as a pixel field; fades in once the data is in, then onReady.
+  // `palette` changes crossfade in place (p5.rain blends between palettes)
+  let { palette = "moss", onReady } = $props();
 
   const FADE_MS = 600;
 
@@ -19,10 +20,20 @@
   // and takes over
   const CROSSFADE_HOURS = 4;
 
-  // faint grid lines in the 1px gaps between the squares, only on this wallpaper
-  const GRID_LINE = "rgba(70, 92, 36, 0.05)";
-  const GRID_LINE_TENTH = "rgba(70, 92, 36, 0.1)";
+  // Bloom: the "Bloom the smile, Bloom the dream!" cover's sky and rose. light rain is
+  // sky blue, heavy rain rose, snow the lavender of the blue-haired girl
+  const BLOOM = {
+    stain: [251, 218, 214],
+    rain: [[195, 219, 244], [163, 203, 239], [120, 181, 234], [250, 139, 153], [242, 100, 122], [216, 72, 99], [179, 54, 79]],
+    snow: [[214, 206, 238], [168, 156, 222], [115, 107, 173]],
+  };
+
+  // faint grid lines in the 1px gaps between the squares, in each palette's deep shade
+  const GRID_INK = { moss: "70, 92, 36", bloom: "47, 101, 162" };
+  let gridInk = GRID_INK.moss;
   function drawGridLines(ctx, g) {
+    const GRID_LINE = `rgba(${gridInk}, 0.05)`;
+    const GRID_LINE_TENTH = `rgba(${gridInk}, 0.1)`;
     const { cell, ox, oy, rows } = g;
     const x1 = ox + 240 * cell;
     const y1 = oy + rows * cell;
@@ -40,7 +51,7 @@
   const look = {
     source: "weekly",
     theme: "light",
-    palette: "moss",
+    palette,
     style: "flow",
     grid: "snap",
     background: false,
@@ -56,6 +67,12 @@
   /** @type {HTMLCanvasElement} */
   let gaps;
   let ready = $state(false);
+  // set once the fields exist, so palette changes can reach them
+  let applyPalette = null;
+  $effect(() => {
+    const name = palette; // read first: `?.` would skip it while still loading
+    applyPalette?.(name);
+  });
 
   onMount(() => {
     let cancelled = false;
@@ -73,10 +90,11 @@
     document.documentElement.addEventListener("pointerleave", handleLeave);
 
     // the desktop's own paper colour sits behind the rain, so it matches the taskbar
-    const paper =
+    const readPaper = () =>
       getComputedStyle(document.documentElement)
         .getPropertyValue("--color-moss-50")
         .trim() || "#f8f7ed";
+    let paper = readPaper();
 
     // only p5.rain itself is needed here, not p5.js: the fields are drawn by
     // rainCells.js, so the 1MB p5 download is left to the p5.rain window
@@ -90,6 +108,9 @@
       });
 
     function start(rain) {
+      if (!rain.PALETTES.bloom) rain.addPalette("bloom", { light: BLOOM });
+      look.palette = palette;
+      gridInk = GRID_INK[palette] ?? GRID_INK.moss;
       // the layer's size and place, kept up to date by the observer below rather than
       // measured every frame (measuring can force the page to lay itself out mid-frame)
       const box = { w: 1, h: 1, left: 0, top: 0 };
@@ -125,6 +146,14 @@
       let cur = 0; // the field being shown; the other one only runs while crossfading
       let crossfading = false;
       let gapLayout = null;
+      // the desktop's theme flips in the same update, so its paper is read a frame later
+      let paperStale = false;
+
+      applyPalette = (name) => {
+        for (const f of fields) f.set({ palette: name });
+        gridInk = GRID_INK[name] ?? GRID_INK.moss;
+        paperStale = true;
+      };
 
       const motion = motionAhead(first.data);
 
@@ -177,6 +206,12 @@
         }
         main = fields[cur];
 
+        if (paperStale) {
+          paperStale = false;
+          paper = readPaper();
+          for (const v of views) v.setPaper(cssToRGB(paper));
+          gapLayout = null;
+        }
         views[cur].render(main);
         if (main._g !== gapLayout) {
           gapLayout = main._g;

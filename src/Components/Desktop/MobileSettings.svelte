@@ -7,6 +7,8 @@
     WALLPAPERS,
     wallpaper,
     setWallpaper,
+    COLOURS,
+    setColours,
   } from "../../lib/wallpaper.svelte.js";
 
   // showLabels (dock labels) is restored from and saved to storage here
@@ -53,10 +55,15 @@
     if (!muted) playSound("open");
   }
 
+  // picking the one already showing still counts: it stops changing on its own
   function chooseWallpaper(id) {
-    if (wallpaper.current === id) return;
-    playSound("tactile", 0.1);
+    if (wallpaper.current !== id) playSound("tactile", 0.1);
     setWallpaper(id);
+  }
+
+  function chooseColours(id) {
+    if (wallpaper.colours !== id) playSound("tactile", 0.1);
+    setColours(id);
   }
 
   function switchUser() {
@@ -123,6 +130,21 @@
           ><span class="knob"></span></span
         >
       </button>
+      <div class="row wallpaper-row">
+        <span id="colours-label">Colours</span>
+        <div class="seg" role="radiogroup" aria-labelledby="colours-label">
+          {#each COLOURS as option (option.id)}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={wallpaper.colours === option.id}
+              onclick={() => chooseColours(option.id)}
+            >
+              {option.name}
+            </button>
+          {/each}
+        </div>
+      </div>
       <div class="row wallpaper-row">
         <span id="wallpaper-label">Wallpaper</span>
         <div class="seg" role="radiogroup" aria-labelledby="wallpaper-label">

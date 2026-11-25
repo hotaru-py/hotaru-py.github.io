@@ -1,27 +1,47 @@
 <script>
-  import { WALLPAPERS, wallpaper, setWallpaper } from "../lib/wallpaper.svelte.js";
+  import {
+    WALLPAPERS,
+    COLOURS,
+    wallpaper,
+    setWallpaper,
+    setColours,
+  } from "../lib/wallpaper.svelte.js";
   import { playSound } from "../lib/sounds.js";
   import { tactile } from "../lib/tactile.js";
 
   // p5.rain is picked but its data hasn't arrived yet (the Motion Blob is still up)
   const loading = $derived(wallpaper.current === "rain" && !wallpaper.rainReady);
 
-  function choose(id) {
-    if (wallpaper.current === id) return;
-    playSound("tactile", 0.1);
+  // picking the one already showing still counts: it stops changing on its own
+  function chooseWallpaper(id) {
+    if (wallpaper.current !== id) playSound("tactile", 0.1);
     setWallpaper(id);
   }
 
-  // a small, fixed field of rain cells for the p5.rain preview: two storm bands across
-  // a faint stain, cells bigger where the rain is heavier
+  function chooseColours(id) {
+    if (wallpaper.colours !== id) playSound("tactile", 0.1);
+    setColours(id);
+  }
+
+  const sliding = $derived(!wallpaper.pinned.wallpaper || !wallpaper.pinned.colours);
+
+  // each colour set as literals, so it shows whatever the site is in now: three
+  // swatches for its button, and rain shades (light to heavy) for the p5.rain preview
+  const LOOKS = {
+    bloom: {
+      swatches: ["#fa8b99", "#a3cbef", "#2a2748"],
+      shades: ["#a3cbef", "#78b5ea", "#fa8b99", "#d84863"],
+    },
+    komorebi: {
+      swatches: ["#c9d69a", "#89b04f", "#213a18"],
+      shades: ["#c9d69a", "#89b04f", "#4b732b", "#213a18"],
+    },
+  };
+
+  // a small, fixed field of rain cells for the previews: two storm bands across a faint
+  // stain, cells bigger where the rain is heavier
   const COLS = 18;
   const ROWS = 11;
-  const SHADES = [
-    "var(--color-moss-300)",
-    "var(--color-moss-500)",
-    "var(--color-moss-700)",
-    "var(--color-moss-900)",
-  ];
   const cells = [];
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
@@ -36,57 +56,94 @@
         x: col * 10 + 5,
         y: row * 10 + 5,
         size: 3 + level * 1.6,
-        fill: SHADES[level],
+        level,
       });
     }
   }
 </script>
 
-<div class="picker">
-  <p class="intro">Pick a wallpaper for the desktop.</p>
-  <div class="options" role="radiogroup" aria-label="Wallpaper">
-    {#each WALLPAPERS as option (option.id)}
-      <button
-        type="button"
-        class="option"
-        role="radio"
-        aria-checked={wallpaper.current === option.id}
-        onclick={() => choose(option.id)}
-        use:tactile
-      >
-        <span class="preview">
-          {#if option.id === "blob"}
-            <span class="blob" aria-hidden="true"></span>
-          {:else}
-            <svg viewBox="0 0 180 110" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-              {#each cells as cell}
-                <rect
-                  x={cell.x - cell.size / 2}
-                  y={cell.y - cell.size / 2}
-                  width={cell.size}
-                  height={cell.size}
-                  style:fill={cell.fill}
-                />
-              {/each}
-            </svg>
-            {#if loading}
-              <!-- three rain cells lighting up in turn while the data loads -->
-              <span class="loading" role="status">
-                <span class="cells" aria-hidden="true"
-                  ><span></span><span></span><span></span></span
-                >
-                Loading…
-              </span>
-            {/if}
-          {/if}
-        </span>
-        <span class="label">
-          <span class="check" aria-hidden="true"></span>
-          {option.name}
-        </span>
-      </button>
+{#snippet rainField(look)}
+  <svg viewBox="0 0 180 110" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    {#each cells as cell}
+      <rect
+        x={cell.x - cell.size / 2}
+        y={cell.y - cell.size / 2}
+        width={cell.size}
+        height={cell.size}
+        style:fill={look.shades[cell.level]}
+      />
     {/each}
-  </div>
+  </svg>
+{/snippet}
+
+<div class="picker">
+  {#if sliding}
+    <p class="note">
+      These take turns changing every 5 minutes, until you pick one yourself.
+    </p>
+  {/if}
+  <section class="group">
+    <h3 id="colours-heading">Colours</h3>
+    <div class="options" role="radiogroup" aria-labelledby="colours-heading">
+      {#each COLOURS as option (option.id)}
+        <button
+          type="button"
+          class="option colour"
+          role="radio"
+          aria-checked={wallpaper.colours === option.id}
+          onclick={() => chooseColours(option.id)}
+          use:tactile
+        >
+          <span class="label">
+            <span class="check" aria-hidden="true"></span>
+            {option.name}
+          </span>
+          <span class="swatches" aria-hidden="true">
+            {#each LOOKS[option.id].swatches as colour}
+              <span style:background={colour}></span>
+            {/each}
+          </span>
+        </button>
+      {/each}
+    </div>
+  </section>
+
+  <section class="group">
+    <h3 id="wallpaper-heading">Wallpaper</h3>
+    <div class="options" role="radiogroup" aria-labelledby="wallpaper-heading">
+      {#each WALLPAPERS as option (option.id)}
+        <button
+          type="button"
+          class="option"
+          role="radio"
+          aria-checked={wallpaper.current === option.id}
+          onclick={() => chooseWallpaper(option.id)}
+          use:tactile
+        >
+          <span class="preview">
+            {#if option.id === "blob"}
+              <span class="blob" aria-hidden="true"></span>
+            {:else}
+              {@render rainField(LOOKS[wallpaper.colours])}
+              {#if loading}
+                <!-- three rain cells lighting up in turn while the data loads -->
+                <span class="loading" role="status">
+                  <span class="cells" aria-hidden="true"
+                    ><span></span><span></span><span></span></span
+                  >
+                  Loading…
+                </span>
+              {/if}
+            {/if}
+          </span>
+          <span class="label">
+            <span class="check" aria-hidden="true"></span>
+            {option.name}
+          </span>
+        </button>
+      {/each}
+    </div>
+  </section>
 </div>
 
 <style>
@@ -97,16 +154,53 @@
     color: var(--color-ink);
   }
 
-  .intro {
+  .note {
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-ink-soft);
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
   }
 
   .options {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
+  }
+
+  /* colour options: name on the left, the set's three colours on the right */
+  .option.colour {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .swatches {
+    display: flex;
+  }
+
+  .swatches span {
+    width: 22px;
+    height: 22px;
+    border: var(--ink-border);
+    border-radius: 50%;
+  }
+
+  .swatches span + span {
+    margin-left: -6px;
   }
 
   .option {
@@ -153,7 +247,7 @@
     height: 100%;
   }
 
-  /* the Motion Blob, at rest: soft moss rings fading into the paper */
+  /* the Motion Blob, at rest: soft rings fading into the paper, in the site's colours */
   .blob {
     position: absolute;
     inset: 0;

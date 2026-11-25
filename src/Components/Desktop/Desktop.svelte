@@ -25,7 +25,7 @@
   // import Gallery from "../Gallery.svelte"; // hidden while the gallery is empty
   import Credits from "../credits.svelte";
   import WallpaperPicker from "../WallpaperPicker.svelte";
-  import { wallpaper } from "../../lib/wallpaper.svelte.js";
+  import { wallpaper, rainPalette } from "../../lib/wallpaper.svelte.js";
   import { credits } from "../../lib/siteContent.js";
   import { fileWindow } from "../../lib/workFiles.js";
   import { blogNav } from "../../lib/blogNav.svelte.js";
@@ -147,7 +147,7 @@
       title: "Wallpaper",
       icon: ICONS.wallpaper,
       component: WallpaperPicker,
-      size: { width: 520, height: 340 },
+      size: { width: 520, height: 410 },
       corner: "bottom-right",
       cornerRowOffset: 1, // just above Credits
       desktopOnly: true,
@@ -443,7 +443,10 @@
       <Wallpaper />
     {/if}
     {#if wallpaper.current === "rain"}
-      <RainWallpaper onReady={() => (wallpaper.rainReady = true)} />
+      <RainWallpaper
+        palette={rainPalette()}
+        onReady={() => (wallpaper.rainReady = true)}
+      />
     {/if}
   </div>
   <!-- NASA asks for credit wherever its data is shown (full wording in Credits). it fades

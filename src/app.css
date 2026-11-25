@@ -22,6 +22,26 @@
   --color-accent: var(--color-moss-500);
 }
 
+/* Bloom (a wallpaper option; recolours the whole site while it's chosen): the moss scale
+   becomes petal pink for paper and hovers, sky blue from 300 up, with navy ink */
+:root[data-theme="bloom"] {
+  --color-moss-50: #fff5f3;
+  --color-moss-100: #feeae7;
+  --color-moss-200: #fdd3cf;
+  --color-moss-300: #a3cbef;
+  --color-moss-400: #78b5ea;
+  --color-moss-500: #4f9be0;
+  --color-moss-600: #3a7fc6;
+  --color-moss-700: #2f65a2;
+  --color-moss-800: #2a4f7d;
+  --color-moss-900: #24395a;
+  --color-moss-950: #1b2840;
+  --color-ink: #2a2748;
+  --color-ink-soft: #4b4868;
+  --color-ink-muted: #7d7894;
+  --color-accent: #a3cbef;
+}
+
 :root {
   --ink-border: 2px solid var(--color-ink);
   --ink-shadow: 4px 4px 0 var(--color-ink);
