@@ -68,8 +68,10 @@
             <clipPath id="loader-logo-clip">
               <path d={LOGO_PATH} />
             </clipPath>
-            <linearGradient id="loader-fill" x1="0" y1="0" x2="1" y2="1">
+            <!-- mostly top to bottom, a little across: darkest at the top left -->
+            <linearGradient id="loader-fill" x1="0.25" y1="0" x2="0.75" y2="1">
               <stop offset="0" style:stop-color="var(--logo-fill-from)" />
+              <stop offset="0.45" style:stop-color="var(--logo-fill-mid)" />
               <stop offset="1" style:stop-color="var(--logo-fill-to)" />
             </linearGradient>
             <!-- coloured fractal noise, contrast stretched, laid over the gradient -->

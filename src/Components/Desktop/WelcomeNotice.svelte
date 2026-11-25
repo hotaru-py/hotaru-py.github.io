@@ -3,7 +3,7 @@
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { playSound } from "../../lib/sounds.js";
-  import avatar from "../../assets/firefly-avatar.webp";
+  import ProfileGlyph from "../ProfileGlyph.svelte";
 
   // phones get a banner from the top, desktops an XP-style tray balloon
   let { isMobile } = $props();
@@ -191,7 +191,7 @@
 
 {#snippet header()}
   <div class="header">
-    <img class="avatar" src={avatar} alt="" />
+    <span class="avatar"><ProfileGlyph label="" grid={17} /></span>
     <h2 class="title">Hey there!</h2>
   </div>
 {/snippet}
@@ -205,16 +205,11 @@
     margin-bottom: 6px;
   }
 
-  /* same green, ink-ringed circle as the start menu and About avatars */
+  /* the same dot-matrix profile as the start menu and About */
   .avatar {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     flex-shrink: 0;
-    padding: 1px;
-    border: var(--ink-border);
-    border-radius: 50%;
-    background-color: var(--color-accent);
-    object-fit: contain;
   }
 
   .title {

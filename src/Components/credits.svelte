@@ -35,29 +35,6 @@
     </section>
 
     <section class="credit-card">
-      <h3 class="credit-heading">Profile Picture &amp; Favicon</h3>
-      <p class="credit-text">
-        <strong>{credits.avatar.character}</strong> from
-        <em>{credits.avatar.source}</em>
-      </p>
-      <p class="credit-text credit-note">{credits.avatar.note}</p>
-    </section>
-
-    <section class="credit-card">
-      <h3 class="credit-heading">Rain Data (p5.rain)</h3>
-      <p class="credit-text">
-        Precipitation data from {#each credits.rainData.sources as source, i}{#if i > 0}{" via "}{/if}<a
-            class="credit-link"
-            href={source.url}
-            target="_blank"
-            rel="noopener noreferrer">{source.text}</a
-          >{/each}, in the p5.rain window and wallpaper.
-      </p>
-      <p class="credit-text credit-note">{credits.rainData.acknowledgement}</p>
-      <p class="credit-text credit-note">{credits.rainData.disclaimer}</p>
-    </section>
-
-    <section class="credit-card">
       <h3 class="credit-heading">Sounds</h3>
       <p class="credit-text">
         All from <a
@@ -79,6 +56,20 @@
           </li>
         {/each}
       </ul>
+    </section>
+
+    <section class="credit-card">
+      <h3 class="credit-heading">Rain Data (p5.rain)</h3>
+      <p class="credit-text">
+        Precipitation data from {#each credits.rainData.sources as source, i}{#if i > 0}{" via "}{/if}<a
+            class="credit-link"
+            href={source.url}
+            target="_blank"
+            rel="noopener noreferrer">{source.text}</a
+          >{/each}, in the p5.rain window and wallpaper.
+      </p>
+      <p class="credit-text credit-note">{credits.rainData.acknowledgement}</p>
+      <p class="credit-text credit-note">{credits.rainData.disclaimer}</p>
     </section>
   </div>
 

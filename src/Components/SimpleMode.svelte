@@ -11,12 +11,14 @@
     liveWork,
     githubProfile,
     projects,
+    gallery,
     bookmarks,
     emphasis,
     starLabel,
     schoolName,
     copyrightLine,
   } from "../lib/siteContent.js";
+  import { entryMedia, simpleHref } from "../lib/siteLinks.js";
   import {
     posts,
     formatPostDate,
@@ -27,11 +29,14 @@
 
   let { onSwitchUser } = $props();
 
+  // the gallery's tab appears once a folder has pictures
+  const galleryWithWork = gallery.filter((folder) => folder.items.length);
+
   const sections = [
     { id: "about", title: "About" },
     { id: "experience", title: "Experience" },
     { id: "projects", title: "Projects" },
-    // { id: "gallery", title: "Gallery" }, // hidden while the gallery is empty
+    ...(galleryWithWork.length ? [{ id: "gallery", title: "Gallery" }] : []),
     { id: "blog", title: "Blog" },
     { id: "skills", title: "Skills" },
     { id: "links", title: "Links" },
@@ -265,6 +270,7 @@
               {#if job.url}{@render link(job.url, job.company)}{:else}{job.company}{/if}
               <span class="muted">({job.period})</span>
             {/if}
+            {@render extras(job, `job-${slug(job.company)}`, job.company)}
           </li>
         {/each}
       </ul>
@@ -276,6 +282,7 @@
         {#each activities as club}
           <li>
             {#if club.url}{@render link(club.url, club.org)}{:else}<strong>{club.org}</strong>{/if}
+            {@render extras(club, `club-${slug(club.org)}`, club.org)}
             {#each club.roles as entry}
               {#if entry.description}
                 <details class="role-detail" use:foldable>
@@ -328,6 +335,33 @@
         {/each}
         <p>{@render link(githubProfile, "More on GitHub")}</p>
       {/if}
+    </section>
+    {:else if route.tab === "gallery"}
+    <section id="gallery">
+      <h2><span class="mark" aria-hidden="true">{"## "}</span>Gallery</h2>
+      {#each galleryWithWork as folder}
+        <h3>
+          <span class="mark" aria-hidden="true">{"### "}</span>{folder.name}
+          <span class="muted">({folder.items.length})</span>
+        </h3>
+        <ul class="gallery-list">
+          {#each folder.items as item (item.id)}
+            <li>
+              {#if item.image}
+                <a class="pic" href={item.image} target="_blank" rel="noopener noreferrer"
+                  ><img src={item.image} alt={item.alt ?? item.title} loading="lazy" /></a
+                >
+              {/if}
+              <strong>{item.title}</strong>
+              {#if item.date}<span class="muted">({formatPostDate(item.date)})</span>{/if}
+              {#if item.description}<br /><span class="muted">{item.description}</span>{/if}
+              {#if simpleHref(item.open)}
+                <br />{@render link(simpleHref(item.open), item.openLabel ?? "See related")}
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      {/each}
     </section>
     {:else if route.tab === "blog"}
     <section id="blog">
@@ -387,6 +421,32 @@
     </footer>
   </main>
 </div>
+
+<!-- an experience entry's pictures (each opens full size) and its links, as Simple
+     Mode's own section links -->
+{#snippet extras(entry, seed, title)}
+  {@const media = entryMedia(entry)}
+  {#if media.length}
+    <span class="media">
+      {#each media as pic, i}
+        <a href={pic.image} target="_blank" rel="noopener noreferrer"
+          ><img
+            src={pic.image}
+            alt={pic.alt || pic.caption || `${title}, picture ${i + 1}`}
+            loading="lazy"
+          /></a
+        >
+      {/each}
+    </span>
+  {/if}
+  {#if entry.links?.length}
+    <span class="entry-links">
+      {#each entry.links as item}
+        {#if simpleHref(item.open)}{@render link(simpleHref(item.open), item.label)}{/if}
+      {/each}
+    </span>
+  {/if}
+{/snippet}
 
 {#snippet link(href, label, external = !href.startsWith("#"))}<span class="link"
     ><span class="bracket" aria-hidden="true">{"[ "}</span><a
@@ -696,6 +756,47 @@
   /* a role's details, folding open inside its club's list item */
   .role-detail {
     margin-top: 0;
+  }
+
+  /* an experience entry's pictures: a row of small, ink-ruled thumbnails */
+  .media {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 2px;
+  }
+
+  .media a {
+    display: block;
+    width: 96px;
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--text);
+    overflow: hidden;
+  }
+
+  .media img,
+  .gallery-list img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .entry-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  .gallery-list li + li {
+    margin-top: 18px;
+  }
+
+  .gallery-list .pic {
+    display: block;
+    max-width: 420px;
+    margin-bottom: 6px;
+    border: 1px solid var(--text);
   }
 
   .role-line {

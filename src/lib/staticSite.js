@@ -17,6 +17,9 @@ import {
   schoolName,
 } from "./siteContent.js";
 
+// the gallery's folders that have pictures (empty ones are hidden everywhere)
+const galleryWithWork = gallery.filter((folder) => folder.items.length);
+
 const OG_IMAGE = "og-image.jpg";
 const SITE_NAME = "hotaru's PC";
 
@@ -180,10 +183,10 @@ export function renderStaticPage() {
     `</section>`,
 
     // gallery: only once it has work in it
-    ...(gallery.length
+    ...(galleryWithWork.length
       ? [
           `<section><h2>Gallery</h2>`,
-          ...gallery.map(
+          ...galleryWithWork.map(
             (folder) =>
               `<h3>${esc(folder.name)}</h3><ul>${folder.items.map((item) => li(`<strong>${esc(item.title)}</strong>${item.description ? `: ${esc(item.description)}` : ""}`)).join("")}</ul>`,
           ),
@@ -271,11 +274,11 @@ export function renderLlmsTxt() {
     }),
     `- [More on GitHub](${githubProfile})`,
     "",
-    ...(gallery.length
+    ...(galleryWithWork.length
       ? [
           "## Gallery",
           "",
-          ...gallery.flatMap((folder) =>
+          ...galleryWithWork.flatMap((folder) =>
             folder.items.map(
               (item) =>
                 `- ${folder.name}: ${item.title}${item.description ? `. ${item.description}` : ""}`,

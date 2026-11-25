@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import Logo from "../Logo.svelte";
-  import avatar from "../../assets/firefly-avatar.webp";
+  import ProfileGlyph from "../ProfileGlyph.svelte";
   import { isMuted, setMuted, playSound } from "../../lib/sounds.js";
   import { fade, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
@@ -140,7 +140,7 @@
           >
             <div class="menu-header-logo">
               <div class="menu-logo-container">
-                <img src={avatar} alt="hotaru logo" class="menu-logo" />
+                <ProfileGlyph label="hotaru" grid={17} />
               </div>
               <div class="menu-title">hotaru</div>
             </div>
@@ -373,20 +373,10 @@
   }
 
   .menu-logo-container {
-    width: 38px;
-    height: 38px;
-    background-color: var(--color-accent);
-    border: var(--ink-border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
     margin-right: 12px;
-  }
-
-  .menu-logo {
-    width: 32px;
-    height: 32px;
   }
 
   .menu-title {

@@ -66,26 +66,38 @@ export const projectFiles = projects.map((project) => ({
   icon: project.demo ? FILE_ICONS.rain : undefined,
 }));
 
-// the gallery's subfolders, with their pictures as files
-export const galleryFolders = gallery.map((folder) => ({
-  id: folder.id,
-  name: folder.name,
-  files: folder.items.map((item) => ({
-    key: `gallery-${folder.id}-${item.id}`,
-    kind: "gallery",
-    typeLabel: folder.typeLabel,
-    name: item.title,
-    fileName: `${item.id}.png`,
-    description: item.description,
-    date: item.date,
-    image: item.image ?? placeholderArt(item.id, item.title),
-    alt: item.title,
-    icon: FILE_ICONS.live,
-  })),
-}));
+// the gallery's subfolders that have pictures, with their pictures as files
+export const galleryFolders = gallery
+  .filter((folder) => folder.items.length)
+  .map((folder) => ({
+    id: folder.id,
+    name: folder.name,
+    files: folder.items.map((item) => ({
+      key: `gallery-${folder.id}-${item.id}`,
+      kind: "gallery",
+      typeLabel: folder.typeLabel,
+      name: item.title,
+      fileName: item.image?.split("/").pop() ?? `${item.id}.png`,
+      description: item.description,
+      date: item.date,
+      image: item.image ?? placeholderArt(item.id, item.title),
+      alt: item.alt ?? item.title,
+      icon: FILE_ICONS.live,
+      open: item.open,
+      openLabel: item.openLabel,
+    })),
+  }));
 
 /** every gallery picture, folder by folder (the phone's gallery widget cycles these) */
 export const galleryFiles = galleryFolders.flatMap((folder) => folder.files);
+
+/** whether the gallery has anything to show: its app and widget appear once it does */
+export const hasGallery = galleryFiles.length > 0;
+
+/** any file by its key: a live site, project or gallery picture */
+export function findFile(key) {
+  return [...liveFiles, ...projectFiles, ...galleryFiles].find((f) => f.key === key);
+}
 
 // openWindow() args for a file, so the explorer and widgets all open the same window
 export function fileWindow(file) {

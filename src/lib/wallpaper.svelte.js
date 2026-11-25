@@ -1,3 +1,5 @@
+import { updateFavicon } from "./favicon.js";
+
 // the desktop wallpaper and the site's colours, chosen separately, shared by the
 // desktop, the Wallpaper window and phone settings. the colours recolour the whole site,
 // login screen and Simple Mode included.
@@ -70,6 +72,7 @@ function applyColours() {
   else delete root.dataset.theme;
   const paper = getComputedStyle(root).getPropertyValue("--color-moss-50").trim();
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", paper);
+  updateFavicon();
 }
 applyColours();
 

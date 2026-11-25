@@ -1,5 +1,5 @@
 <script>
-  import { onMount, untrack } from "svelte";
+  import { getContext, onMount, untrack } from "svelte";
   import { fetchStars } from "../lib/githubStars.js";
   import { starLabel } from "../lib/siteContent.js";
   import { FILE_ICONS } from "../lib/workFiles.js";
@@ -7,6 +7,9 @@
   import P5Rain from "./P5Rain.svelte";
 
   let { file, isMobile = false } = $props();
+
+  // a picture (gallery or experience) can link to related things elsewhere on the site
+  const desktop = getContext("desktop");
 
   // shown until (or if) the live count can't be fetched
   let stars = $state(untrack(() => file.stars?.fallback ?? null));
@@ -91,6 +94,15 @@
         >
           {file.linkText} →
         </a>
+      {/if}
+      {#if file.open}
+        <button
+          type="button"
+          class="open-link"
+          onclick={() => desktop?.openTarget(file.open)}
+        >
+          {file.openLabel ?? "See related"} →
+        </button>
       {/if}
     </aside>
   </div>
@@ -313,9 +325,11 @@
     background-color: var(--color-accent);
     box-shadow: 3px 3px 0 var(--color-ink);
     color: var(--color-ink);
+    font-family: inherit;
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
+    cursor: pointer;
     transition:
       transform 0.15s ease,
       box-shadow 0.15s ease;

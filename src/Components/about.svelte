@@ -1,12 +1,5 @@
-<script module>
-  import { preloadImages } from "../lib/preload.js";
-  // padded so the whole drawing fits inside a circle (the start menu uses it too)
-  import avatar from "../assets/firefly-avatar.webp";
-
-  preloadImages([avatar]);
-</script>
-
 <script>
+  import ProfileGlyph from "./ProfileGlyph.svelte";
   import {
     about,
     emphasis,
@@ -16,7 +9,7 @@
 
 <div class="about-container">
   <div class="about-header">
-    <img src={avatar} alt="Hotaru" class="about-avatar" />
+    <span class="about-avatar"><ProfileGlyph label="Hotaru" /></span>
     <div>
       <h1 class="about-title">
         {about.greeting}
@@ -71,16 +64,12 @@
     margin-bottom: 20px;
   }
 
+  /* the dot-matrix profile: its own dots make the circle */
   .about-avatar {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    margin-right: 16px;
-    object-fit: contain;
-    background-color: var(--color-accent);
-    border: var(--ink-border);
-    box-shadow: 3px 3px 0 var(--color-ink);
-    padding: 2px;
+    flex-shrink: 0;
+    width: 140px;
+    height: 140px;
+    margin-right: 18px;
   }
 
   .about-title {

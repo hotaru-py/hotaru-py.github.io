@@ -64,13 +64,21 @@ export const about = {
   ],
 };
 
-// most recent first; `url` is optional (freelancing has no company page)
+// most recent first; `url` is optional (freelancing has no company page).
+// pictures and links, on a job, a club or a single role (all optional):
+//   media: [{ image, alt, caption, open }]  2-3 pictures shown under the entry, without
+//     expanding it. `image` is a path in public/ ("/experience/miniture-1.webp"); a click
+//     opens it in the picture viewer, or `open` instead (a target, as below)
+//   links: [{ label, open }]  buttons that open related things elsewhere on the site.
+//     `open` is a target (see siteLinks.js): { file: "live-miniture" }, { post: "<id>" },
+//     { app: "projects" } or { url: "https://..." }
 export const experience = [
   {
     role: "Software Development Engineering Intern",
     company: "Miniture",
     url: "https://miniture.in",
     period: "March 2025 - February 2026",
+    links: [{ label: "Project", open: { file: "live-miniture" } }],
     description:
       "Redesigned and built the company's storefront and mobile app, from design to code. Built the tools that let non-engineers manage pages, data and marketing themselves, then used analytics to keep improving the updated storefront after launch.",
   },
@@ -79,7 +87,7 @@ export const experience = [
     company: "Freelance (on and off)",
     period: "2020 - Present",
     description:
-      "Take up a few projects here and there, whenever I'm free (and require a source of income).",
+      "Take up a few projects here and there, whenever I'm free, not actively employed, and require a source of income.",
   },
 ];
 
@@ -237,18 +245,28 @@ export const featured = {
   file: "project-p5-rain",
 };
 
-// gallery subfolders, hidden while empty (commented out in Desktop and SimpleMode). an
-// item without an `image` gets a placeholder drawn from its id
+// gallery subfolders; an empty one is hidden, and the Gallery app, its widget and Simple
+// Mode's tab only appear once one has pictures. an item:
+//   { id: "poster-1", title: "...", date: "2026-11-17", description: "...",
+//     image: "/gallery/graphics/poster-1.webp", alt: "...", open: { post: "..." } }
+// `image` is a path in public/ (an item without one gets a placeholder drawn from its
+// id); `date`, `description`, `alt`, and `open` with its button's `openLabel` (a link
+// elsewhere on the site, see siteLinks.js) are optional
 export const gallery = [
-  // {
-  //   id: "art",
-  //   name: "Art",
-  //   typeLabel: "Art",
-  //   items: [{ id: "…", title: "…", date: "2026-11-17", description: "…", image: "/gallery/….webp" }],
-  // },
-  // { id: "mockups", name: "UI/UX Mockups", typeLabel: "UI/UX mockup", items: [] },
-  // { id: "graphics", name: "Graphic Design", typeLabel: "Graphic design", items: [] },
-  // { id: "photos", name: "Photos", typeLabel: "Photo", items: [] },
+  { id: "art", name: "Art", typeLabel: "Art", items: [] },
+  {
+    id: "mockups",
+    name: "UI/UX Mockups",
+    typeLabel: "UI/UX mockup",
+    items: [],
+  },
+  {
+    id: "graphics",
+    name: "Graphic Design",
+    typeLabel: "Graphic design",
+    items: [],
+  },
+  { id: "photos", name: "Photos", typeLabel: "Photo", items: [] },
 ];
 
 export const skillCategories = [
@@ -431,11 +449,6 @@ export const credits = {
         url: "https://www.youtube.com/c/sharyap",
       },
     ],
-  },
-  avatar: {
-    character: "Firefly",
-    source: "Honkai: Star Rail",
-    note: "Character and artwork © HoYoverse. Non-commercial usage.",
   },
   // NASA's terms for the p5.rain data (window and wallpaper), as the p5.rain README
   // asks: credit "NASA GPM IMERG via GIBS", GIBS's acknowledgement, no implied endorsement

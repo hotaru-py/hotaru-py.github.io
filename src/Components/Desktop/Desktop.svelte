@@ -11,7 +11,7 @@
   import WelcomeNotice from "./WelcomeNotice.svelte";
   import AboutTip from "./AboutTip.svelte";
   import BlogWidget from "./BlogWidget.svelte";
-  // import GalleryWidget from "./GalleryWidget.svelte"; // back once the gallery has work
+  import GalleryWidget from "./GalleryWidget.svelte";
   import SoonWidget from "./SoonWidget.svelte";
   import FeaturedWidget from "./FeaturedWidget.svelte";
   import { sparkleDots } from "../../lib/halftone.js";
@@ -22,12 +22,12 @@
   import Reach from "../reach.svelte";
   import Experience from "../Experience.svelte";
   import Blog from "../Blog.svelte";
-  // import Gallery from "../Gallery.svelte"; // hidden while the gallery is empty
+  import Gallery from "../Gallery.svelte";
   import Credits from "../credits.svelte";
   import WallpaperPicker from "../WallpaperPicker.svelte";
   import { wallpaper, rainPalette } from "../../lib/wallpaper.svelte.js";
   import { credits } from "../../lib/siteContent.js";
-  import { fileWindow } from "../../lib/workFiles.js";
+  import { fileWindow, findFile, hasGallery } from "../../lib/workFiles.js";
   import { blogNav } from "../../lib/blogNav.svelte.js";
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
@@ -125,14 +125,18 @@
       size: { width: 640, height: 520 },
     },
     { id: "skills", title: "Skills", icon: ICONS.skills, component: Skills },
-    // hidden while the gallery is empty (see `gallery` in siteContent.js)
-    // {
-    //   id: "gallery",
-    //   title: "Gallery",
-    //   icon: ICONS.gallery,
-    //   component: Gallery,
-    //   size: { width: 760, height: 520 },
-    // },
+    // only once the gallery has pictures (see `gallery` in siteContent.js)
+    ...(hasGallery
+      ? [
+          {
+            id: "gallery",
+            title: "Gallery",
+            icon: ICONS.gallery,
+            component: Gallery,
+            size: { width: 760, height: 520 },
+          },
+        ]
+      : []),
     {
       id: "credits",
       title: "Credits",
@@ -183,8 +187,9 @@
       cornerRowOffset: 2,
     },
     {
+      // the gallery's pictures once it has some; until then a "soon" card
       id: "widget-soon",
-      widget: soonWidget,
+      widget: hasGallery ? galleryWidget : soonWidget,
       span: { cols: 2, rows: 2 },
       corner: "top-right",
       cornerRowOffset: 2,
@@ -238,7 +243,25 @@
   );
 
   // lets window contents open windows of their own (e.g. a file from the Work folder)
-  setContext("desktop", { openWindow });
+  // a link elsewhere in the site (see siteLinks.js): a file, blog post, app or web page
+  function openTarget(target) {
+    if (!target) return;
+    if (target.url) {
+      window.open(target.url, "_blank", "noopener,noreferrer");
+    } else if (target.post) {
+      openPost(target.post);
+    } else if (target.app) {
+      const app = desktopIcons.find((icon) => icon.id === target.app);
+      if (app) openWindow(app);
+      else console.warn(`openTarget: no app "${target.app}"`);
+    } else if (target.file) {
+      const file = findFile(target.file);
+      if (file) openWindow(fileWindow(file));
+      else console.warn(`openTarget: no file "${target.file}"`);
+    }
+  }
+
+  setContext("desktop", { openWindow, openTarget });
 
   // desktops open About Me right of the icon columns; phones point a bubble at its dock
   // icon instead, once per visit
@@ -431,6 +454,9 @@
 {#snippet soonWidget()}
   <SoonWidget />
 {/snippet}
+{#snippet galleryWidget()}
+  <GalleryWidget onOpenFile={(file) => openWindow(fileWindow(file))} />
+{/snippet}
 {#snippet featuredWidget()}
   <FeaturedWidget onOpenFile={(file) => openWindow(fileWindow(file))} />
 {/snippet}
@@ -573,7 +599,11 @@
           </div>
           <div class="widget-row">
             <FeaturedWidget onOpenFile={(file) => openWindow(fileWindow(file))} />
-            <SoonWidget />
+            {#if hasGallery}
+              <GalleryWidget onOpenFile={(file) => openWindow(fileWindow(file))} />
+            {:else}
+              <SoonWidget />
+            {/if}
           </div>
         </section>
       </div>
