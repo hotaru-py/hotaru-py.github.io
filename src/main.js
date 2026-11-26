@@ -1,5 +1,6 @@
 import { mount } from "svelte";
 import "./app.css";
+import "./lib/uiScale.svelte.js";
 import App from "./App.svelte";
 // applies the chosen wallpaper's colour theme before anything is drawn
 import "./lib/wallpaper.svelte.js";

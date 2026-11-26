@@ -92,6 +92,12 @@
     height: auto;
   }
 
+  /* the scaled desktop and login screen are laid out larger or smaller than the window
+     (a transform doesn't change layout size), so the page itself must never scroll */
+  :global(html:not([data-mode="simple"])) {
+    overflow: hidden;
+  }
+
   /* only the page itself scrolls: a scrolling body would also trap Simple Mode's sticky
      section bar, which sticks to its nearest scroller */
   :global(html[data-mode="simple"]) {
@@ -102,11 +108,15 @@
     overflow: visible;
   }
 
+  /* laid out at the reference size (the screen divided by --ui-scale) and scaled up or
+     down to fill it; fixed-position children are placed against it, not the screen */
   .desktop-main {
-    width: 100vw;
+    width: calc(100vw / var(--ui-scale, 1));
     /* dvh is the visible height; on phones vh ignores the address bar and runs under the dock */
-    height: 100vh;
-    height: 100dvh;
+    height: calc(100vh / var(--ui-scale, 1));
+    height: calc(100dvh / var(--ui-scale, 1));
+    transform: scale(var(--ui-scale, 1));
+    transform-origin: 0 0;
   }
 
   /* mode switches: a slightly slower, eased crossfade than the browser default */

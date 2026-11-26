@@ -1,4 +1,5 @@
 <script>
+  import { ui } from "../../lib/uiScale.svelte.js";
   import { onMount, untrack } from "svelte";
   import { playSound } from "../../lib/sounds.js";
   import { CRASH_EVENT } from "../../lib/xylophone.js";
@@ -137,11 +138,11 @@
     if (isResizing) {
       const newWidth = Math.max(
         MIN_WIDTH,
-        startWidth + resizeDirX * (e.clientX - startX),
+        startWidth + (resizeDirX * (e.clientX - startX)) / ui.scale,
       );
       const newHeight = Math.max(
         MIN_HEIGHT,
-        startHeight + resizeDirY * (e.clientY - startY),
+        startHeight + (resizeDirY * (e.clientY - startY)) / ui.scale,
       );
 
       currentWidth = newWidth;
@@ -184,8 +185,14 @@
       const maxY = desktop.clientHeight - taskbarSpace - TITLE_BAR_H;
       const minX = MIN_VISIBLE_X - currentWidth;
       const maxX = desktop.clientWidth - MIN_VISIBLE_X;
-      currentX = Math.min(maxX, Math.max(minX, offsetX + (e.clientX - startX)));
-      currentY = Math.min(maxY, Math.max(0, offsetY + (e.clientY - startY)));
+      currentX = Math.min(
+        maxX,
+        Math.max(minX, offsetX + (e.clientX - startX) / ui.scale),
+      );
+      currentY = Math.min(
+        maxY,
+        Math.max(0, offsetY + (e.clientY - startY) / ui.scale),
+      );
     }
   }
 

@@ -1,5 +1,6 @@
 <script>
   import { fade, fly } from "svelte/transition";
+  import { ui } from "../../lib/uiScale.svelte.js";
   import DesktopIcon from "./DesktopIcon.svelte";
 
   // icons take a cell, widgets a block of cells (`span`); both drag, snap and reset alike.
@@ -235,8 +236,8 @@
 
   function handlePointerMove(e) {
     if (!drag || e.pointerId !== drag.pointerId) return;
-    drag.dx = e.clientX - drag.startX;
-    drag.dy = e.clientY - drag.startY;
+    drag.dx = (e.clientX - drag.startX) / ui.scale;
+    drag.dy = (e.clientY - drag.startY) / ui.scale;
     if (!drag.active && Math.hypot(drag.dx, drag.dy) > DRAG_THRESHOLD) {
       drag.active = true;
       settling = false; // follow the pointer directly, no easing lag

@@ -75,7 +75,7 @@
   class:preview-simple={previewSimple}
   in:fade={{ duration: 250 }}
 >
-  <Wallpaper />
+  <div class="wallpaper-fix"><Wallpaper /></div>
   <!-- Simple Mode's plain background, faded in over the wallpaper while previewing -->
   <div class="simple-wash" aria-hidden="true"></div>
 
@@ -229,12 +229,31 @@
 </div>
 
 <style>
+  /* the wallpaper draws in screen pixels: this undoes the scaling for it */
+  .wallpaper-fix {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(100% * var(--ui-scale, 1));
+    height: calc(100% * var(--ui-scale, 1));
+    transform: scale(calc(1 / var(--ui-scale, 1)));
+    transform-origin: 0 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
   .picker {
-    --bar-height: clamp(56px, 11vh, 96px);
+    --bar-height: clamp(56px, calc(11vh / var(--ui-scale, 1)), 96px);
     /* the login screen is in the mono face, like Simple Mode */
     font-family: var(--font-terminal);
+    /* laid out at the reference size and scaled to the screen (see uiScale.svelte.js) */
     position: fixed;
-    inset: 0;
+    left: 0;
+    top: 0;
+    width: calc(100vw / var(--ui-scale, 1));
+    height: calc(100vh / var(--ui-scale, 1));
+    transform: scale(var(--ui-scale, 1));
+    transform-origin: 0 0;
     isolation: isolate;
     overflow: auto;
     display: flex;

@@ -29,6 +29,7 @@
   import { credits } from "../../lib/siteContent.js";
   import { fileWindow, findFile, hasGallery } from "../../lib/workFiles.js";
   import { blogNav } from "../../lib/blogNav.svelte.js";
+  import { ui } from "../../lib/uiScale.svelte.js";
   import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
@@ -343,8 +344,8 @@
   });
 
   function updateDesktopDimensions() {
-    desktopWidth = window.innerWidth;
-    desktopHeight = window.innerHeight;
+    desktopWidth = window.innerWidth / ui.scale;
+    desktopHeight = window.innerHeight / ui.scale;
     isMobileView = window.innerWidth <= 768;
   }
 
@@ -724,9 +725,16 @@
     animation: intro-in 450ms cubic-bezier(0.22, 1, 0.36, 1) var(--intro-lead) backwards;
   }
 
+  /* wallpapers draw in screen pixels, so this undoes the screen's scaling: it is the
+     size of the real screen again, at the real screen's scale */
   .wallpaper-layer {
     position: absolute;
-    inset: 0;
+    left: 0;
+    top: 0;
+    width: calc(100% * var(--ui-scale, 1));
+    height: calc(100% * var(--ui-scale, 1));
+    transform: scale(calc(1 / var(--ui-scale, 1)));
+    transform-origin: 0 0;
     z-index: -1;
     pointer-events: none;
   }
@@ -738,10 +746,8 @@
   }
 
   .desktop-container {
-    width: 100vw;
-    /* dvh is the visible height; on phones vh ignores the address bar and runs under the dock */
-    height: 100vh;
-    height: 100dvh;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
