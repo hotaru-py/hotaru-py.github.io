@@ -21,8 +21,8 @@
   ];
   // the pixel world map under the rain: off, or soft (as p5.rain's `map` strength)
   const MAPS = [
-    { id: "off", label: "Off", value: false },
-    { id: "soft", label: "Soft", value: 0.18 },
+    { id: "off", label: "Map Off", value: false },
+    { id: "soft", label: "Map On", value: 0.18 },
   ];
   const mapStrength = (id) => MAPS.find((m) => m.id === id)?.value ?? false;
 
@@ -147,7 +147,8 @@
           };
         }, layer);
         observer = new ResizeObserver(() => {
-          if (layer.clientWidth && layer.clientHeight) sketch.resizeCanvas(...size());
+          if (layer.clientWidth && layer.clientHeight)
+            sketch.resizeCanvas(...size());
         });
         observer.observe(layer);
       })
@@ -445,13 +446,28 @@
     height: 7px;
   }
   .sw-ocean {
-    background: linear-gradient(90deg, #2a7fd4 0 33%, #35b6e8 33% 66%, #ff5fa2 66%);
+    background: linear-gradient(
+      90deg,
+      #2a7fd4 0 33%,
+      #35b6e8 33% 66%,
+      #ff5fa2 66%
+    );
   }
   .sw-moss {
-    background: linear-gradient(90deg, #3e782a 0 33%, #b0d43a 33% 66%, #ff963c 66%);
+    background: linear-gradient(
+      90deg,
+      #3e782a 0 33%,
+      #b0d43a 33% 66%,
+      #ff963c 66%
+    );
   }
   .sw-ember {
-    background: linear-gradient(90deg, #941e22 0 33%, #f06234 33% 66%, #ffe8c8 66%);
+    background: linear-gradient(
+      90deg,
+      #941e22 0 33%,
+      #f06234 33% 66%,
+      #ffe8c8 66%
+    );
   }
 
   .meta {

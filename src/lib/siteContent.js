@@ -41,10 +41,10 @@ export const about = {
     "Play the piano",
     "Random doodling",
     "Poke into electronics",
-    "Video games (old and new)",
-    "Play some tennis",
     "Watch Movies/TV/Anime",
+    "Video games (old and new)",
     "Listen to music (playlist more diverse than a friend group in a college brochure)",
+    "Play some tennis",
     "Can't think of anything else at this hour, will add more later",
   ],
   // most recent first. `board` is shown after the name ("School - CBSE"); `type` is the
@@ -80,7 +80,7 @@ export const experience = [
     period: "March 2025 - February 2026",
     links: [{ label: "Project", open: { file: "live-miniture" } }],
     description:
-      "Redesigned and built the company's storefront and mobile app, from design to code. Built the tools that let non-engineers manage pages, data and marketing themselves, then used analytics to keep improving the updated storefront after launch.",
+      "Redesigned and built the company's storefront and mobile app, then used analytics to keep improving the updated storefront and apps after launch. Built internal tools that let non-engineers manage pages, data and marketing themselves.",
   },
   {
     role: "Web Development, UI/UX & Graphic Design",

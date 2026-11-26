@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
   import { cellView, cssToRGB, paintGaps } from "../../lib/rainCells.js";
+  import { ui } from "../../lib/uiScale.svelte.js";
 
   // NASA's last week of rain as a pixel field; fades in once the data is in, then onReady.
   // `palette` changes crossfade in place (p5.rain blends between palettes)
@@ -56,6 +57,9 @@
     grid: "snap",
     background: false,
     start: 96,
+    // the pointer's lens: p5.rain's default is a 120px radius. wider (and scaled with the
+    // screen, which draws in real pixels) so it reads on a big desktop
+    lens: { radius: Math.round(210 * ui.scale), strength: 7 },
   };
 
   /** @type {HTMLDivElement} */

@@ -122,11 +122,13 @@ export function cellView(canvas, rain, paper) {
         if (a <= 0) continue;
         const c = gy * COLS + gx;
         const b = c >= 0 && c < N ? boost[c] : 0;
-        let lv = plv[k] + b * 0.4;
+        // the lens (b, 0 to 0.5 at its centre) pushes drops to the heavy end of the ramp
+        // and darkens them, so a hover shows as a clear spot of strong colour
+        let lv = plv[k] + b * 1.4;
         lv = lv < 0 ? 0 : lv > 1 ? 1 : lv;
         const ci = ((lv * 63) | 0) * 3;
         const ramp = psn[k] ? P.snow : P.rain;
-        const al = a / 20;
+        const al = Math.min(1, a / 20 + b * 0.8);
         const i = (yy * COLS + gx) * 4;
         px[i] += (ramp[ci] - px[i]) * al;
         px[i + 1] += (ramp[ci + 1] - px[i + 1]) * al;
