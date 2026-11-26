@@ -1,3 +1,9 @@
+<script module>
+  // the blob carries on across screens (the login screen, then the desktop): its clock
+  // and where every particle is live here, so a new one picks up where the last left off
+  const shared = { origin: 0, state: null, width: 0, height: 0 };
+</script>
+
 <script>
   import { onMount } from "svelte";
 
@@ -316,7 +322,34 @@
     }
 
     resize();
-    settle(0);
+    const now0 = performance.now();
+    if (!shared.origin) shared.origin = now0;
+
+    // pick up the previous blob's state if the screen is the same size
+    function restore() {
+      const s = shared.state;
+      [anchor.x, anchor.y, anchor.vx, anchor.vy] = s;
+      particles.forEach((p, i) => {
+        const o = 4 + i * 4;
+        [p.x, p.y, p.vx, p.vy] = [s[o], s[o + 1], s[o + 2], s[o + 3]];
+      });
+    }
+    function save() {
+      const s = (shared.state ??= new Float32Array(4 + particles.length * 4));
+      [s[0], s[1], s[2], s[3]] = [anchor.x, anchor.y, anchor.vx, anchor.vy];
+      particles.forEach((p, i) => {
+        const o = 4 + i * 4;
+        [s[o], s[o + 1], s[o + 2], s[o + 3]] = [p.x, p.y, p.vx, p.vy];
+      });
+      shared.width = width;
+      shared.height = height;
+    }
+
+    if (shared.state && shared.width === width && shared.height === height) {
+      restore();
+    } else {
+      settle(reducedMotion ? 0 : (now0 - shared.origin) / 1000);
+    }
     draw();
 
     if (reducedMotion) {
@@ -334,13 +367,13 @@
 
     let frame;
     let last = performance.now();
-    const start = last;
 
     function loop(now) {
       // clamp so a backgrounded tab doesn't make the blob explode on return
       const dt = Math.min((now - last) / 1000, 1 / 30);
       last = now;
-      step((now - start) / 1000, dt);
+      step((now - shared.origin) / 1000, dt);
+      save();
       draw();
       frame = requestAnimationFrame(loop);
     }

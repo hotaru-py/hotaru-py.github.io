@@ -25,14 +25,19 @@
 
   let width = $state(0);
   let height = $state(0);
-  // rows fill the height top to bottom like a desktop's; columns take the same step so
-  // cells stay square, centred across (any spare height, past MAX_GAP, goes at the bottom)
+  // rows fill the height top to bottom like a desktop's (any spare height, past MAX_GAP,
+  // goes at the bottom). as many columns as fit at that step, then spread so the first
+  // and last sit exactly MARGIN from the edges: the step across is never smaller than
+  // the one down, and at most a column's share wider
   const rows = $derived(fit(height));
   const step = $derived(spread(height, rows));
   const cols = $derived(
     Math.max(1, Math.floor((width - 2 * MARGIN - CELL) / step) + 1),
   );
-  const originX = $derived((width - (cols - 1) * step - CELL) / 2);
+  const stepX = $derived(
+    cols < 2 ? step : (width - 2 * MARGIN - CELL) / (cols - 1),
+  );
+  const originX = MARGIN;
   const originY = MARGIN;
 
   function fit(size) {
@@ -76,7 +81,7 @@
   const dropCell = $derived.by(() => {
     if (!dragged) return null;
     const from = placed[dragged.id];
-    const col = Math.round(from.col + drag.dx / step);
+    const col = Math.round(from.col + drag.dx / stepX);
     const row = Math.round(from.row + drag.dy / step);
     return nearestFree(
       { col, row },
@@ -87,10 +92,10 @@
     );
   });
 
-  const cellX = (cell) => originX + cell.col * step;
+  const cellX = (cell) => originX + cell.col * stepX;
   const cellY = (cell) => originY + cell.row * step;
   // a block of cells, from the first cell's corner to the far edge of the last one
-  const spanW = (span) => (span.cols - 1) * step + CELL;
+  const spanW = (span) => (span.cols - 1) * stepX + CELL;
   const spanH = (span) => (span.rows - 1) * step + CELL;
   const boxW = (item) => spanW(spanOf(item));
   const boxH = (item) => spanH(spanOf(item));

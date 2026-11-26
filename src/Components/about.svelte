@@ -49,10 +49,10 @@
 </div>
 
 <style>
+  /* scrolls with the window as a whole, header included */
   .about-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
     width: 100%;
   }
 
@@ -84,10 +84,6 @@
     font-weight: 500;
     color: var(--color-ink-muted);
     white-space: nowrap;
-  }
-
-  .about-content {
-    overflow-y: auto;
   }
 
   .about-paragraph {

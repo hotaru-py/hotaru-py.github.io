@@ -54,7 +54,8 @@
 
   // the side-profile dot matrix, in the site's ink on its paper. `grid`: 33 for larger
   // avatars (the default), 17 for small icons. one canvas, drawn by one animation loop
-  // (hundreds of separately animated SVG dots were heavy on phones)
+  // (hundreds of separately animated SVG dots were heavy on phones). each dot is a
+  // stamp of one pre-drawn circle: filling ~850 separate paths a frame was slow in Firefox
   let { label = "hotaru", grid = LARGEST } = $props();
 
   /** @type {HTMLCanvasElement} */
@@ -65,11 +66,21 @@
     const ctx = canvas.getContext("2d");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let ink = "";
+    let sprite = null;
     let raf = 0;
     let start = 0;
 
+    // a solid circle in the ink colour, big enough to scale down from sharply
+    const SPRITE = 64;
     const readInk = () => {
       ink = getComputedStyle(canvas).getPropertyValue("--color-ink").trim() || "#161614";
+      sprite ??= document.createElement("canvas");
+      sprite.width = sprite.height = SPRITE;
+      const sc = sprite.getContext("2d");
+      sc.fillStyle = ink;
+      sc.beginPath();
+      sc.arc(SPRITE / 2, SPRITE / 2, SPRITE / 2, 0, Math.PI * 2);
+      sc.fill();
     };
 
     // sized to the element at the screen's pixel density
@@ -83,7 +94,6 @@
     // t: ms since the animation started (Infinity: the finished picture)
     function draw(t) {
       ctx.clearRect(0, 0, glyph.n, glyph.n);
-      ctx.fillStyle = ink;
       for (const dot of glyph.dots) {
         const p = clamp01((t - dot.pop) / POP);
         if (p <= 0) continue;
@@ -93,9 +103,8 @@
           alpha = BACKGROUND.ink + (dot.ink - BACKGROUND.ink) * (1 - (1 - k) ** 2);
         }
         ctx.globalAlpha = alpha * Math.min(1, p * 2);
-        ctx.beginPath();
-        ctx.arc(dot.x, dot.y, dot.r * Math.max(0, backOut(p)), 0, Math.PI * 2);
-        ctx.fill();
+        const r = dot.r * Math.max(0, backOut(p));
+        ctx.drawImage(sprite, dot.x - r, dot.y - r, 2 * r, 2 * r);
       }
       ctx.globalAlpha = 1;
     }
