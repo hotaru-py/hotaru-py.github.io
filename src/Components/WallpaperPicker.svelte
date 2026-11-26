@@ -1,10 +1,8 @@
 <script>
   import {
     WALLPAPERS,
-    COLOURS,
     wallpaper,
     setWallpaper,
-    setColours,
   } from "../lib/wallpaper.svelte.js";
   import { playSound } from "../lib/sounds.js";
   import { tactile } from "../lib/tactile.js";
@@ -18,24 +16,10 @@
     setWallpaper(id);
   }
 
-  function chooseColours(id) {
-    if (wallpaper.colours !== id) playSound("tactile", 0.1);
-    setColours(id);
-  }
-
-  const sliding = $derived(!wallpaper.pinned.wallpaper || !wallpaper.pinned.colours);
-
-  // each colour set as literals, so it shows whatever the site is in now: three
-  // swatches for its button, and rain shades (light to heavy) for the p5.rain preview
+  // rain shades (light to heavy) for the p5.rain preview, per colour set
   const LOOKS = {
-    bloom: {
-      swatches: ["#fa8b99", "#a3cbef", "#2a2748"],
-      shades: ["#a3cbef", "#78b5ea", "#fa8b99", "#d84863"],
-    },
-    komorebi: {
-      swatches: ["#c9d69a", "#89b04f", "#213a18"],
-      shades: ["#c9d69a", "#89b04f", "#4b732b", "#213a18"],
-    },
+    bloom: { shades: ["#a3cbef", "#78b5ea", "#fa8b99", "#d84863"] },
+    komorebi: { shades: ["#c9d69a", "#89b04f", "#4b732b", "#213a18"] },
   };
 
   // a small, fixed field of rain cells for the previews: two storm bands across a faint
@@ -77,37 +61,6 @@
 {/snippet}
 
 <div class="picker">
-  {#if sliding}
-    <p class="note">
-      These take turns changing every 5 minutes, until you pick one yourself.
-    </p>
-  {/if}
-  <section class="group">
-    <h3 id="colours-heading">Colours</h3>
-    <div class="options" role="radiogroup" aria-labelledby="colours-heading">
-      {#each COLOURS as option (option.id)}
-        <button
-          type="button"
-          class="option colour"
-          role="radio"
-          aria-checked={wallpaper.colours === option.id}
-          onclick={() => chooseColours(option.id)}
-          use:tactile
-        >
-          <span class="label">
-            <span class="check" aria-hidden="true"></span>
-            {option.name}
-          </span>
-          <span class="swatches" aria-hidden="true">
-            {#each LOOKS[option.id].swatches as colour}
-              <span style:background={colour}></span>
-            {/each}
-          </span>
-        </button>
-      {/each}
-    </div>
-  </section>
-
   <section class="group">
     <h3 id="wallpaper-heading">Wallpaper</h3>
     <div class="options" role="radiogroup" aria-labelledby="wallpaper-heading">
@@ -154,12 +107,6 @@
     color: var(--color-ink);
   }
 
-  .note {
-    margin: 0;
-    font-size: 13px;
-    color: var(--color-ink-soft);
-  }
-
   .group {
     display: flex;
     flex-direction: column;
@@ -181,27 +128,6 @@
     gap: 16px;
   }
 
-  /* colour options: name on the left, the set's three colours on the right */
-  .option.colour {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .swatches {
-    display: flex;
-  }
-
-  .swatches span {
-    width: 22px;
-    height: 22px;
-    border: var(--ink-border);
-    border-radius: 50%;
-  }
-
-  .swatches span + span {
-    margin-left: -6px;
-  }
 
   .option {
     display: flex;

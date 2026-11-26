@@ -151,7 +151,7 @@
       title: "Wallpaper",
       icon: ICONS.wallpaper,
       component: WallpaperPicker,
-      size: { width: 520, height: 410 },
+      size: { width: 520, height: 300 },
       corner: "bottom-right",
       cornerRowOffset: 1, // just above Credits
       desktopOnly: true,
